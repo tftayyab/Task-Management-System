@@ -1,0 +1,29 @@
+{
+  "name": "task-management-system",
+  "version": "1.0.0",
+  "description": "This is a **Task Management System** developed as part of a software development internship assignment. The application allows users to create, update, delete, and manage tasks with advanced features like authentication, search, filters, and progress tracking.",
+  "main": "index.js",
+ "scripts": {
+  "start": "node server.js",
+  "dev": "nodemon server.js"
+},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tftayyab/Task-Management-System.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tftayyab/Task-Management-System/issues"
+  },
+  "homepage": "https://github.com/tftayyab/Task-Management-System#readme",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "mongoose": "^8.15.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}

@@ -3,6 +3,7 @@ const app = express();
 
 const mongoose = require('mongoose');
 
+app.use(express.json());
 const userRouter = require('./routes/tasks'); 
 
 mongoose.connect('mongodb://127.0.0.1:27017/taskdb', {
@@ -15,6 +16,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/taskdb', {
 
 app.set('view engine', 'ejs');
 app.use('/tasks', userRouter); 
+
 
 app.get("/", (req, res) => {
     res.render("index");

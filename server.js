@@ -23,7 +23,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/taskdb', {
 
 app.set('view engine', 'ejs');
 app.use('/tasks', taskRoutes);
-app.use('/tasks', taskByIdRoutes); 
+app.use('/task', taskByIdRoutes); 
 
 
 app.get("/", (req, res) => {

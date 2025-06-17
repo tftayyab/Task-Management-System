@@ -1,8 +1,11 @@
-.WelcomeMessage{
-  color: #000;
-font-family: Inter;
-font-size: 2.25rem;
-font-style: normal;
-font-weight: 500;
-line-height: 2.125rem; /* 94.444% */
+@import "tailwindcss";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+  }
 }

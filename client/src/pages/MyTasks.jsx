@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
-import '../../css/Tasks.css';
 import api from '../api'; // Axios instance
 
-function AllTasks() {
+function MyTasks() {
   const [tasks, setTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState(null);
   const [newTask, setNewTask] = useState({
@@ -169,4 +168,4 @@ function AllTasks() {
   );
 }
 
-export default AllTasks;
+export default MyTasks;

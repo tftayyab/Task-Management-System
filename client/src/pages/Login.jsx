@@ -1,13 +1,10 @@
 import '../App.css';
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
-function Home() {
+function Login() {
   useEffect(() => {
-    document.title = 'Home';
+    document.title = 'Login';
   }, []);
-
-   const navigate = useNavigate();
 
   return (
     <div className="relative w-full h-screen bg-gray-100 overflow-hidden">
@@ -37,8 +34,7 @@ function Home() {
 
         {/* Buttons */}
         <div className="flex gap-6">
-          <button className="text-[#F8F9FB] bg-[#FF9090] text-sm sm:text-base font-medium px-6 py-3 sm:px-10 sm:py-4 rounded"
-                            onClick={() => navigate('/login')}>
+          <button className="text-[#F8F9FB] bg-[#FF9090] text-sm sm:text-base font-medium px-6 py-3 sm:px-10 sm:py-4 rounded">
             Login
           </button>
           <button className="text-[#F8F9FB] bg-[#FF9090] text-sm sm:text-base font-medium px-6 py-3 sm:px-10 sm:py-4 rounded">
@@ -50,4 +46,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default Login;

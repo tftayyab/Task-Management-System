@@ -2,7 +2,7 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
-function TaskDetails() {
+function ViewTasks() {
   const { id } = useParams();
   const [task, setTask] = useState(null);
 
@@ -22,4 +22,4 @@ function TaskDetails() {
   );
 }
 
-export default TaskDetails;
+export default ViewTasks;

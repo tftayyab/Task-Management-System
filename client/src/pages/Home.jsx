@@ -7,11 +7,11 @@ function Home() {
     document.title = 'Home';
   }, []);
 
-   const navigate = useNavigate();
+  const navigate = useNavigate();
 
   return (
     <div className="relative w-full h-screen bg-gray-100 overflow-hidden">
-      
+
       {/* Background Image */}
       <div className="absolute inset-0 bg-[url('/bg.jpg')] bg-center bg-cover z-0" />
 
@@ -22,7 +22,7 @@ function Home() {
         <img
           src="/icon.png"
           alt="Logo"
-          className="w-24 h-24 sm:w-40 sm:h-40 mb-8"
+          className="w-24 h-24 sm:w-40 sm:h-40 mb-8 transition-transform duration-500 hover:rotate-6"
         />
 
         {/* Heading */}
@@ -37,11 +37,16 @@ function Home() {
 
         {/* Buttons */}
         <div className="flex gap-6">
-          <button className="text-[#F8F9FB] bg-[#FF9090] text-sm sm:text-base font-medium px-6 py-3 sm:px-10 sm:py-4 rounded"
-                            onClick={() => navigate('/login')}>
+          <button
+            className="text-[#F8F9FB] bg-[#FF9090] text-sm sm:text-base font-medium px-6 py-3 sm:px-10 sm:py-4 rounded sm:w-40 transition-all duration-300 ease-in-out hover:bg-[#FF6F6F] hover:shadow-lg active:scale-95"
+            onClick={() => navigate('/login')}
+          >
             Login
           </button>
-          <button className="text-[#F8F9FB] bg-[#FF9090] text-sm sm:text-base font-medium px-6 py-3 sm:px-10 sm:py-4 rounded">
+          <button
+            className="text-[#F8F9FB] bg-[#FF9090] text-sm sm:text-base font-medium px-6 py-3 sm:px-10 sm:py-4 rounded sm:w-40 transition-all duration-300 ease-in-out hover:bg-[#FF6F6F] hover:shadow-lg active:scale-95"
+            onClick={() => navigate('/register')}
+          >
             Sign Up
           </button>
         </div>

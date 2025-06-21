@@ -1,91 +1,87 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../api'; // Axios instance
 
 function MyTasks() {
   const [tasks, setTasks] = useState([]);
   const [selectedTask, setSelectedTask] = useState(null);
-  const [newTask, setNewTask] = useState({
-    title: '',
-    description: '',
-    status: 'In Progress',
-    dueDate: ''
-  });
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingTaskId, setEditingTaskId] = useState(null);
-
-  const fetchTasks = () => {
-  const username = localStorage.getItem("username");
-  api.get(`/tasks?username=${username}`)
-    .then(res => setTasks(res.data))
-    .catch(err => console.log(err));
-};
-
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchTasks();
+    document.title = 'My Tasks';
+    fetchTasks(); // call after mount
   }, []);
 
-  // ✅ Handle input
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setNewTask(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const handleLogout = async () => {
+    try {
+      await api.post('/auth/logout'); // Clear refresh cookie from backend
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+
+    navigate('/login');
   };
 
-  // ✅ Submit (Create or Update)
-const handleSubmit = () => {
-  const username = localStorage.getItem("username"); // ✅ Get username
-  const taskData = { ...newTask, username }; // ✅ Attach username
+  const fetchTasks = async () => {
+    try {
+      const username = localStorage.getItem("username");
+      const token = localStorage.getItem("token");
 
-  if (isEditing) {
-    api.put(`/task/${editingTaskId}`, taskData)
-      .then(() => {
-        fetchTasks();
-        setNewTask({ title: '', description: '', status: 'In Progress', dueDate: '' });
-        setIsEditing(false);
-        setEditingTaskId(null);
-      })
-      .catch(err => console.log(err));
-  } else {
-    api.post('/tasks', taskData)
-      .then(res => {
-        setTasks(prev => [...prev, res.data.task]);
-        setNewTask({ title: '', description: '', status: 'In Progress', dueDate: '' });
-      })
-      .catch(err => console.log(err));
-  }
-};
+      const res = await api.get(`/tasks?username=${username}`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
 
+      setTasks(res.data);
+    } catch (err) {
+      if (err.response?.status === 401) {
+        try {
+          const refresh = await api.get('http://localhost:3000/auth/refresh-token', {
+            withCredentials: true,
+          });
 
+          const newToken = refresh.data.accessToken;
+          localStorage.setItem('token', newToken);
 
-  // ✅ Delete
-  const handleDelete = (id) => {
-    api.delete(`/task/${id}`)
-      .then(() => {
-        fetchTasks();
-        setSelectedTask(null);
-      })
-      .catch(err => console.log(err));
+          const username = localStorage.getItem("username");
+          const retryRes = await api.get(`/tasks?username=${username}`, {
+            headers: {
+              Authorization: `Bearer ${newToken}`
+            }
+          });
+
+          setTasks(retryRes.data);
+        } catch (refreshError) {
+          console.error('Session expired. Please log in again.');
+          alert('Session expired. Please log in again.');
+          navigate('/login');
+        }
+      } else {
+        console.error(err);
+      }
+    }
   };
 
-  // ✅ View task
   const handleViewTask = (task) => {
     setSelectedTask(task);
   };
 
-  // ✅ Edit task
-  const handleEdit = (task) => {
-    setIsEditing(true);
-    setEditingTaskId(task._id);
-    setNewTask({
-      title: task.title,
-      description: task.description,
-      status: task.status,
-      dueDate: task.dueDate
-    });
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/task/${id}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      fetchTasks();
+      setSelectedTask(null);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -107,69 +103,14 @@ const handleSubmit = () => {
           <p><strong>Status:</strong> {selectedTask.status}</p>
           <p><strong>Due Date:</strong> {selectedTask.dueDate}</p>
           <button onClick={() => handleDelete(selectedTask._id)}>Delete</button>
-          <button onClick={() => handleEdit(selectedTask)}>Edit</button>
+          <button onClick={() => navigate('/edit')}>Edit</button>
         </>
       )}
 
       <hr />
 
-      <h3>{isEditing ? 'Edit Task' : 'Add New Task'}</h3>
-      <input
-        type="text"
-        placeholder="Title"
-        name="title"
-        value={newTask.title}
-        onChange={handleChange}
-      />
-      <input
-        type="text"
-        placeholder="Description"
-        name="description"
-        value={newTask.description}
-        onChange={handleChange}
-      />
-      <div>
-        <label>
-          <input
-            type="radio"
-            name="status"
-            value="Pending"
-            checked={newTask.status === 'Pending'}
-            onChange={handleChange}
-          />
-          Pending
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="status"
-            value="In Progress"
-            checked={newTask.status === 'In Progress'}
-            onChange={handleChange}
-          />
-          In Progress
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="status"
-            value="Completed"
-            checked={newTask.status === 'Completed'}
-            onChange={handleChange}
-          />
-          Completed
-        </label>
-      </div>
-
-      <p>Due Date</p>
-      <input
-        type="date"
-        name="dueDate"
-        value={newTask.dueDate}
-        onChange={handleChange}
-      />
-
-      <button onClick={handleSubmit}>{isEditing ? 'Update Task' : 'Submit Task'}</button>
+      <button onClick={() => navigate('/addtasks')}>Add Task</button>
+      <button onClick={handleLogout}>Logout</button>
     </>
   );
 }

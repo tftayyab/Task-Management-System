@@ -1,0 +1,50 @@
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2ODU2OTVhZjgyOGY4NDAyNWViNmRiOWEiLCJ1c2VybmFtZSI6ImFsaWtoYW4xMjMiLCJpYXQiOjE3NTA1MDY1NTAsImV4cCI6MTc1MDUwNjU2MH0.vBiojyE5sU8BnQKIokGPT2MmbXaeOirMTuK04jCHiPU
+
+### Register New User
+POST http://localhost:3000/register
+Content-Type: application/json
+
+{
+  "firstName": "Ali",
+  "lastName": "Khan",
+  "username": "alikhan123",
+  "email": "ali@example.com",
+  "password": "password123"
+}
+
+### Login (Get JWT Token)
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+  "username": "alikhan123",
+  "password": "password123"
+}
+
+### Get new Access Token using Refresh Token
+GET http://localhost:3000/auth/refresh-token
+
+### Submit New Task (Authorized)
+POST http://localhost:3000/tasks
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "Finish React Project",
+  "description": "Build and polish frontend",
+  "status": "In Progress",
+  "dueDate": "2025-06-25",
+  "username": "alikhan123"
+}
+
+### Get Tasks for User
+GET http://localhost:3000/tasks?username=alikhan123
+Authorization: Bearer {{token}}
+
+### Test JWT verification on localhost:4000
+GET http://localhost:4000/verify-token
+Authorization: Bearer {{token}} 
+
+### Logout
+POST http://localhost:3000/auth/logout
+

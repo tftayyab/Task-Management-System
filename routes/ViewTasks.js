@@ -4,8 +4,10 @@ const { validateTasks } = require("../validations/Tasksvalidation");
 const validateRequest = require("../middleware/validateRequest");
 const isValidObjectId = require("../utils/validateObjectId");
 const asyncWrapper = require("../middleware/asyncWrapper");
+const verifyToken = require("../middleware/verifyToken");
 
 const router = express.Router();
+router.use(verifyToken); 
 
 // GET /tasks/:id
 router.get(

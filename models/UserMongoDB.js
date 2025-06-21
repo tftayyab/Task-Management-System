@@ -27,6 +27,10 @@ const UserSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true
+  },
+  refreshToken: {
+    type: String,
+    default: null // ✅ only added field, no effect on anything else
   }
 }, {
   timestamps: true // adds createdAt and updatedAt automatically

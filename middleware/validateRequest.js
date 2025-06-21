@@ -1,11 +1,9 @@
-const Joi = require('joi');
-
-// Middleware for schema validation using Joi
-module.exports = (schemaFn) => (req, res, next) => { // This exports a function that returns a middleware function.
-  const { error, value } = schemaFn(req.body);
-  if (error) {
-    return res.status(400).json({ message: error });
+// middleware/validateRequest.js
+module.exports = (validateFn) => (req, res, next) => {
+  const { errors, value } = validateFn(req.body);  // ✅ Just call the function directly
+  if (errors) {
+    return res.status(400).json({ errors });
   }
-  req.validatedBody = value;
+  req.validatedBody = value; // Optional: keep if you want to use the validated data later
   next();
 };

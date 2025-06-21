@@ -1,14 +1,64 @@
 import '../App.css';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function Register() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+  firstName: '',
+  lastName: '',
+  username: '',
+  email: '',
+  password: '',
+  confirmPassword: '',
+  termsAccepted: false,
+});
+
+const [errors, setErrors] = useState([]);
+const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     document.title = 'Register';
   }, []);
+
+  const handleRegister = async () => {
+  setErrors([]); // clear previous errors
+
+  if (!formData.termsAccepted) {
+    setErrors(["You must agree to the terms."]);
+    return;
+  }
+
+  if (formData.password !== formData.confirmPassword) {
+    setErrors(["Passwords do not match."]);
+    return;
+  }
+
+  try {
+    setLoading(true);
+    const response = await axios.post("http://localhost:3000/register", {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      username: formData.username,
+      email: formData.email,
+      password: formData.password,
+    });
+
+    navigate("/login");
+  } catch (err) {
+    if (err.response?.data?.errors) {
+      setErrors(err.response.data.errors); // Joi validation errors from backend
+    } else if (err.response?.data?.message) {
+      setErrors([err.response.data.message]); // like "email already exists"
+    } else {
+      setErrors(["Something went wrong. Please try again."]);
+    }
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="relative w-full h-screen bg-gray-100 overflow-hidden">
@@ -50,7 +100,9 @@ function Register() {
             <input
               type="text"
               placeholder="Enter First Name"
-               className="w-full h-14 sm:h-12 pl-12 pr-12 sm:pl-10 sm:pr-10 rounded-md border border-[#565454] font-montserrat text-base font-medium placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#FF9090] hover:border-[#FF9090] transition-colors duration-300"
+              className="w-full h-14 sm:h-12 pl-12 pr-12 sm:pl-10 sm:pr-10 rounded-md border border-[#565454] font-montserrat text-base font-medium placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#FF9090] hover:border-[#FF9090] transition-colors duration-300"
+              value={formData.firstName}
+              onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
             />
           </div>
 
@@ -65,7 +117,9 @@ function Register() {
             <input
               type="text"
               placeholder="Enter Last Name"
-               className="w-full h-14 sm:h-12 pl-12 pr-12 sm:pl-10 sm:pr-10 rounded-md border border-[#565454] font-montserrat text-base font-medium placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#FF9090] hover:border-[#FF9090] transition-colors duration-300"
+              className="w-full h-14 sm:h-12 pl-12 pr-12 sm:pl-10 sm:pr-10 rounded-md border border-[#565454] font-montserrat text-base font-medium placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#FF9090] hover:border-[#FF9090] transition-colors duration-300"
+              value={formData.lastName}
+              onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
             />
           </div>
         
@@ -79,7 +133,9 @@ function Register() {
             <input
               type="text"
               placeholder="Enter Username"
-               className="w-full h-14 sm:h-12 pl-12 pr-12 sm:pl-10 sm:pr-10 rounded-md border border-[#565454] font-montserrat text-base font-medium placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#FF9090] hover:border-[#FF9090] transition-colors duration-300"
+              className="w-full h-14 sm:h-12 pl-12 pr-12 sm:pl-10 sm:pr-10 rounded-md border border-[#565454] font-montserrat text-base font-medium placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#FF9090] hover:border-[#FF9090] transition-colors duration-300"
+              value={formData.username}
+              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
             />
           </div>
 
@@ -93,7 +149,9 @@ function Register() {
             <input
               type="email"
               placeholder="Enter Email"
-               className="w-full h-14 sm:h-12 pl-12 pr-12 sm:pl-10 sm:pr-10 rounded-md border border-[#565454] font-montserrat text-base font-medium placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#FF9090] hover:border-[#FF9090] transition-colors duration-300"
+              className="w-full h-14 sm:h-12 pl-12 pr-12 sm:pl-10 sm:pr-10 rounded-md border border-[#565454] font-montserrat text-base font-medium placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#FF9090] hover:border-[#FF9090] transition-colors duration-300"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             />
           </div>
 
@@ -107,7 +165,9 @@ function Register() {
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Enter Password"
-               className="w-full h-14 sm:h-12 pl-12 pr-12 sm:pl-10 sm:pr-10 rounded-md border border-[#565454] font-montserrat text-base font-medium placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#FF9090] hover:border-[#FF9090] transition-colors duration-300"
+              className="w-full h-14 sm:h-12 pl-12 pr-12 sm:pl-10 sm:pr-10 rounded-md border border-[#565454] font-montserrat text-base font-medium placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#FF9090] hover:border-[#FF9090] transition-colors duration-300"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
             />
             <div
               className="absolute inset-y-0 right-6 flex items-center cursor-pointer"
@@ -138,7 +198,9 @@ function Register() {
           <input
             type={showPassword ? "text" : "password"}
             placeholder="Confirm Password"
-             className="w-full h-14 sm:h-12 pl-12 pr-12 sm:pl-10 sm:pr-10 rounded-md border border-[#565454] font-montserrat text-base font-medium placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#FF9090] hover:border-[#FF9090] transition-colors duration-300"
+            className="w-full h-14 sm:h-12 pl-12 pr-12 sm:pl-10 sm:pr-10 rounded-md border border-[#565454] font-montserrat text-base font-medium placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#FF9090] hover:border-[#FF9090] transition-colors duration-300"
+            value={formData.confirmPassword}
+            onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
           />
           <div
             className="absolute inset-y-0 right-6 flex items-center cursor-pointer"
@@ -166,6 +228,11 @@ function Register() {
             <input
               type="checkbox"
               id="terms"
+              name="termsAccepted"
+              checked={formData.termsAccepted}
+              onChange={(e) =>
+                setFormData({ ...formData, termsAccepted: e.target.checked })
+              }
               className="peer w-5 h-5 appearance-none border border-[#565454] rounded-sm bg-white
                         checked:bg-[#FF6767] transition-all duration-200 grid place-content-center"
             />
@@ -184,13 +251,25 @@ function Register() {
           </label>
         </div>
 
+          {errors.length > 0 && (
+          <div className="px-4 text-red-600">
+            <ul className="list-disc ml-4 text-sm">
+              {errors.map((err, idx) => (
+                <li key={idx}>{err}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+
         {/* Register Button*/}
         <div className="mt-6 sm:mt-4 px-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
           <button
             className="text-[#F8F9FB] bg-[#FF9090] text-sm sm:text-base font-medium px-6 py-3 sm:px-10 sm:py-4 rounded transition-all duration-300 ease-in-out hover:bg-[#FF6F6F] hover:shadow-lg active:scale-95"
-            onClick={() => navigate('/login')}
+            onClick={handleRegister}
+            disabled={loading}
           >
-            Register
+            {loading ? 'Registering...' : 'Register'}
           </button>
 
           {/* Already Have an Account */}

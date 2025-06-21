@@ -13,12 +13,13 @@ function MyTasks() {
   const [isEditing, setIsEditing] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState(null);
 
-  // ✅ Fetch tasks
   const fetchTasks = () => {
-    api.get('/tasks')
-      .then(res => setTasks(res.data))
-      .catch(err => console.log(err));
-  };
+  const username = localStorage.getItem("username");
+  api.get(`/tasks?username=${username}`)
+    .then(res => setTasks(res.data))
+    .catch(err => console.log(err));
+};
+
 
   useEffect(() => {
     fetchTasks();
@@ -34,25 +35,30 @@ function MyTasks() {
   };
 
   // ✅ Submit (Create or Update)
-  const handleSubmit = () => {
-    if (isEditing) {
-      api.put(`/task/${editingTaskId}`, newTask)
-        .then(() => {
-          fetchTasks();
-          setNewTask({ title: '', description: '', status: 'In Progress', dueDate: '' });
-          setIsEditing(false);
-          setEditingTaskId(null);
-        })
-        .catch(err => console.log(err));
-    } else {
-      api.post('/tasks', newTask)
-        .then(res => {
-          setTasks(prev => [...prev, res.data.task]); // Access inside `task` object
-          setNewTask({ title: '', description: '', status: 'In Progress', dueDate: '' });
-        })
-        .catch(err => console.log(err));
-    }
-  };
+const handleSubmit = () => {
+  const username = localStorage.getItem("username"); // ✅ Get username
+  const taskData = { ...newTask, username }; // ✅ Attach username
+
+  if (isEditing) {
+    api.put(`/task/${editingTaskId}`, taskData)
+      .then(() => {
+        fetchTasks();
+        setNewTask({ title: '', description: '', status: 'In Progress', dueDate: '' });
+        setIsEditing(false);
+        setEditingTaskId(null);
+      })
+      .catch(err => console.log(err));
+  } else {
+    api.post('/tasks', taskData)
+      .then(res => {
+        setTasks(prev => [...prev, res.data.task]);
+        setNewTask({ title: '', description: '', status: 'In Progress', dueDate: '' });
+      })
+      .catch(err => console.log(err));
+  }
+};
+
+
 
   // ✅ Delete
   const handleDelete = (id) => {

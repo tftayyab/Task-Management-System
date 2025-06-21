@@ -18,13 +18,11 @@ const Edit = require('./routes/Edit');
 const AddTasks = require('./routes/AddTasks');
 
 
-mongoose.connect('mongodb://127.0.0.1:27017/taskdb', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
+mongoose.connect('mongodb://127.0.0.1:27017/Task-ManagerDB', {
+  // no need for useNewUrlParser or useUnifiedTopology in latest versions
 })
-.then(() => console.log('MongoDB Connected'))
+.then(() => console.log('MongoDB Connected to Task-ManagerDB'))
 .catch((err) => console.log(err));
-
 
 app.set('view engine', 'ejs');
 app.use('/tasks', MyTasks);

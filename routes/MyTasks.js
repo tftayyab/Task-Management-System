@@ -20,12 +20,16 @@ router.post(
 );
 
 // GET /tasks
-router.get(
-  "/",
-  asyncWrapper(async (req, res) => {
-    const tasks = await Task.find();
-    res.json(tasks);
-  })
-);
+router.get("/", asyncWrapper(async (req, res) => {
+  const username = req.query.username;
+
+  if (!username) {
+    return res.status(400).json({ message: "Username required in query" });
+  }
+
+  const tasks = await Task.find({ username }); // ✅ only fetch tasks for that user
+  res.json(tasks);
+}));
+
 
 module.exports = router;

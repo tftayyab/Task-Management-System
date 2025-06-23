@@ -20,7 +20,7 @@ router.post(
     if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
     // ✅ 1. Generate Tokens
-    const payload = { userId: user._id, username: user.username };
+    const payload = { userId: user._id, username: user.username, email: user.email };
     const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "15m" });
     const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET, { expiresIn: "7d" });
 

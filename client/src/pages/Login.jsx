@@ -40,6 +40,7 @@ function Login() {
 
       // ✅ Always save correct username
       localStorage.setItem('username', response.data.user.username);
+      localStorage.setItem('email', response.data.user.email); 
 
       // ✅ Only remember it if checkbox is checked
       if (formData.remember) {

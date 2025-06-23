@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../api'; // adjust path if needed
+import api from '../api';
 
 const Actions = ({ task, fetchTasksWithRetry }) => {
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ const Actions = ({ task, fetchTasksWithRetry }) => {
           localStorage.setItem('token', newToken);
           await api.delete(`/task/${id}`);
           fetchTasksWithRetry();
-        } catch (refreshErr) {
+        } catch {
           console.error('Token refresh failed on delete');
           navigate('/login');
         }
@@ -28,18 +28,18 @@ const Actions = ({ task, fetchTasksWithRetry }) => {
   };
 
   return (
-    <div className="inline-flex flex-col items-center rounded-md bg-white shadow-[12px_7px_4px_0_rgba(0,0,0,0),8px_4px_4px_0_rgba(0,0,0,0.01),4px_2px_3px_0_rgba(0,0,0,0.02),2px_1px_2px_0_rgba(0,0,0,0.03),0_0_1px_0_rgba(0,0,0,0.04)] px-[0.9375rem] pb-[0.8125rem] pt-0">
+    <div className="flex flex-col min-w-[6rem] bg-white rounded-xl shadow-lg ring-1 ring-gray-200 overflow-hidden transition-all duration-300 ease-in-out">
       <button
         onClick={() => navigate('/edit', { state: { task } })}
-        className="flex w-[2.4375rem] h-4 px-2 pr-0 pb-1 items-center flex-shrink-0"
+        className="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 hover:text-blue-800 transition-all font-medium text-left"
       >
-        Edit
+        ✏️ Edit
       </button>
       <button
         onClick={() => handleDelete(task._id)}
-        className="flex w-[2.4375rem] h-4 px-2 pr-0 pb-1 items-center flex-shrink-0"
+        className="px-4 whitespace-nowrap py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-800 transition-all font-medium text-left"
       >
-        Delete
+        🗑️ Delete
       </button>
     </div>
   );

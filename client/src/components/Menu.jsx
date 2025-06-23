@@ -1,52 +1,119 @@
-import { useNavigate } from 'react-router-dom';
-import api from '../api';
+import { useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import {
+  DashboardSelectedIcon, DashboardNotSelectedIcon,
+  LogoutIcon,
+  MyTasksSelectedIcon, MyTasksNotSelectedIcon
+} from './svg';
 
-function Menu() {
+function Menu({ onClose }) {
   const navigate = useNavigate();
+  const location = useLocation();
+  const menuRef = useRef(null);
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+
+  useEffect(() => {
+    const storedUsername = localStorage.getItem('username');
+    const storedEmail = localStorage.getItem('email');
+    if (storedUsername) setUsername(storedUsername);
+    if (storedEmail) setEmail(storedEmail);
+  }, []);
 
   const handleLogout = async () => {
     try {
-      await api.post('/auth/logout');
-    } catch (err) {
-      console.error('Logout error:', err);
-    }
+      await fetch('http://localhost:3000/auth/logout', {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch {}
     localStorage.removeItem('token');
     localStorage.removeItem('username');
+    localStorage.removeItem('email');
     navigate('/login');
   };
 
+  const isDashboard = location.pathname === '/dashboard';
+  const isTasks = location.pathname === '/tasks';
+
   return (
     <>
-      <div className="w-[22.8125rem] h-[54.25rem] flex-shrink-0 rounded-tr-[0.5rem] rounded-br-[0.5rem] bg-black shadow-[0_4px_12px_0_rgba(0,0,0,0.08)]">
-        <div className="p-4 flex flex-col gap-4">
-            <p className="text-white font-inter text-center text-base font-semibold leading-none">
-                tftayyab</p>
-            <p className="text-white font-inter text-base text-center font-semibold leading-none">
-                tftayyabfaisal@gmail.com</p>
-          <button
-            
-            class="flex w-72 h-[3.6875rem] justify-center items-center flex-shrink-0 rounded-tr-md text-white font-inter text-center text-base font-semibold leading-none rounded-br-md"
-            onClick={() => navigate('/dashboard')}
-          >
-            Dashboard
-          </button>
-          
-          <button
-            className="text-white border border-white px-4 py-2 rounded"
-            onClick={() => navigate('/tasks')}
-          >
-            My Tasks
-          </button>
+      {/* Transparent Overlay (Mobile Only) */}
+      <div
+        className="fixed top-0 right-0 w-[15%] h-full bg-black/30 z-40 sm:hidden"
+        onClick={onClose}
+      ></div>
 
+      {/* Menu Drawer */}
+      <div
+        ref={menuRef}
+        className="fixed sm:bottom-0 left-0 w-[95%] z-50 h-full sm:w-[22rem] sm:h-[84vh] bg-[#1c1c1e] rounded-tr-2xl rounded-br-2xl shadow-2xl transition-transform duration-300 transform translate-x-0 flex flex-col justify-between"
+      >
+        {/* Top Section */}
+        <div className="p-6 flex flex-col gap-6">
+          {/* User Info */}
+          <div className="text-white text-center mt-4 space-y-1">
+            <p className="text-lg font-semibold tracking-wide">{username}</p>
+            <p className="text-sm font-light text-gray-400">{email}</p>
+          </div>
+
+          {/* Navigation Buttons */}
+          <nav className="mt-6 flex flex-col gap-2">
+            <MenuButton
+              label="Dashboard"
+              isActive={isDashboard}
+              IconActive={DashboardSelectedIcon}
+              IconInactive={DashboardNotSelectedIcon}
+              onClick={() => {
+                navigate('/dashboard');
+                onClose?.();
+              }}
+            />
+            <MenuButton
+              label="My Tasks"
+              isActive={isTasks}
+              IconActive={MyTasksSelectedIcon}
+              IconInactive={MyTasksNotSelectedIcon}
+              onClick={() => {
+                navigate('/tasks');
+                onClose?.();
+              }}
+            />
+          </nav>
+        </div>
+
+        {/* Bottom - Logout */}
+        <div className="p-6 border-t border-white/10">
           <button
-            className="text-white border border-red-500 px-4 py-2 rounded"
             onClick={handleLogout}
+            className="group flex items-center gap-3 px-5 py-3 w-full rounded-lg font-medium text-white hover:bg-red-500/90 transition-all duration-200"
           >
-            Logout
+            <LogoutIcon className="w-6 h-6 group-hover:scale-110 transition-transform" />
+            <span className="group-hover:translate-x-1 transition-all">Logout</span>
           </button>
         </div>
       </div>
     </>
+  );
+}
+
+function MenuButton({ label, isActive, IconActive, IconInactive, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`group flex items-center gap-3 px-5 py-3 w-full rounded-lg font-medium transition-all duration-200 ${
+        isActive
+          ? 'bg-white text-[#FF6767]'
+          : 'text-white hover:bg-white/10 hover:text-[#FF6767]'
+      }`}
+    >
+      {isActive ? (
+        <IconActive className="w-6 h-6 transition-transform duration-200" />
+      ) : (
+        <IconInactive className="w-6 h-6 group-hover:scale-110 transition-transform duration-200" />
+      )}
+      <span className="group-hover:translate-x-1 transition-transform duration-200">{label}</span>
+    </button>
   );
 }
 

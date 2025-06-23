@@ -1,5 +1,4 @@
 import { TaskIcon, DotIcon } from '../components/svg';
-
 import { useEffect, useState } from "react";
 
 const AnimatedNumber = ({ target }) => {
@@ -10,7 +9,7 @@ const AnimatedNumber = ({ target }) => {
     const end = parseInt(target);
     if (start === end) return;
 
-    const step = Math.ceil(end / 40); // Adjust speed here
+    const step = Math.ceil(end / 40);
     const interval = setInterval(() => {
       start += step;
       if (start >= end) {
@@ -18,7 +17,7 @@ const AnimatedNumber = ({ target }) => {
         clearInterval(interval);
       }
       setCount(start);
-    }, 20); // Smaller = faster count
+    }, 20);
 
     return () => clearInterval(interval);
   }, [target]);
@@ -26,13 +25,11 @@ const AnimatedNumber = ({ target }) => {
   return <>{count}%</>;
 };
 
-
 const statusConfig = [
   { label: "Pending", key: "Pending", color: "#FFB347" },
   { label: "In Progress", key: "In Progress", color: "#3ABEFF" },
   { label: "Completed", key: "Completed", color: "#4CAF50" },
 ];
-
 
 const CircleProgress = ({ percent, color }) => {
   const radius = 40;
@@ -67,36 +64,39 @@ const CircleProgress = ({ percent, color }) => {
 };
 
 const TaskStatusCard = ({ tasks }) => {
-    console.log(tasks.map(t => t.status));
   const total = tasks.length || 1;
 
   const getCount = (key) => tasks.filter((t) => t.status === key).length;
   const getPercent = (count) => Math.round((count / total) * 100);
 
   return (
-    <div className="w-[19.3125rem] h-[11.9375rem] flex-shrink-0 rounded-[0.875rem] bg-[#F5F8FF] shadow-md p-4 flex flex-col gap-y-3 ">
+    <div className="w-full sm:w-[22rem] rounded-2xl bg-[#F5F8FF] shadow-lg p-4 flex flex-col gap-y-4 transition hover:shadow-xl">
       {/* Header */}
       <div className="flex items-center gap-x-2">
-        <TaskIcon className="w-[1.04269rem] h-[1.02906rem] flex-shrink-0" />
-        <p className="text-[#FF6767] text-[0.9375rem] font-medium font-inter mb-1">Task Status</p>
+        <TaskIcon className="w-5 h-5 flex-shrink-0" />
+        <p className="text-[#FF6767] text-base font-medium font-inter">Task Status</p>
       </div>
 
-      {/* Status Sections */}
-      <div className="flex justify-between gap-x-2">
+      {/* Status Section */}
+      <div className="flex justify-between sm:gap-x-2 gap-x-1">
         {statusConfig.map(({ label, key, color }) => {
           const count = getCount(key);
           const percent = getPercent(count);
           return (
-            <div className="flex flex-col gap-y-2 items-center" key={key}>
-              <div className="relative flex items-center justify-center w-[5.625rem] h-[5.625rem] right-3">
-                    <CircleProgress percent={percent} color={color} />
-                    <p className="absolute text-black text-[0.9375rem] font-inter font-medium w-[2.3125rem] h-[1.25rem] flex items-center justify-center">
-                        <AnimatedNumber target={percent} />
-                    </p>
-               </div>
+            <div
+              key={key}
+              className="flex flex-col items-center gap-y-2 group hover:scale-105 transition-all"
+            >
+              <div className="relative flex items-center justify-center w-20 h-20">
+                <CircleProgress percent={percent} color={color} />
+                <p className="absolute text-black text-sm font-inter font-semibold">
+                  <AnimatedNumber target={percent} />
+                </p>
+              </div>
+
               <div className="flex items-center gap-1">
-                <DotIcon className="w-[0.31731rem] h-[0.31731rem] flex-shrink-0" fill={color} />
-                <p className="text-black text-[0.625rem] font-inter font-medium w-[5.25rem] h-[0.75rem]">{label}</p>
+                <DotIcon className="w-2 h-2" fill={color} />
+                <p className="text-black text-xs font-medium font-inter">{label}</p>
               </div>
             </div>
           );

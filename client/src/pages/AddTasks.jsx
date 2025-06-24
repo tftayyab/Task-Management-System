@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../api'; // Axios instance
+import api from '../api';
 
 function AddTasks() {
   const [newTask, setNewTask] = useState({
@@ -21,21 +21,6 @@ function AddTasks() {
     }
   }, []);
 
-  const handleLogout = async () => {
-  try {
-    await api.post('/auth/logout'); // Clear refresh cookie from backend
-  } catch (err) {
-    console.error('Logout error:', err);
-  }
-
-  // Clear localStorage
-  localStorage.removeItem('token');
-  localStorage.removeItem('username');
-
-  // Redirect to login
-  navigate('/login');
-};
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setNewTask(prev => ({
@@ -44,7 +29,7 @@ function AddTasks() {
     }));
   };
 
-  const submitTask = async () => {
+  const handleSubmit = async () => {
     const username = localStorage.getItem("username");
     const taskData = { ...newTask, username };
     await api.post('/tasks', taskData);
@@ -56,95 +41,39 @@ function AddTasks() {
     });
   };
 
-  const handleSubmit = async () => {
+  const handleLogout = async () => {
     try {
-      await submitTask();
-    } catch (error) {
-      if (error.response?.status === 401) {
-        try {
-          const res = await api.get('/auth/refresh-token');
-          const newToken = res.data.accessToken;
-          localStorage.setItem('token', newToken);
-          await submitTask(); // Retry task submission
-        } catch (refreshErr) {
-          console.error('Refresh token failed');
-          navigate('/login');
-        }
-      } else {
-        console.error(error);
-      }
+      await api.post('/auth/logout');
+    } catch (err) {
+      console.error('Logout error:', err);
     }
+
+    localStorage.clear();
+    navigate('/login');
   };
 
   return (
     <>
       <h2>Add New Task</h2>
 
-      <input
-        type="text"
-        placeholder="Title"
-        name="title"
-        value={newTask.title}
-        onChange={handleChange}
-      />
-      <input
-        type="text"
-        placeholder="Description"
-        name="description"
-        value={newTask.description}
-        onChange={handleChange}
-      />
+      <input type="text" name="title" placeholder="Title" value={newTask.title} onChange={handleChange} />
+      <input type="text" name="description" placeholder="Description" value={newTask.description} onChange={handleChange} />
 
       <div>
-        <label>
-          <input
-            type="radio"
-            name="status"
-            value="Pending"
-            checked={newTask.status === 'Pending'}
-            onChange={handleChange}
-          />
-          Pending
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="status"
-            value="In Progress"
-            checked={newTask.status === 'In Progress'}
-            onChange={handleChange}
-          />
-          In Progress
-        </label>
-        <label>
-          <input
-            type="radio"
-            name="status"
-            value="Completed"
-            checked={newTask.status === 'Completed'}
-            onChange={handleChange}
-          />
-          Completed
-        </label>
+        <label><input type="radio" name="status" value="Pending" checked={newTask.status === 'Pending'} onChange={handleChange} /> Pending</label>
+        <label><input type="radio" name="status" value="In Progress" checked={newTask.status === 'In Progress'} onChange={handleChange} /> In Progress</label>
+        <label><input type="radio" name="status" value="Completed" checked={newTask.status === 'Completed'} onChange={handleChange} /> Completed</label>
       </div>
 
       <p>Due Date</p>
-      <input
-        type="date"
-        name="dueDate"
-        value={newTask.dueDate}
-        onChange={handleChange}
-      />
+      <input type="date" name="dueDate" value={newTask.dueDate} onChange={handleChange} />
 
       <br />
       <button onClick={handleSubmit}>Submit Task</button>
       <br /><br />
       <button onClick={() => navigate('/tasks')}>My Tasks</button>
       <button onClick={() => navigate('/edit')}>Edit</button>
-      <button onClick={handleLogout}>
-        Logout
-      </button>
-
+      <button onClick={handleLogout}>Logout</button>
     </>
   );
 }

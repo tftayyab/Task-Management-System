@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { CircleIcon, OptionIcon } from './svg';
 import Actions from './actions';
 
 function TaskList({ tasks, fetchTasksWithRetry, statuses = [], searchTerm = '' }) {
+  const navigate = useNavigate();
   const [openActionId, setOpenActionId] = useState(null);
-
+  const clickTimeout = useRef(null);
   const search = searchTerm.toLowerCase().trim();
 
   const filtered = tasks.filter(task => {
@@ -16,7 +19,6 @@ function TaskList({ tasks, fetchTasksWithRetry, statuses = [], searchTerm = '' }
     ].some(field => field?.includes(search));
 
     if (search) return matchesSearch;
-
     return statuses.includes(task.status);
   });
 
@@ -34,11 +36,20 @@ function TaskList({ tasks, fetchTasksWithRetry, statuses = [], searchTerm = '' }
   };
 
   return (
-    <ul className="flex flex-col gap-4 w-full max-h-[23rem] overflow-y-auto pr-1 scrollbar-hide">
+    <ul className="flex flex-col gap-4 w-full h-full overflow-y-auto pr-1 scrollbar-hide">
       {filtered.map((task) => (
         <li
           key={task._id}
-          className="group p-4 rounded-xl border border-[#A1A3AB] bg-white shadow transition-all duration-200 hover:shadow-lg hover:scale-[1.001] relative"
+          onClick={() => {
+            clickTimeout.current = setTimeout(() => {
+              navigate('/tasks', { state: { taskId: task._id } });
+            }, 250); // Delay to detect double click
+          }}
+          onDoubleClick={() => {
+            clearTimeout(clickTimeout.current);
+            navigate(`/task/${task._id}`); // ✅ pass ID in URL
+          }}
+          className="cursor-pointer group p-4 rounded-xl border border-[#A1A3AB] bg-white shadow transition-all duration-200 hover:shadow-lg hover:scale-[1.001] relative"
         >
           {/* Top Row */}
           <div className="flex justify-between items-start gap-2 flex-wrap">
@@ -69,7 +80,9 @@ function TaskList({ tasks, fetchTasksWithRetry, statuses = [], searchTerm = '' }
           </div>
 
           {/* Description */}
-          <p className="text-[#747474] text-sm mt-2 break-words">{task.description}</p>
+          <p className="text-[#747474] text-sm mt-2 break-words line-clamp-2 overflow-hidden text-ellipsis">
+            {task.description}
+          </p>
 
           {/* Status + Due */}
           <div className="flex justify-between items-center mt-3 text-xs">

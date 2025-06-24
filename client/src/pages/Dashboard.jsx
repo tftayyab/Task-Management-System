@@ -6,12 +6,24 @@ import {
 import TaskStatusCard from '../components/TaskStatusCard';
 import TaskList from '../components/TaskList';
 import PageHeader from '../components/PageHeader';
+import api from '../api';
 
 function Dashboard() {
   const [tasks, setTasks] = useState([]);
   const [filteredTasksList, setFilteredTasksList] = useState([]);
-  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    document.title = "Dashboard";
+    fetchTasks();
+  }, []);
+
+  const fetchTasks = async () => {
+    const username = localStorage.getItem("username");
+    const res = await api.get(`/tasks?username=${username}`);
+    setTasks(res.data);
+  };
 
   return (
     <div className="min-h-screen bg-white flex flex-col overflow-hidden">
@@ -32,7 +44,7 @@ function Dashboard() {
           <div className="relative z-0 border border-[rgba(161,163,171,0.63)] shadow-lg rounded-2xl p-4 flex flex-col sm:flex-row sm:gap-6 w-full max-w-7xl mx-auto bg-white transition-all duration-300">
             
             {/* Left Side: Tasks */}
-            <div className="order-2 sm:order-1 flex-1 mt-7 sm:mt:0 bg-[#F5F8FF] rounded-xl p-6 overflow-y-auto max-h-[70vh] scrollbar-hide">
+            <div className="order-2 sm:order-1 flex-1 mt-7 sm:mt-0 bg-[#F5F8FF] rounded-xl p-6 overflow-y-auto max-h-[75vh] scrollbar-hide">
               <div className="flex items-center justify-between mb-4">
                 <div
                   onClick={() => navigate('/tasks')}
@@ -65,7 +77,7 @@ function Dashboard() {
 
               <div className="hidden sm:block bg-[#F5F8FF] p-4 rounded-xl border border-[rgba(161,163,171,0.63)] shadow overflow-y-auto max-h-[50vh] scrollbar-hide">
                 <div className='flex flex-row gap-x-2'>
-                  <CompletedTasksIcon className="w-4 h-4"/>
+                  <CompletedTasksIcon className="w-4 h-4" />
                   <p className="text-[#F24E1E] font-medium text-sm mb-2">Completed Tasks</p>
                 </div>
                 <TaskList

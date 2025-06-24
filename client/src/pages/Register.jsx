@@ -2,7 +2,7 @@ import '../App.css';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import * as Icons from '../components/svg';
+import { ConfirmPasswordIcon, EmailIcon, EyeIcon, EyeOffIcon, FirstNameIcon, LastNameIcon, PasswordIcon, TickIcon, UsernameIcon } from '../components/svg';
 
 function Register() {
   const navigate = useNavigate();
@@ -92,7 +92,7 @@ const [loading, setLoading] = useState(false);
           {/* First Name Input */}
           <div className="relative w-full px-4">
             <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
-              <Icons.FirstNameIcon/>
+              <FirstNameIcon/>
             </div>
             <input
               type="text"
@@ -106,7 +106,7 @@ const [loading, setLoading] = useState(false);
             {/* Last Name Input */}
           <div className="relative w-full px-4">
             <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
-              <Icons.LastNameIcon/>
+              <LastNameIcon/>
             </div>
             <input
               type="text"
@@ -120,7 +120,7 @@ const [loading, setLoading] = useState(false);
           {/* Username Input */}
           <div className="relative w-full px-4">
             <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
-              <Icons.UsernameIcon/>
+              <UsernameIcon/>
             </div>
             <input
               type="text"
@@ -134,7 +134,7 @@ const [loading, setLoading] = useState(false);
           {/* Email Input */}
           <div className="relative w-full px-4">
             <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
-              <Icons.EmailIcon/>
+              <EmailIcon/>
             </div>
             <input
               type="email"
@@ -148,7 +148,7 @@ const [loading, setLoading] = useState(false);
           {/* Password Input */}
           <div className="relative w-full px-4">
             <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
-              <Icons.PasswordIcon/>
+              <PasswordIcon/>
             </div>
             <input
               type={showPassword ? "text" : "password"}
@@ -163,10 +163,10 @@ const [loading, setLoading] = useState(false);
             >
               {showPassword ? (
                 // Eye off icon
-                <Icons.EyeOffIcon/>
+                <EyeOffIcon/>
               ) : (
                 // Eye icon
-                <Icons.EyeIcon/>
+                <EyeIcon/>
               )}
             </div>
           </div>
@@ -174,9 +174,7 @@ const [loading, setLoading] = useState(false);
         {/* Conform Password Input */}
         <div className="relative w-full px-4">
           <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
-          <svg className="w-5.5 h-5.5" viewBox="0 0 24 24" fill="white" stroke="black" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 1a5 5 0 00-5 5v4H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V12a2 2 0 00-2-2h-1V6a5 5 0 00-5-5zm-3 5a3 3 0 116 0v4H9V6zm3 7a1.5 1.5 0 11-.001 3.001A1.5 1.5 0 0112 13z" />
-          </svg>
+          <ConfirmPasswordIcon/>
           </div>
           <input
             type={showPassword ? "text" : "password"}
@@ -189,18 +187,7 @@ const [loading, setLoading] = useState(false);
             className="absolute inset-y-0 right-6 flex items-center cursor-pointer"
             onClick={() => setShowPassword(!showPassword)}
           >
-            {showPassword ? (
-              // Eye off icon
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.176.203-2.3.575-3.325m4.045 1.575A3.978 3.978 0 0112 7c2.21 0 4 1.79 4 4a3.978 3.978 0 01-1.825 3.375M15 15l6 6" />
-              </svg>
-            ) : (
-              // Eye icon
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-.062.204-.128.406-.2.606" />
-              </svg>
-            )}
+            {showPassword ? (<EyeOffIcon/>) : (<EyeIcon/>)}
           </div>
         </div>
       </div>
@@ -220,14 +207,7 @@ const [loading, setLoading] = useState(false);
                         checked:bg-[#FF6767] transition-all duration-200 grid place-content-center"
             />
             {/* Centered White Tick */}
-            <svg
-              className="absolute w-3.5 h-3.5 text-white pointer-events-none opacity-0 peer-checked:opacity-100 left-[2.5px] top-[5.5px]"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path d="M20.285 6.709a1 1 0 00-1.414-1.418l-9.192 9.192-4.243-4.243a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l9.849-9.945z" />
-            </svg>
-
+            <TickIcon/>
             <span className="ml-2 text-[#212427] font-montserrat text-base font-medium">
               I agree to all terms
             </span>

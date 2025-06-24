@@ -33,6 +33,12 @@ export const PasswordIcon = ({ className = "w-6 h-6 text-[#212427]" }) => (
   </svg>
 );
 
+export const ConfirmPasswordIcon = ({ className = "w-6 h-6 text-[#212427]" }) => (
+  <svg className="w-5.5 h-5.5" viewBox="0 0 24 24" fill="white" stroke="black" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 1a5 5 0 00-5 5v4H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V12a2 2 0 00-2-2h-1V6a5 5 0 00-5-5zm-3 5a3 3 0 116 0v4H9V6zm3 7a1.5 1.5 0 11-.001 3.001A1.5 1.5 0 0112 13z" />
+  </svg>
+);
+
 export const EyeOffIcon = ({ className = "w-6 h-6 text-gray-600" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 0-1.176.203-2.3.575-3.325m4.045 1.575A3.978 3.978 0 0112 7c2.21 0 4 1.79 4 4a3.978 3.978 0 01-1.825 3.375M15 15l6 6" />
@@ -44,6 +50,12 @@ export const EyeIcon = ({ className = "w-6 h-6 text-gray-600" }) => (
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-.062.204-.128.406-.2.606" />
   </svg>
+);
+
+export const TickIcon = () => (
+<svg className="absolute w-3.5 h-3.5 text-white pointer-events-none opacity-0 peer-checked:opacity-100 left-[3px] top-[5px]" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M20.285 6.709a1 1 0 00-1.414-1.418l-9.192 9.192-4.243-4.243a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0l9.849-9.945z" />
+            </svg>
 );
 
 export const MenuIcon = ({ className = "w-6 h-6 text-gray-600" }) => (
@@ -169,5 +181,19 @@ export const CompletedTasksIcon = ({ className = "w-5 h-5 text-[#F24E1E]" }) => 
       d="M9.68093 14.1479L7.62296 11.7144L6 13.6335L9.68093 17.9861L15.6574 10.9191L14.0345 9L9.68093 14.1479Z"
       fill="#A1A3AB"
     />
+  </svg>
+);
+
+export const DeleteTasksIcon = ({ className = "w-5 h-5 text-[#F24E1E]" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
+    <rect width="36" height="36" rx="8" fill="#FF6767"/>
+    <path d="M12 25C12 26.1 12.9 27 14 27H22C23.1 27 24 26.1 24 25V15C24 13.9 23.1 13 22 13H14C12.9 13 12 13.9 12 15V25ZM24 10H21.5L20.79 9.29C20.61 9.11 20.35 9 20.09 9H15.91C15.65 9 15.39 9.11 15.21 9.29L14.5 10H12C11.45 10 11 10.45 11 11C11 11.55 11.45 12 12 12H24C24.55 12 25 11.55 25 11C25 10.45 24.55 10 24 10Z" fill="white"/>
+  </svg>
+);
+
+export const EditTasksIcon = ({ className = "w-5 h-5 text-[#F24E1E]" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
+    <rect width="36" height="36" rx="8" fill="#FF6767"/>
+    <path d="M21 8.94979C22.296 8.94979 23.496 9.35979 24.477 10.0598L15.343 19.1928C15.2475 19.285 15.1713 19.3954 15.1189 19.5174C15.0665 19.6394 15.0389 19.7706 15.0377 19.9034C15.0366 20.0362 15.0619 20.1678 15.1122 20.2907C15.1625 20.4136 15.2367 20.5253 15.3306 20.6192C15.4245 20.7131 15.5361 20.7873 15.659 20.8376C15.7819 20.8879 15.9136 20.9132 16.0464 20.912C16.1792 20.9109 16.3104 20.8833 16.4324 20.8309C16.5544 20.7785 16.6648 20.7023 16.757 20.6068L25.891 11.4728C26.6141 12.4878 27.0019 13.7035 27 14.9498V24.9498C27 25.4802 26.7893 25.9889 26.4142 26.364C26.0391 26.7391 25.5304 26.9498 25 26.9498H11C10.4696 26.9498 9.96086 26.7391 9.58579 26.364C9.21071 25.9889 9 25.4802 9 24.9498V10.9498C9 10.4194 9.21071 9.91065 9.58579 9.53557C9.96086 9.1605 10.4696 8.94979 11 8.94979H21ZM27.657 8.29279C27.8445 8.48031 27.9498 8.73462 27.9498 8.99979C27.9498 9.26495 27.8445 9.51926 27.657 9.70679L25.89 11.4728C25.5006 10.9261 25.0227 10.4482 24.476 10.0588L26.242 8.29279C26.4295 8.10532 26.6838 8 26.949 8C27.2142 8 27.4695 8.10532 27.657 8.29279Z" fill="white"/>
   </svg>
 );

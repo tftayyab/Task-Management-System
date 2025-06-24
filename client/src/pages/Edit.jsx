@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../api'; // Axios instance
+import api from '../api';
 
 function Edit() {
   const [tasks, setTasks] = useState([]);
@@ -28,26 +28,20 @@ function Edit() {
   }, []);
 
   const handleLogout = async () => {
-  try {
-    await api.post('/auth/logout'); // Clear refresh cookie from backend
-  } catch (err) {
-    console.error('Logout error:', err);
-  }
+    try {
+      await api.post('/auth/logout');
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
 
-  // Clear localStorage
-  localStorage.removeItem('token');
-  localStorage.removeItem('username');
+    localStorage.clear();
+    navigate('/login');
+  };
 
-  // Redirect to login
-  navigate('/login');
-};
-
-
-  const fetchTasks = () => {
+  const fetchTasks = async () => {
     const username = localStorage.getItem("username");
-    api.get(`/tasks?username=${username}`)
-      .then(res => setTasks(res.data))
-      .catch(err => console.log(err));
+    const res = await api.get(`/tasks?username=${username}`);
+    setTasks(res.data);
   };
 
   const handleViewTask = (task) => {
@@ -76,7 +70,6 @@ function Edit() {
     const taskData = { ...newTask, username };
 
     await api.put(`/task/${editingTaskId}`, taskData);
-
     fetchTasks();
     setNewTask({
       title: '',
@@ -89,50 +82,10 @@ function Edit() {
     setSelectedTask(null);
   };
 
-  const handleUpdate = async () => {
-    try {
-      await updateTask();
-    } catch (error) {
-      if (error.response?.status === 401) {
-        try {
-          const res = await api.get('/auth/refresh-token');
-          const newToken = res.data.accessToken;
-          localStorage.setItem('token', newToken);
-          await updateTask(); // retry update
-        } catch (refreshErr) {
-          console.error('Refresh failed');
-          navigate('/login');
-        }
-      } else {
-        console.log(error);
-      }
-    }
-  };
-
   const deleteTask = async (id) => {
     await api.delete(`/task/${id}`);
     fetchTasks();
     setSelectedTask(null);
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      await deleteTask(id);
-    } catch (error) {
-      if (error.response?.status === 401) {
-        try {
-          const res = await api.get('/auth/refresh-token');
-          const newToken = res.data.accessToken;
-          localStorage.setItem('token', newToken);
-          await deleteTask(id); // retry delete
-        } catch (refreshErr) {
-          console.error('Refresh failed');
-          navigate('/login');
-        }
-      } else {
-        console.log(error);
-      }
-    }
   };
 
   return (
@@ -149,70 +102,24 @@ function Edit() {
       {selectedTask && (
         <>
           <h4>Edit Task</h4>
-          <input
-            type="text"
-            name="title"
-            value={newTask.title}
-            onChange={handleChange}
-            placeholder="Title"
-          />
-          <input
-            type="text"
-            name="description"
-            value={newTask.description}
-            onChange={handleChange}
-            placeholder="Description"
-          />
+          <input type="text" name="title" value={newTask.title} onChange={handleChange} placeholder="Title" />
+          <input type="text" name="description" value={newTask.description} onChange={handleChange} placeholder="Description" />
           <div>
-            <label>
-              <input
-                type="radio"
-                name="status"
-                value="Pending"
-                checked={newTask.status === 'Pending'}
-                onChange={handleChange}
-              />
-              Pending
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="status"
-                value="In Progress"
-                checked={newTask.status === 'In Progress'}
-                onChange={handleChange}
-              />
-              In Progress
-            </label>
-            <label>
-              <input
-                type="radio"
-                name="status"
-                value="Completed"
-                checked={newTask.status === 'Completed'}
-                onChange={handleChange}
-              />
-              Completed
-            </label>
+            <label><input type="radio" name="status" value="Pending" checked={newTask.status === 'Pending'} onChange={handleChange} /> Pending</label>
+            <label><input type="radio" name="status" value="In Progress" checked={newTask.status === 'In Progress'} onChange={handleChange} /> In Progress</label>
+            <label><input type="radio" name="status" value="Completed" checked={newTask.status === 'Completed'} onChange={handleChange} /> Completed</label>
           </div>
           <p>Due Date</p>
-          <input
-            type="date"
-            name="dueDate"
-            value={newTask.dueDate}
-            onChange={handleChange}
-          />
+          <input type="date" name="dueDate" value={newTask.dueDate} onChange={handleChange} />
           <br />
-          <button onClick={handleUpdate}>Update Task</button>
-          <button onClick={() => handleDelete(selectedTask._id)}>Delete</button>
+          <button onClick={updateTask}>Update Task</button>
+          <button onClick={() => deleteTask(selectedTask._id)}>Delete</button>
         </>
       )}
 
       <hr />
       <button onClick={() => navigate('/tasks')}>View Tasks</button>
-      <button onClick={handleLogout}>
-        Logout
-      </button>
+      <button onClick={handleLogout}>Logout</button>
     </>
   );
 }

@@ -2,10 +2,9 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: 'http://localhost:3000',
-  withCredentials: true, // ✅ sends refresh token cookie to backend
+  withCredentials: true, // so cookies go with request
 });
 
-// ✅ Attach access token to every request automatically
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -13,6 +12,39 @@ api.interceptors.request.use(
     return config;
   },
   (error) => Promise.reject(error)
+);
+
+api.interceptors.response.use(
+  (res) => res,
+  async (error) => {
+    const originalRequest = error.config;
+    const status = error.response?.status;
+
+    if ((status === 401 || status === 403) && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        console.log('🔁 Trying to refresh token...');
+        const res = await axios.get('http://localhost:3000/auth/refresh-token', {
+          withCredentials: true,
+        });
+
+        const newToken = res.data.accessToken;
+        if (!newToken) throw new Error("No token from refresh");
+
+        localStorage.setItem('token', newToken);
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        console.log('✅ Token refreshed via interceptor');
+
+        return api(originalRequest);
+      } catch (err) {
+        console.error("❌ Refresh failed in interceptor:", err.response?.data || err.message);
+        localStorage.clear();
+        window.location.href = '/login';
+      }
+    }
+
+    return Promise.reject(error);
+  }
 );
 
 export default api;

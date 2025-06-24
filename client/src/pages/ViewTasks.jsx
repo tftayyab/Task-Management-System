@@ -1,106 +1,87 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import api from '../api'; // Axios instance
+import { useNavigate, useParams } from 'react-router-dom';
+import {
+  TaskIcon
+} from '../components/svg';
+import TaskList from '../components/TaskList';
+import Tasks from '../components/Tasks';
+import PageHeader from '../components/PageHeader';
+import api from '../api';
 
 function ViewTasks() {
+  const { id } = useParams();
   const [tasks, setTasks] = useState([]);
-  const [selectedTask, setSelectedTask] = useState(null);
+  const [filteredTasksList, setFilteredTasksList] = useState([]);
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [loading, setLoading] = useState(true); // ✅ block render until token is handled
+
   const navigate = useNavigate();
 
-  useEffect(() => {
-    document.title = 'View Tasks';
-
-    const rememberedUsername = localStorage.getItem('rememberedUsername');
-    if (rememberedUsername) {
-      // No effect on your current logic, this line is kept as-is
-    }
-
-    fetchTasks();
-  }, []);
-
-  const handleLogout = async () => {
-  try {
-    await api.post('/auth/logout'); // Clear refresh cookie from backend
-  } catch (err) {
-    console.error('Logout error:', err);
-  }
-
-  // Clear localStorage
-  localStorage.removeItem('token');
-  localStorage.removeItem('username');
-
-  // Redirect to login
-  navigate('/login');
-};
-
-
-  const fetchTasks = () => {
-    const username = localStorage.getItem("username");
-    api.get(`/tasks?username=${username}`)
-      .then(res => setTasks(res.data))
-      .catch(err => console.log(err));
-  };
-
-  const handleViewTask = (task) => {
-    setSelectedTask(task);
-  };
-
-  const deleteTask = async (id) => {
-    await api.delete(`/task/${id}`);
-    fetchTasks();
-    setSelectedTask(null);
-  };
-
-  const handleDelete = async (id) => {
+useEffect(() => {
+  const fetchTasks = async () => {
     try {
-      await deleteTask(id);
+      const username = localStorage.getItem('username');
+      console.log("📥 Fetching tasks for:", username);
+      const res = await api.get(`/tasks?username=${username}`);
+      setTasks(res.data);
+      setFilteredTasksList(res.data);
     } catch (err) {
-      if (err.response?.status === 401) {
-        try {
-          const res = await api.get('/auth/refresh-token');
-          const newToken = res.data.accessToken;
-          localStorage.setItem('token', newToken);
-          await deleteTask(id); // Retry after refresh
-        } catch (refreshErr) {
-          console.error('Token refresh failed');
-          navigate('/login');
-        }
-      } else {
-        console.error(err);
-      }
+      console.error("❌ Fetch error in MyTasks:", err.response?.data || err.message);
+    } finally {
+      setLoading(false);
     }
   };
+
+  fetchTasks();
+}, []);
+
+
+
+  useEffect(() => {
+    if (id && filteredTasksList.length > 0) {
+      const exists = filteredTasksList.some(task => task._id === id);
+      setSelectedTaskId(exists ? id : null);
+    } else if (!selectedTaskId && filteredTasksList.length > 0) {
+      setSelectedTaskId(filteredTasksList[0]._id);
+    }
+  }, [id, filteredTasksList, selectedTaskId]);
+
 
   return (
-    <>
-      <h2>Task List</h2>
-      <ul>
-        {tasks.map((task, index) => (
-          <li key={task._id}>
-            <button onClick={() => handleViewTask(task)}>Task {index + 1}</button>
-          </li>
-        ))}
-      </ul>
+    <div className="min-h-screen bg-white flex flex-col overflow-hidden">
+      <PageHeader
+        redTitle="Ta"
+        blackTitle="sks"
+        tasks={tasks}
+        setTasks={setTasks}
+        setFilteredTasksList={setFilteredTasksList}
+        setIsMenuOpen={setIsMenuOpen}
+      />
 
-      {selectedTask && (
-        <>
-          <h4>Task Details</h4>
-          <p><strong>Title:</strong> {selectedTask.title}</p>
-          <p><strong>Description:</strong> {selectedTask.description}</p>
-          <p><strong>Status:</strong> {selectedTask.status}</p>
-          <p><strong>Due Date:</strong> {selectedTask.dueDate}</p>
-          <button onClick={() => handleDelete(selectedTask._id)}>Delete</button>
-          <button onClick={() => navigate('/edit')}>Edit</button>
-        </>
-      )}
+      {/* Content */}
+      <div className="sm:w-[150vh] w-full sm:absolute sm:right-15 sm:-bottom-4 px-4 mt-5 sm:mt-10 pb-6">
+        {!isMenuOpen && (
+          <div className="relative z-0 border border-[rgba(161,163,171,0.63)] shadow-lg rounded-2xl p-4 flex flex-col sm:flex-row sm:gap-6 w-full max-w-7xl mx-auto bg-white transition-all duration-300">
 
-      <hr />
+            {/* Left side could be added here if needed (TaskList, etc.) */}
 
-      <button onClick={() => navigate('/addtasks')}>Add Task</button>
-      <button onClick={handleLogout}>
-        Logout
-      </button>
-    </>
+            {/* Right Side: Task Preview */}
+            <div className="hidden sm:flex sm:order-2 w-full sm:w-[35rem] flex-col gap-6 mt-6 sm:mt-0">
+              {selectedTaskId && (
+                <div className="hidden sm:block sm:w-[140vh] h-[31rem] bg-[#F5F8FF] p-4 rounded-xl border border-[rgba(161,163,171,0.63)] shadow overflow-y-auto scrollbar-hide">
+                  <Tasks
+                    tasks={tasks}
+                    task_id={selectedTaskId}
+                  />
+                </div>
+              )}
+            </div>
+
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 

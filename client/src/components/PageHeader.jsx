@@ -10,9 +10,10 @@ const PageHeader = ({
   tasks,
   setFilteredTasksList,
   setIsMenuOpen,
+  searchTerm,
+  setSearchTerm
 }) => {
   const [showMenu, setShowMenu] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {

@@ -47,7 +47,7 @@ function Menu({ onClose }) {
       {/* Menu Drawer */}
       <div
         ref={menuRef}
-        className="fixed sm:bottom-0 left-0 w-[95%] z-50 h-full sm:w-[22rem] sm:h-[84vh] bg-[#1c1c1e] rounded-tr-2xl rounded-br-2xl shadow-2xl transition-transform duration-300 transform translate-x-0 flex flex-col justify-between"
+        className="fixed sm:bottom-0 left-0 w-[95%] z-50 h-full sm:w-[20rem] sm:h-[84vh] bg-[#1c1c1e] rounded-tr-2xl rounded-br-2xl shadow-2xl transition-transform duration-300 transform translate-x-0 flex flex-col justify-between"
       >
         {/* Top Section */}
         <div className="p-6 flex flex-col gap-6">

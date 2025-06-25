@@ -23,6 +23,7 @@ function MyTasks() {
   const [loading, setLoading] = useState(true); // ✅ block render until token is handled
   const [showAddModal, setShowAddModal] = useState(false);
   const [editTask, setEditTask] = useState(null); // to hold the task being edited
+  const [searchTerm, setSearchTerm] = useState('');
 
 
 
@@ -101,6 +102,8 @@ function MyTasks() {
         setTasks={setTasks}
         setFilteredTasksList={setFilteredTasksList}
         setIsMenuOpen={setIsMenuOpen}
+        searchTerm={searchTerm}               // ✅
+        setSearchTerm={setSearchTerm}  
       />
 
       {/* Content */}
@@ -133,6 +136,7 @@ function MyTasks() {
                 setEditTask={setEditTask} // ✅ new prop
                 fetchTasksWithRetry={fetchTasksWithRetry}
                 onTaskClick={(id) => setSelectedTaskId(id)}
+                searchTerm={searchTerm} 
               />
             </div>
 

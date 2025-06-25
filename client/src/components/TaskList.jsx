@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { CircleIcon, OptionIcon } from './svg';
 import Actions from './actions';
+import useIsMobile from '../utils/useScreenSize'; // adjust path
 
 function TaskList({ tasks, fetchTasksWithRetry, statuses = [], searchTerm = '', setEditTask, onTaskClick }) {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [openActionId, setOpenActionId] = useState(null);
   const clickTimeout = useRef(null);
   const search = searchTerm.toLowerCase().trim();
@@ -41,13 +43,12 @@ function TaskList({ tasks, fetchTasksWithRetry, statuses = [], searchTerm = '', 
         <li
           key={task._id}
           onClick={() => {
-          if (window.innerWidth < 640) {
-            // Mobile view (Tailwind's `sm` breakpoint is 640px)
-            navigate(`/viewtask/${task._id}`);
-          } else {
-            onTaskClick?.(task._id);
-          }
-        }}// ✅ View Task on click 
+            if (isMobile) {
+              navigate(`/viewtask/${task._id}`);
+            } else {
+              onTaskClick?.(task._id);
+            }
+          }}
           className="cursor-pointer group p-4 rounded-xl border border-[#A1A3AB] bg-white shadow transition-all duration-200 hover:shadow-lg hover:scale-[1.001] relative"
         >
 

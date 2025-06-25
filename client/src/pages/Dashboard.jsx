@@ -10,6 +10,7 @@ import AddTasks from './AddTasks';
 import Edit from './Edit'; // or wherever you have it
 import api from '../api';
 
+
 function Dashboard() {
   const [tasks, setTasks] = useState([]);
   const [filteredTasksList, setFilteredTasksList] = useState([]);
@@ -17,6 +18,7 @@ function Dashboard() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editTask, setEditTask] = useState(null); // to hold the task being edited
   const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
   
 
   const navigate = useNavigate();
@@ -64,15 +66,17 @@ function Dashboard() {
         filteredTasksList={filteredTasksList}
         setFilteredTasksList={setFilteredTasksList}
         setIsMenuOpen={setIsMenuOpen}
+        searchTerm={searchTerm}               // ✅
+        setSearchTerm={setSearchTerm}  
       />
 
       {/* ✅ Main Content */}
-      <div className="sm:w-[150vh] w-full sm:absolute sm:right-15 sm:-bottom-4 px-4 mt-5 sm:mt-10 pb-6">
+      <div className="sm:w-[150vh] w-full sm:top-25 sm:absolute sm:right-15 sm:-bottom-4 px-4 mt-5 sm:mt-10 pb-6">
         {!isMenuOpen && (
           <div className="relative z-0 border border-[rgba(161,163,171,0.63)] shadow-lg rounded-2xl p-4 flex flex-col sm:flex-row sm:gap-6 w-full max-w-7xl mx-auto bg-white transition-all duration-300">
 
             {/* 🔶 Left: Task List */}
-            <div className="order-2 sm:order-1 flex-1 mt-7 sm:mt-0 bg-[#F5F8FF] rounded-xl p-6 overflow-y-auto max-h-[75vh] scrollbar-hide">
+            <div className="order-2 sm:order-1 sm:h-[72vh] flex-1 mt-7 sm:mt-0 bg-[#F5F8FF] rounded-xl p-6 overflow-y-auto max-h-[75vh] scrollbar-hide">
               <div className="flex items-center justify-between mb-4">
                 <div
                   onClick={() => navigate('/mytasks')}
@@ -97,6 +101,7 @@ function Dashboard() {
                 statuses={["Pending", "In Progress"]}
                 onTaskClick={(id) => setSelectedTaskId(id)}
                 setEditTask={setEditTask} // ✅ new prop
+                searchTerm={searchTerm} 
               />
             </div>
 

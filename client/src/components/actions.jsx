@@ -1,10 +1,7 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import api from '../api';
 
-const Actions = ({ task, fetchTasksWithRetry }) => {
-  const navigate = useNavigate();
-
+const Actions = ({ task, fetchTasksWithRetry, setEditTask }) => {
   const handleDelete = async (id) => {
     try {
       await api.delete(`/task/${id}`);
@@ -19,7 +16,7 @@ const Actions = ({ task, fetchTasksWithRetry }) => {
           fetchTasksWithRetry();
         } catch {
           console.error('Token refresh failed on delete');
-          navigate('/login');
+          window.location.href = '/login';
         }
       } else {
         console.error('Delete error:', error);
@@ -30,7 +27,7 @@ const Actions = ({ task, fetchTasksWithRetry }) => {
   return (
     <div className="flex flex-col min-w-[6rem] bg-white rounded-xl shadow-lg ring-1 ring-gray-200 overflow-hidden transition-all duration-300 ease-in-out">
       <button
-        onClick={() => navigate('/edit', { state: { task } })}
+        onClick={() => setEditTask(task)} // ✅ this calls parent to open modal
         className="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 hover:text-blue-800 transition-all font-medium text-left"
       >
         ✏️ Edit

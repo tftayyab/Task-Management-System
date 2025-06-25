@@ -7,6 +7,10 @@ import TaskList from '../components/TaskList';
 import Tasks from '../components/Tasks';
 import PageHeader from '../components/PageHeader';
 import api from '../api';
+import AddTasks from './AddTasks'; // ✅ Import modal
+import Edit from './Edit'; // or wherever you have it
+
+
 
 function MyTasks() {
   const location = useLocation();
@@ -17,6 +21,10 @@ function MyTasks() {
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true); // ✅ block render until token is handled
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [editTask, setEditTask] = useState(null); // to hold the task being edited
+
+
 
   const navigate = useNavigate();
 
@@ -72,6 +80,20 @@ function MyTasks() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col overflow-hidden">
+      {showAddModal && (
+        <AddTasks
+          onClose={() => setShowAddModal(false)} // ✅ close modal
+          fetchTasksWithRetry={fetchTasksWithRetry} // ✅ reload tasks
+        />
+      )}
+      {editTask && (
+        <Edit
+          taskData={editTask}
+          onClose={() => setEditTask(null)} // close logic
+          fetchTasksWithRetry={fetchTasksWithRetry}
+        />
+      )}
+
       <PageHeader
         redTitle="Ta"
         blackTitle="sks"
@@ -90,14 +112,14 @@ function MyTasks() {
             <div className="order-2 sm:order-1 flex-1 sm:mt-0 bg-[#F5F8FF] rounded-xl p-6 overflow-y-auto max-h-[70vh] scrollbar-hide">
               <div className="flex items-center justify-between mb-4">
                 <div
-                  onClick={() => navigate('/tasks')}
+                  onClick={() => navigate('/mytasks')}
                   className="flex items-center gap-x-2 cursor-pointer group"
                 >
                   <TaskIcon className="w-4 h-4" />
                   <p className="text-[#FF6767] text-sm font-medium group-hover:underline">Tasks</p>
                 </div>
                 <button
-                  onClick={() => navigate('/addtasks')}
+                  onClick={() => setShowAddModal(true)} // ✅ open modal
                   className="flex items-center gap-x-2 text-sm text-[#A1A3AB] hover:text-[#FF6767] transition-all"
                 >
                   <AddIcon className="w-4 h-4" />
@@ -108,6 +130,8 @@ function MyTasks() {
               <TaskList
                 tasks={filteredTasksList}
                 statuses={["Pending", "In Progress", "Completed"]}
+                setEditTask={setEditTask} // ✅ new prop
+                fetchTasksWithRetry={fetchTasksWithRetry}
                 onTaskClick={(id) => setSelectedTaskId(id)}
               />
             </div>
@@ -119,6 +143,7 @@ function MyTasks() {
                   <Tasks
                     tasks={tasks}
                     task_id={selectedTaskId}
+                    setEditTask={setEditTask}
                   />
                 </div>
               )}

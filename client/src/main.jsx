@@ -17,8 +17,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/tasks" element={<MyTasks />} />
-        <Route path="/task/:id" element={<ViewTasks />} />
+        <Route path="/mytasks" element={<MyTasks />} />
+        <Route path="/viewtask/:id" element={<ViewTasks />} />
         <Route path="/addtasks" element={<AddTasks />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/register" element={<Register />} />

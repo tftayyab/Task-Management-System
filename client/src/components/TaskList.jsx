@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { CircleIcon, OptionIcon } from './svg';
 import Actions from './actions';
 
-function TaskList({ tasks, fetchTasksWithRetry, statuses = [], searchTerm = '' }) {
+function TaskList({ tasks, fetchTasksWithRetry, statuses = [], searchTerm = '', setEditTask, onTaskClick }) {
   const navigate = useNavigate();
   const [openActionId, setOpenActionId] = useState(null);
   const clickTimeout = useRef(null);
@@ -41,16 +41,16 @@ function TaskList({ tasks, fetchTasksWithRetry, statuses = [], searchTerm = '' }
         <li
           key={task._id}
           onClick={() => {
-            clickTimeout.current = setTimeout(() => {
-              navigate('/tasks', { state: { taskId: task._id } });
-            }, 250); // Delay to detect double click
-          }}
-          onDoubleClick={() => {
-            clearTimeout(clickTimeout.current);
-            navigate(`/task/${task._id}`); // ✅ pass ID in URL
-          }}
+          if (window.innerWidth < 640) {
+            // Mobile view (Tailwind's `sm` breakpoint is 640px)
+            navigate(`/viewtask/${task._id}`);
+          } else {
+            onTaskClick?.(task._id);
+          }
+        }}// ✅ View Task on click 
           className="cursor-pointer group p-4 rounded-xl border border-[#A1A3AB] bg-white shadow transition-all duration-200 hover:shadow-lg hover:scale-[1.001] relative"
         >
+
           {/* Top Row */}
           <div className="flex justify-between items-start gap-2 flex-wrap">
             <div className="flex items-center gap-2">
@@ -60,20 +60,25 @@ function TaskList({ tasks, fetchTasksWithRetry, statuses = [], searchTerm = '' }
               </p>
             </div>
 
-            <div className="relative">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setOpenActionId(prev => (prev === task._id ? null : task._id));
-                }}
-                className="hover:scale-110 transition-transform"
-              >
-                <OptionIcon />
-              </button>
+           <div className="relative hidden sm:block">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpenActionId(prev => (prev === task._id ? null : task._id));
+              }}
+              className="hover:scale-110 transition-transform"
+              type="button" // ✅ prevent accidental form submit
+            >
+              <OptionIcon />
+            </button>
 
               {openActionId === task._id && (
                 <div className="absolute z-50 right-0 mt-2">
-                  <Actions task={task} fetchTasksWithRetry={fetchTasksWithRetry} />
+                  <Actions
+                    task={task}
+                    fetchTasksWithRetry={fetchTasksWithRetry}
+                    setEditTask={setEditTask} // ✅ pass to Actions
+                  />
                 </div>
               )}
             </div>

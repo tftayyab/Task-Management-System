@@ -7,6 +7,7 @@ import TaskList from '../components/TaskList';
 import Tasks from '../components/Tasks';
 import PageHeader from '../components/PageHeader';
 import api from '../api';
+import Edit from './Edit'; // or wherever you have it
 
 function ViewTasks() {
   const { id } = useParams();
@@ -15,11 +16,36 @@ function ViewTasks() {
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true); // ✅ block render until token is handled
+  const [editTask, setEditTask] = useState(null);
 
   const navigate = useNavigate();
 
 useEffect(() => {
-  const fetchTasks = async () => {
+    const tryFetch = async () => {
+      const token = localStorage.getItem('token');
+
+      if (!token) {
+        try {
+          console.log("⏳ No token, trying to refresh...");
+          const res = await api.get('/auth/refresh-token');
+          const newToken = res.data.accessToken;
+          localStorage.setItem('token', newToken);
+          console.log("✅ Token refreshed");
+        } catch (err) {
+          console.error("🚫 Refresh failed:", err.response?.data || err.message);
+          window.location.href = '/login';
+          return; // stop here
+        }
+      }
+
+      // ✅ Now safe to fetch
+      fetchTasksWithRetry();
+    };
+
+    tryFetch();
+  }, []);
+
+  const fetchTasksWithRetry = async () => {
     try {
       const username = localStorage.getItem('username');
       console.log("📥 Fetching tasks for:", username);
@@ -27,14 +53,11 @@ useEffect(() => {
       setTasks(res.data);
       setFilteredTasksList(res.data);
     } catch (err) {
-      console.error("❌ Fetch error in MyTasks:", err.response?.data || err.message);
+      console.error("❌ Fetch error:", err.response?.data || err.message);
     } finally {
-      setLoading(false);
+      setLoading(false); // ✅ allow rendering now
     }
   };
-
-  fetchTasks();
-}, []);
 
 
 
@@ -50,6 +73,13 @@ useEffect(() => {
 
   return (
     <div className="min-h-screen bg-white flex flex-col overflow-hidden">
+      {editTask && (
+        <Edit
+          taskData={editTask}
+          onClose={() => setEditTask(null)} // close logic
+          fetchTasksWithRetry={fetchTasksWithRetry}
+        />
+      )}
       <PageHeader
         redTitle="Ta"
         blackTitle="sks"
@@ -67,12 +97,13 @@ useEffect(() => {
             {/* Left side could be added here if needed (TaskList, etc.) */}
 
             {/* Right Side: Task Preview */}
-            <div className="hidden sm:flex sm:order-2 w-full sm:w-[35rem] flex-col gap-6 mt-6 sm:mt-0">
+            <div className=" sm:flex sm:order-2 w-full sm:w-[35rem] flex-col gap-6 mt-6 sm:mt-0">
               {selectedTaskId && (
-                <div className="hidden sm:block sm:w-[140vh] h-[31rem] bg-[#F5F8FF] p-4 rounded-xl border border-[rgba(161,163,171,0.63)] shadow overflow-y-auto scrollbar-hide">
+                <div className="sm:block sm:w-[140vh] h-[31rem] bg-[#F5F8FF] p-4 rounded-xl border border-[rgba(161,163,171,0.63)] shadow overflow-y-auto scrollbar-hide">
                   <Tasks
                     tasks={tasks}
                     task_id={selectedTaskId}
+                    setEditTask={setEditTask}
                   />
                 </div>
               )}

@@ -1,126 +1,143 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
+import { CrossIcon } from '../components/svg';
 
-function Edit() {
-  const [tasks, setTasks] = useState([]);
-  const [selectedTask, setSelectedTask] = useState(null);
+function Edit({ taskData, onClose, fetchTasksWithRetry }) {
   const [newTask, setNewTask] = useState({
     title: '',
     description: '',
     status: 'In Progress',
     dueDate: ''
   });
-  const [isEditing, setIsEditing] = useState(false);
-  const [editingTaskId, setEditingTaskId] = useState(null);
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    document.title = 'Edit';
+ useEffect(() => {
+  document.title = 'Edit Task';
 
-    const rememberedUsername = localStorage.getItem('rememberedUsername');
-    if (rememberedUsername) {
-      setNewTask((prev) => ({ ...prev, username: rememberedUsername }));
-    }
+  if (taskData) {
+    const formattedDate = taskData.dueDate?.slice(0, 10); // ✅ "yyyy-MM-dd" format from ISO string
 
-    fetchTasks();
-  }, []);
-
-  const handleLogout = async () => {
-    try {
-      await api.post('/auth/logout');
-    } catch (err) {
-      console.error('Logout error:', err);
-    }
-
-    localStorage.clear();
-    navigate('/login');
-  };
-
-  const fetchTasks = async () => {
-    const username = localStorage.getItem("username");
-    const res = await api.get(`/tasks?username=${username}`);
-    setTasks(res.data);
-  };
-
-  const handleViewTask = (task) => {
-    setSelectedTask(task);
-    setIsEditing(true);
-    setEditingTaskId(task._id);
     setNewTask({
-      title: task.title,
-      description: task.description,
-      status: task.status,
-      dueDate: task.dueDate
+      title: taskData.title,
+      description: taskData.description,
+      status: taskData.status,
+      dueDate: formattedDate
     });
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-  };
+  }
+
+  const rememberedUsername = localStorage.getItem('rememberedUsername');
+  if (rememberedUsername) {
+    setNewTask(prev => ({ ...prev, username: rememberedUsername }));
+  }
+}, [taskData]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setNewTask(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setNewTask(prev => ({ ...prev, [name]: value }));
   };
 
-  const updateTask = async () => {
-    const username = localStorage.getItem("username");
-    const taskData = { ...newTask, username };
+  const handleUpdate = async () => {
+    const username = localStorage.getItem('username');
+    const taskPayload = { ...newTask, username };
 
-    await api.put(`/task/${editingTaskId}`, taskData);
-    fetchTasks();
-    setNewTask({
-      title: '',
-      description: '',
-      status: 'In Progress',
-      dueDate: ''
-    });
-    setIsEditing(false);
-    setEditingTaskId(null);
-    setSelectedTask(null);
-  };
-
-  const deleteTask = async (id) => {
-    await api.delete(`/task/${id}`);
-    fetchTasks();
-    setSelectedTask(null);
+    await api.put(`/task/${taskData._id}`, taskPayload);
+    onClose?.(); // close modal or navigate
   };
 
   return (
-    <>
-      <h2>Task List</h2>
-      <ul>
-        {tasks.map((task, index) => (
-          <li key={task._id}>
-            <button onClick={() => handleViewTask(task)}>Task {index + 1}</button>
-          </li>
-        ))}
-      </ul>
+    <div className="fixed inset-0 z-[999] flex items-center justify-center backdrop-blur-sm bg-black/40 px-4">
+      <div className="relative w-full max-w-3xl sm:h-[40rem] bg-[#F9F9F9] rounded-xl shadow-2xl p-6 sm:p-10 space-y-6">
+        
+        {/* Close Icon */}
+        <div
+          className="absolute top-4 right-4 sm:top-6 sm:right-6 cursor-pointer"
+          onClick={onClose}
+        >
+          <CrossIcon className="w-6 h-6 hover:scale-110 transition-transform" />
+        </div>
 
-      {selectedTask && (
-        <>
-          <h4>Edit Task</h4>
-          <input type="text" name="title" value={newTask.title} onChange={handleChange} placeholder="Title" />
-          <input type="text" name="description" value={newTask.description} onChange={handleChange} placeholder="Description" />
+        {/* Header */}
+        <div className="text-center">
+          <p className="text-black font-semibold text-xl sm:text-2xl">Edit Task</p>
+          <div className="mt-1 mx-auto w-12 sm:w-20 h-1 bg-[#F24E1E] rounded-full" />
+        </div>
+
+        {/* Form */}
+        <div className="space-y-5">
+          {/* Title */}
           <div>
-            <label><input type="radio" name="status" value="Pending" checked={newTask.status === 'Pending'} onChange={handleChange} /> Pending</label>
-            <label><input type="radio" name="status" value="In Progress" checked={newTask.status === 'In Progress'} onChange={handleChange} /> In Progress</label>
-            <label><input type="radio" name="status" value="Completed" checked={newTask.status === 'Completed'} onChange={handleChange} /> Completed</label>
+            <label htmlFor="title" className="block text-sm font-semibold text-black mb-1">Title</label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={newTask.title}
+              onChange={handleChange}
+              className="w-full rounded-md border border-[#A1A3AB] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 hover:border-orange-400 transition-all"
+            />
           </div>
-          <p>Due Date</p>
-          <input type="date" name="dueDate" value={newTask.dueDate} onChange={handleChange} />
-          <br />
-          <button onClick={updateTask}>Update Task</button>
-          <button onClick={() => deleteTask(selectedTask._id)}>Delete</button>
-        </>
-      )}
 
-      <hr />
-      <button onClick={() => navigate('/tasks')}>View Tasks</button>
-      <button onClick={handleLogout}>Logout</button>
-    </>
+          {/* Description */}
+          <div>
+            <label htmlFor="description" className="block text-sm font-semibold text-black mb-1">Description</label>
+            <textarea
+              id="description"
+              name="description"
+              value={newTask.description}
+              onChange={handleChange}
+              rows="4"
+              className="w-full h-[10rem] rounded-md border border-[#A1A3AB] px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-orange-400 hover:border-orange-400 transition-all"
+            />
+          </div>
+
+          {/* Due Date */}
+          <div>
+            <label htmlFor="dueDate" className="block text-sm font-semibold text-black mb-1">Due Date</label>
+            <input
+              type="date"
+              name="dueDate"
+              id="dueDate"
+              value={newTask.dueDate}
+              onChange={handleChange}
+              className="w-full rounded-md border border-[#A1A3AB] px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-400 hover:border-orange-400 transition-all"
+            />
+          </div>
+
+          {/* Status */}
+          <div>
+            <p className="block text-sm font-semibold text-black mb-2">Status</p>
+            <div className="flex flex-wrap gap-4">
+              {["Pending", "In Progress", "Completed"].map((status) => (
+                <label key={status} className="inline-flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-orange-600 transition">
+                  <input
+                    type="radio"
+                    name="status"
+                    value={status}
+                    checked={newTask.status === status}
+                    onChange={handleChange}
+                    className="accent-orange-500"
+                  />
+                  {status}
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Submit Button */}
+        <div className="flex justify-center sm:justify-start">
+          <button
+            onClick={handleUpdate}
+            className="bg-[#FF9090] hover:bg-[#FF6F6F] active:scale-95 text-white px-6 py-2 rounded-md text-sm font-medium shadow transition-all"
+          >
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 

@@ -23,8 +23,10 @@ mongoose.connect('mongodb://127.0.0.1:27017/Task-ManagerDB')
 app.set('view engine', 'ejs');
 
 // Route imports
-const MyTasks = require('./routes/MyTasks');
-const ViewTasks = require('./routes/ViewTasks');
+const MyTasks = require('./routes/tasks');
+const ViewTasks = require('./routes/task');
+const tasks = require('./routes/tasks');
+const task = require('./routes/task');
 const login = require('./routes/login');
 const Register = require('./routes/Register');
 const Dashboard = require('./routes/Dashboard');
@@ -33,8 +35,10 @@ const AddTasks = require('./routes/AddTasks');
 const AuthRoutes = require('./routes/auth'); // NEW — for refresh token and logout
 
 // Mount routes
-app.use('/tasks', MyTasks);
-app.use('/task', ViewTasks); 
+app.use('/tasks', tasks);
+app.use('/task', task);
+app.use('/mytask', MyTasks);
+app.use('/viewtask', ViewTasks); 
 app.use('/login', login);
 app.use('/edit', Edit);
 app.use('/dashboard', Dashboard);

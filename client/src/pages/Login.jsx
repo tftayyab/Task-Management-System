@@ -70,7 +70,7 @@ function Login() {
       />
 
       <div className="relative z-10 flex flex-col h-full px-4 sm:px-8 justify-start pt-[20vh]">
-        <h1 className="text-[#212427] font-montserrat text-3xl sm:text-4xl font-bold text-center sm:text-left">
+        <h1 className="text-[#212427] sm:ml-4.5 font-montserrat text-3xl sm:text-4xl font-bold text-center sm:text-left">
           Sign In
         </h1>
 

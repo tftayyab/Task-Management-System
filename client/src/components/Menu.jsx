@@ -34,7 +34,7 @@ function Menu({ onClose }) {
   };
 
   const isDashboard = location.pathname === '/dashboard';
-  const isTasks = location.pathname === '/tasks';
+  const isTasks = location.pathname === '/mytasks';
 
   return (
     <>
@@ -75,7 +75,7 @@ function Menu({ onClose }) {
               IconActive={MyTasksSelectedIcon}
               IconInactive={MyTasksNotSelectedIcon}
               onClick={() => {
-                navigate('/tasks');
+                navigate('/mytasks');
                 onClose?.();
               }}
             />

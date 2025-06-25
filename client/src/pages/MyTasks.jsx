@@ -112,7 +112,7 @@ function MyTasks() {
           <div className="relative z-0 border border-[rgba(161,163,171,0.63)] shadow-lg rounded-2xl p-4 flex flex-col sm:flex-row sm:gap-6 w-full max-w-7xl mx-auto bg-white transition-all duration-300">
 
             {/* Left Side: Task List */}
-            <div className="order-2 sm:order-1 flex-1 sm:mt-0 bg-[#F5F8FF] rounded-xl p-6 overflow-y-auto max-h-[70vh] scrollbar-hide">
+            <div className="order-2 sm:order-1 flex-1 sm:mt-0 bg-[#F5F8FF] sm:h-[72vh] rounded-xl p-6 overflow-y-auto max-h-[72vh] scrollbar-hide">
               <div className="flex items-center justify-between mb-4">
                 <div
                   onClick={() => navigate('/mytasks')}

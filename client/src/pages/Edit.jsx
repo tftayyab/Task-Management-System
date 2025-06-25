@@ -40,12 +40,24 @@ function Edit({ taskData, onClose, fetchTasksWithRetry }) {
   };
 
   const handleUpdate = async () => {
+  try {
     const username = localStorage.getItem('username');
     const taskPayload = { ...newTask, username };
 
     await api.put(`/task/${taskData._id}`, taskPayload);
-    onClose?.(); // close modal or navigate
-  };
+
+    // ✅ Refresh tasks after update
+    if (fetchTasksWithRetry) {
+      fetchTasksWithRetry();
+    }
+
+    // ✅ Close modal after update
+    onClose?.();
+  } catch (error) {
+    console.error("Failed to update task:", error);
+  }
+};
+
 
   return (
     <div className="fixed inset-0 z-[999] flex items-center justify-center backdrop-blur-sm bg-black/40 px-4">

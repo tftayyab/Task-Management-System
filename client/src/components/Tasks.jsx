@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { DeleteTasksIcon, EditTasksIcon } from './svg';
 import Edit from '../pages/Edit';
 import api from '../api';
+import handleDelete from '../utils/handleDelete';
 
 function Tasks({
   tasks,
@@ -42,28 +43,6 @@ function Tasks({
     return `${day} ${month} ${year}`;
   };
 
-  const handleDelete = async (id) => {
-    try {
-      await api.delete(`/task/${id}`);
-      fetchTasksWithRetry?.();
-    } catch (error) {
-      if (error.response?.status === 401) {
-        try {
-          const refreshRes = await api.get('/auth/refresh-token');
-          const newToken = refreshRes.data.accessToken;
-          localStorage.setItem('token', newToken);
-          await api.delete(`/task/${id}`);
-          fetchTasksWithRetry?.();
-        } catch {
-          console.error('Token refresh failed on delete');
-          window.location.href = '/login';
-        }
-      } else {
-        console.error('Delete error:', error);
-      }
-    }
-  };
-
   return (
     <>
       <ul className="flex flex-col gap-4 w-full h-full overflow-y-auto pr-1 scrollbar-hide">
@@ -95,6 +74,7 @@ function Tasks({
                   onClick={(e) => {
                     e.stopPropagation(); // ✅ stop from triggering view
                     handleDelete(task._id);
+                    navigate('/mytasks');
                   }}
                 >
                   <DeleteTasksIcon className="w-5 h-5" />

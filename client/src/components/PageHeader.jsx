@@ -21,7 +21,7 @@ const PageHeader = ({
   }, []);
 
   useEffect(() => {
-    const term = searchTerm.toLowerCase().trim();
+    const term = (searchTerm || '').toLowerCase().trim();
 
     const validTasks = tasks.filter(t =>
       t.status === 'Pending' || t.status === 'In Progress' || t.status === 'Completed'

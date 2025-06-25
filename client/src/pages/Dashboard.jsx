@@ -51,7 +51,7 @@ function Dashboard() {
       )}
       {editTask && (
         <Edit
-          task={editTask}
+          taskData={editTask}
           onClose={() => setEditTask(null)} // close logic
           fetchTasksWithRetry={fetchTasksWithRetry}
         />
@@ -73,10 +73,10 @@ function Dashboard() {
       {/* ✅ Main Content */}
       <div className="sm:w-[150vh] w-full sm:top-25 sm:absolute sm:right-15 sm:-bottom-4 px-4 mt-5 sm:mt-10 pb-6">
         {!isMenuOpen && (
-          <div className="relative z-0 border border-[rgba(161,163,171,0.63)] shadow-lg rounded-2xl p-4 flex flex-col sm:flex-row sm:gap-6 w-full max-w-7xl mx-auto bg-white transition-all duration-300">
+          <div className="relative z-0 border h-[79vh] border-[rgba(161,163,171,0.63)] shadow-lg rounded-2xl p-4 flex flex-col sm:flex-row sm:gap-6 w-full max-w-7xl mx-auto bg-white transition-all duration-300">
 
             {/* 🔶 Left: Task List */}
-            <div className="order-2 sm:order-1 sm:h-[72vh] flex-1 mt-7 sm:mt-0 bg-[#F5F8FF] rounded-xl p-6 overflow-y-auto max-h-[75vh] scrollbar-hide">
+            <div className="order-2 sm:order-1 sm:h-[73vh] flex-1 mt-7 sm:mt-0 bg-[#F5F8FF] rounded-xl p-6 overflow-y-auto max-h-[75vh] scrollbar-hide">
               <div className="flex items-center justify-between mb-4">
                 <div
                   onClick={() => navigate('/mytasks')}

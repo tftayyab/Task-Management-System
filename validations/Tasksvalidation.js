@@ -11,6 +11,6 @@ const taskSchema = Joi.object({
   })
 });
 
-const validateTasks = () => taskSchema; // ✅ just return schema functionally
+const validateTasks = () => taskSchema;
 
 module.exports = { validateTasks };

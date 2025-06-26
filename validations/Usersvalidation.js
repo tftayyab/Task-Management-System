@@ -24,7 +24,7 @@ const userSchema = Joi.object({
   })
 });
 
-// ✅ Export a function
+
 const validateUsers = () => userSchema;
 
 module.exports = { validateUsers };

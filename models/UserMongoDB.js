@@ -30,7 +30,7 @@ const UserSchema = new mongoose.Schema({
   },
   refreshToken: {
     type: String,
-    default: null // ✅ only added field, no effect on anything else
+    default: null 
   }
 }, {
   timestamps: true // adds createdAt and updatedAt automatically

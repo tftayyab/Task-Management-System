@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const router = express.Router();
 const User = require("../models/UserMongoDB");
 
-// ✅ GET /auth/refresh-token
+// GET /auth/refresh-token
 router.get("/refresh-token", async (req, res) => {
   const token = req.cookies.refreshToken;
   if (!token) return res.status(401).json({ message: "No refresh token" });
@@ -11,13 +11,13 @@ router.get("/refresh-token", async (req, res) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
 
-    // 🔍 Check if token exists in DB
+    //  Check if token exists in DB
     const user = await User.findById(decoded.userId);
     if (!user || user.refreshToken !== token) {
       return res.status(403).json({ message: "Invalid or mismatched refresh token" });
     }
 
-    // 🔁 Generate new access token
+    //  Generate new access token
     const newAccessToken = jwt.sign(
       { userId: user._id, username: user.username },
       process.env.JWT_SECRET,
@@ -31,7 +31,7 @@ router.get("/refresh-token", async (req, res) => {
   }
 });
 
-// ✅ POST /auth/logout
+//  POST /auth/logout
 router.post("/logout", async (req, res) => {
   const token = req.cookies.refreshToken;
   if (!token) return res.sendStatus(204); // already logged out
@@ -39,7 +39,7 @@ router.post("/logout", async (req, res) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
 
-    // 🔍 Clear token from DB if it matches
+    //  Clear token from DB if it matches
     const user = await User.findById(decoded.userId);
     if (user && user.refreshToken === token) {
       user.refreshToken = null;
@@ -50,7 +50,7 @@ router.post("/logout", async (req, res) => {
     // Even if token is invalid, we still clear the cookie
   }
 
-  // ✅ Clear refreshToken cookie
+  //  Clear refreshToken cookie
   res.clearCookie("refreshToken", {
     httpOnly: true,
     secure: false, // true in production

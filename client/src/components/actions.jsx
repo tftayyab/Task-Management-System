@@ -1,7 +1,7 @@
-import React from 'react';
 import api from '../api';
 
 const Actions = ({ task, fetchTasksWithRetry, setEditTask }) => {
+  
   const handleDelete = async (id) => {
     try {
       await api.delete(`/task/${id}`);

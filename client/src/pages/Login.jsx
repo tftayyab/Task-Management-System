@@ -13,6 +13,9 @@ function Login() {
     remember: false,
   });
 
+  const [loginError, setLoginError] = useState('');
+
+
   useEffect(() => {
     document.title = 'Login';
 
@@ -35,18 +38,19 @@ function Login() {
   };
 
   const handleLogin = async () => {
+    setLoginError(''); // clear any previous errors
     try {
       const response = await axios.post('http://localhost:3000/login', {
         username: formData.username,
         password: formData.password,
-      }, { withCredentials: true }); // sends refresh token cookie
+      }, { withCredentials: true });
 
       const user = response.data.user;
       const token = response.data.accessToken;
 
       localStorage.setItem('username', user.username);
       localStorage.setItem('email', user.email);
-      localStorage.setItem('token', token); // ✅ same name used in api.js
+      localStorage.setItem('token', token);
 
       if (formData.remember) {
         localStorage.setItem('rememberedUsername', user.username);
@@ -57,7 +61,7 @@ function Login() {
       navigate('/dashboard');
     } catch (error) {
       console.error('Login failed:', error);
-      alert('Invalid username or password');
+      setLoginError('Invalid username or password');
     }
   };
 
@@ -127,6 +131,12 @@ function Login() {
             <span className="ml-2 text-[#212427] font-montserrat text-base font-medium">Remember me</span>
           </label>
         </div>
+
+        {loginError && (
+          <div className="px-4 text-red-500 mt-3 text-sm font-medium">
+            {loginError}
+          </div>
+        )}
 
         <div className="mt-6 px-4">
           <button

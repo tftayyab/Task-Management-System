@@ -71,8 +71,8 @@ const PageHeader = ({
           </h1>
         </div>
 
-        <div className="flex sm:flex-row flex-col sm:gap-x-50 sm:items-end items-center gap-2 sm:mt-0 mt-2 w-full sm:w-auto">
-          <div className="w-full sm:w-[50rem] max-w-full px-2 sm:px-0">
+        <div className="flex sm:flex-row flex-col sm:gap-x-30 sm:items-end items-center gap-2 sm:mt-0 mt-2 w-full sm:w-auto">
+          <div className="w-full sm:w-[120vh] max-w-full px-2 sm:px-0">
             <div className="relative flex items-center w-full">
               <SearchIcon className="absolute left-3 w-4 h-4 text-gray-500" />
               <input
@@ -85,7 +85,7 @@ const PageHeader = ({
               />
             </div>
           </div>
-          <div className="text-center sm:text-right">
+          <div className="text-center sm:text-right ">
             <p className="text-black font-inter text-sm sm:text-base font-medium">{day}</p>
             <p className="text-[#3ABEFF] font-inter text-xs sm:text-sm font-medium">{date}</p>
           </div>

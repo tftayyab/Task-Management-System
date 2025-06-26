@@ -1,9 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
 import { DeleteTasksIcon, EditTasksIcon } from './svg';
-import Edit from '../pages/Edit';
-import api from '../api';
-import handleDelete from '../utils/handleDelete';
+import { formatDueDate } from '../utils/DayDate';
+import api from '../api'; 
+
 
 function Tasks({
   tasks,
@@ -16,6 +15,29 @@ function Tasks({
 
   const navigate = useNavigate();
   const search = searchTerm.toLowerCase().trim();
+
+  const handleDelete = async (id) => {
+    try {
+      await api.delete(`/task/${id}`);
+    } catch (error) {
+      if (error.response?.status === 401) {
+        try {
+          const refreshRes = await api.get('/auth/refresh-token');
+          const newToken = refreshRes.data.accessToken;
+          localStorage.setItem('token', newToken);
+          await api.delete(`/task/${id}`);
+        } catch (refreshError) {
+          console.error('❌ Token refresh failed during delete');
+          window.location.href = '/login';
+          return;
+        }
+      } else {
+        console.error('❌ Delete failed:', error);
+        throw error;
+      }
+    }
+  };
+
 
   const filtered = tasks.filter(task => {
     if (task_id) return task._id === task_id;
@@ -30,18 +52,6 @@ function Tasks({
     if (search) return matchesSearch;
     return statuses.includes(task.status);
   });
-
-  const formatDueDate = (dateString) => {
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const monthNames = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    const month = monthNames[date.getMonth()];
-    const year = date.getFullYear();
-    return `${day} ${month} ${year}`;
-  };
 
   return (
     <>
@@ -68,17 +78,23 @@ function Tasks({
             <p className="text-[#747474] text-sm mt-2 break-words">{task.description}</p>
 
               <div className="absolute bottom-4 right-4 flex items-center gap-4 opacity-80 group-hover:opacity-100 transition-opacity">
-                <button
+              <button
                 type="button"
-                  className="hover:text-red-500 hover:scale-110 transition-transform"
-                  onClick={(e) => {
-                    e.stopPropagation(); // ✅ stop from triggering view
-                    handleDelete(task._id);
-                    navigate('/mytasks');
-                  }}
-                >
-                  <DeleteTasksIcon className="w-5 h-5" />
-                </button>
+                className="hover:text-red-500 hover:scale-110 transition-transform"
+                onClick={async (e) => {
+                  e.stopPropagation(); // ✅ prevent task view
+
+                  try {
+                    await handleDelete(task._id);      //  delete from server
+                    await fetchTasksWithRetry();       //  refresh UI 
+                    navigate('/mytasks');              // redirect to /mytasks
+                  } catch (err) {
+                    console.error("Delete failed:", err);
+                  }
+                }}
+              >
+                <DeleteTasksIcon className="w-8 h-8" />
+              </button>
                 <button
                 type="button"
                   className="hover:text-blue-500 hover:scale-110 transition-transform"
@@ -87,7 +103,7 @@ function Tasks({
                     setEditTask(task);
                   }}
                 >
-                  <EditTasksIcon className="w-5 h-5" />
+                  <EditTasksIcon className="w-8 h-8" />
                 </button>
               </div>
           </li>

@@ -5,6 +5,7 @@ import {
   LogoutIcon,
   MyTasksSelectedIcon, MyTasksNotSelectedIcon
 } from './svg';
+import { handleLogout } from '../utils/handleTasks';
 
 function Menu({ onClose }) {
   const navigate = useNavigate();
@@ -20,18 +21,6 @@ function Menu({ onClose }) {
     if (storedEmail) setEmail(storedEmail);
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await fetch('http://localhost:3000/auth/logout', {
-        method: 'POST',
-        credentials: 'include',
-      });
-    } catch {}
-    localStorage.removeItem('token');
-    localStorage.removeItem('username');
-    localStorage.removeItem('email');
-    navigate('/login');
-  };
 
   const isDashboard = location.pathname === '/dashboard';
   const isTasks = location.pathname === '/mytasks';
@@ -47,7 +36,7 @@ function Menu({ onClose }) {
       {/* Menu Drawer */}
       <div
         ref={menuRef}
-        className="fixed sm:bottom-0 left-0 w-[95%] z-50 h-full sm:w-[20rem] sm:h-[84vh] bg-[#1c1c1e] rounded-tr-2xl rounded-br-2xl shadow-2xl transition-transform duration-300 transform translate-x-0 flex flex-col justify-between"
+        className="fixed sm:bottom-0 left-0 w-[95%] z-50 h-full sm:w-[20rem] sm:h-[80vh] bg-[#1c1c1e] rounded-tr-2xl rounded-br-2xl shadow-2xl transition-transform duration-300 transform translate-x-0 flex flex-col justify-between"
       >
         {/* Top Section */}
         <div className="p-6 flex flex-col gap-6">
@@ -85,7 +74,7 @@ function Menu({ onClose }) {
         {/* Bottom - Logout */}
         <div className="p-6 border-t border-white/10">
           <button
-            onClick={handleLogout}
+             onClick={() => handleLogout(navigate)}
             className="group flex items-center gap-3 px-5 py-3 w-full rounded-lg font-medium text-white hover:bg-red-500/90 transition-all duration-200"
           >
             <LogoutIcon className="w-6 h-6 group-hover:scale-110 transition-transform" />

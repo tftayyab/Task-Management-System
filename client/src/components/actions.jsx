@@ -27,11 +27,15 @@ const Actions = ({ task, fetchTasksWithRetry, setEditTask }) => {
   return (
     <div className="flex flex-col min-w-[6rem] bg-white rounded-xl shadow-lg ring-1 ring-gray-200 overflow-hidden transition-all duration-300 ease-in-out">
       <button
-        onClick={() => setEditTask(task)} // ✅ this calls parent to open modal
+        onClick={(e) => {
+          e.stopPropagation(); // 🛑 prevent parent <li> click
+          setEditTask(task);   // ✅ open edit modal only
+        }}
         className="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 hover:text-blue-800 transition-all font-medium text-left"
       >
         ✏️ Edit
       </button>
+
       <button
         onClick={() => handleDelete(task._id)}
         className="px-4 whitespace-nowrap py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-800 transition-all font-medium text-left"

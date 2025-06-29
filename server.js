@@ -7,10 +7,10 @@ require('dotenv').config();
 
 // ==== Middleware Setup ====
 app.use(cors({
-  origin: [
-    'http://localhost:5173',           // for local frontend
-    'https://your-frontend-url.netlify.app' // add deployed frontend here later
-  ],
+    origin: [
+      'http://localhost:5173',
+      'https://tf-task-management-system.netlify.app'
+    ],
   credentials: true
 }));
 

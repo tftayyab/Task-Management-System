@@ -39,7 +39,7 @@ const [loading, setLoading] = useState(false);
 
   try {
     setLoading(true);
-    const response = await axios.post("http://localhost:3000/register", {
+    await axios.post(`${import.meta.env.VITE_API_URL}/register`, {
       firstName: formData.firstName,
       lastName: formData.lastName,
       username: formData.username,

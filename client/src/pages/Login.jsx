@@ -40,7 +40,7 @@ function Login() {
   const handleLogin = async () => {
     setLoginError(''); // clear any previous errors
     try {
-      const response = await axios.post('http://localhost:3000/login', {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/login`, {
         username: formData.username,
         password: formData.password,
       }, { withCredentials: true });

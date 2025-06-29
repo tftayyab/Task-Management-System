@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://task-manager-api.onrender.com',
-  withCredentials: true, // so cookies go with request
+  baseURL: import.meta.env.VITE_API_URL,
+  withCredentials: true,
 });
 
 api.interceptors.request.use(
@@ -24,11 +24,10 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       try {
         console.log('🔁 Trying to refresh token...');
-        const res = await axios.get('http://localhost:3000/auth/refresh-token', {
-          withCredentials: true,
-        });
 
+        const res = await api.get('/auth/refresh-token');
         const newToken = res.data.accessToken;
+
         if (!newToken) throw new Error("No token from refresh");
 
         localStorage.setItem('token', newToken);

@@ -3,26 +3,33 @@ const app = express();
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
-require('dotenv').config(); // Load JWT_SECRET and JWT_REFRESH_SECRET
+require('dotenv').config();
 
-// Allow cookies and frontend communication
+// ==== Middleware Setup ====
 app.use(cors({
-  origin: 'http://localhost:5173', // Frontend URL
-  credentials: true // Needed to accept cookies
+  origin: [
+    'http://localhost:5173',           // for local frontend
+    'https://your-frontend-url.netlify.app' // add deployed frontend here later
+  ],
+  credentials: true
 }));
 
 app.use(express.json());
-app.use(cookieParser()); // For reading/writing cookies
+app.use(cookieParser());
 
-// Mongoose setup
-mongoose.connect('mongodb://127.0.0.1:27017/Task-ManagerDB')
-  .then(() => console.log('MongoDB Connected to Task-ManagerDB'))
-  .catch((err) => console.log(err));
+// ==== Mongoose Connection ====
+const mongoURI = process.env.MONGO_URI;
+mongoose.connect(mongoURI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log('✅ MongoDB Atlas Connected'))
+.catch((err) => console.error('❌ MongoDB Connection Failed:', err));
 
-// View engine
+// ==== View Engine ====
 app.set('view engine', 'ejs');
 
-// Route imports
+// ==== Route Imports ====
 const MyTasks = require('./routes/tasks');
 const ViewTasks = require('./routes/task');
 const tasks = require('./routes/tasks');
@@ -32,25 +39,27 @@ const Register = require('./routes/Register');
 const Dashboard = require('./routes/Dashboard');
 const Edit = require('./routes/Edit');
 const AddTasks = require('./routes/AddTasks');
-const AuthRoutes = require('./routes/auth'); // NEW — for refresh token and logout
+const AuthRoutes = require('./routes/auth');
 
-// Mount routes
+// ==== Mount Routes ====
 app.use('/tasks', tasks);
 app.use('/task', task);
 app.use('/mytask', MyTasks);
-app.use('/viewtask', ViewTasks); 
+app.use('/viewtask', ViewTasks);
 app.use('/login', login);
 app.use('/edit', Edit);
 app.use('/dashboard', Dashboard);
 app.use('/register', Register);
 app.use('/addtasks', AddTasks);
-app.use('/auth', AuthRoutes); // NEW: contains /refresh-token and /logout
+app.use('/auth', AuthRoutes);
 
-// Home page
+// ==== Home Page ====
 app.get("/", (req, res) => {
     res.render("index");
 });
 
-app.listen(3000, () => {
-    console.log('Server running on port 3000');
+// ==== Server Port ====
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
 });

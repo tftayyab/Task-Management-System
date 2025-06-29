@@ -21,9 +21,8 @@ This is a **Task Management System** developed as part of a software development
 ### Backend
 - Node.js  
 - Express.js  
-- MongoDB  
-- Mongoose  
-- Joi / express-validator (Validation)  
+- MongoDB    
+- Joi (Validation)  
 - JWT (Authentication)
 
 ### Frontend

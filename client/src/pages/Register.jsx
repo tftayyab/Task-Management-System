@@ -87,7 +87,7 @@ const [loading, setLoading] = useState(false);
         </h1>
 
         {/* Input Fields */}
-        <div  className="flex flex-col gap-5 mt-15 sm:gap-2.5 sm:mt-5 items-center sm:items-start w-85 sm:w-full max-w-xl">
+        <div  className="flex flex-col gap-5 mt-5 sm:gap-2.5 sm:mt-5 items-center sm:items-start w-85 sm:w-full max-w-xl">
 
           {/* First Name Input */}
           <div className="relative w-full px-4">
@@ -226,7 +226,7 @@ const [loading, setLoading] = useState(false);
 
 
         {/* Register Button*/}
-        <div className="mt-6 sm:mt-4 px-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
+        <div className="mt-2 sm:mt-4 px-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0">
           <button
             className="text-[#F8F9FB] bg-[#FF9090] text-sm sm:text-base font-medium px-6 py-3 sm:px-10 sm:py-4 rounded transition-all duration-300 ease-in-out hover:bg-[#FF6F6F] hover:shadow-lg active:scale-95"
             onClick={handleRegister}

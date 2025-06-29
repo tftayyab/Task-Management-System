@@ -82,7 +82,7 @@ const [loading, setLoading] = useState(false);
       <div className="relative z-10 h-full flex justify-center sm:justify-end items-start pt-[5vh] pr-0 sm:pr-[8vw]">
         <div className="w-full sm:w-[420px] flex flex-col items-center sm:items-start">
         {/* Sign In Heading */}
-        <h1 className="text-[#212427] mt-18 sm:mt-1 font-montserrat text-3xl sm:text-4xl font-bold leading-tight text-center sm:text-left ml-3">
+        <h1 className="text-[#212427] mt-8 sm:mt-1 font-montserrat text-3xl sm:text-4xl font-bold leading-tight text-center sm:text-left ml-3">
           Sign Up
         </h1>
 

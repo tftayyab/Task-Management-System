@@ -39,32 +39,47 @@ function Login() {
   };
 
   const handleLogin = async () => {
-    setLoginError(''); // clear any previous errors
-    try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/login`, {
-        username: formData.username,
-        password: formData.password,
-      }, { withCredentials: true });
+  setLoginError(''); // Clear any previous errors
 
-      const user = response.data.user;
-      const token = response.data.accessToken;
+  try {
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}/login`, {
+      username: formData.username,
+      password: formData.password,
+    }, { withCredentials: true });
 
-      localStorage.setItem('username', user.username);
-      localStorage.setItem('email', user.email);
-      localStorage.setItem('token', token);
+    const user = response.data.user;
+    const token = response.data.accessToken;
 
-      if (formData.remember) {
-        localStorage.setItem('rememberedUsername', user.username);
-      } else {
-        localStorage.removeItem('rememberedUsername');
-      }
+    localStorage.setItem('username', user.username);
+    localStorage.setItem('email', user.email);
+    localStorage.setItem('token', token);
 
-      navigate('/dashboard');
-    } catch (error) {
-      console.error('Login failed:', error);
-      setLoginError('Invalid username or password');
+    if (formData.remember) {
+      localStorage.setItem('rememberedUsername', user.username);
+    } else {
+      localStorage.removeItem('rememberedUsername');
     }
-  };
+
+    navigate('/dashboard');
+
+  } catch (error) {
+    console.error('Login failed:', error);
+
+    if (error.response) {
+      const { status, data } = error.response;
+
+      if (status === 404 && data.message === "User not found") {
+        setLoginError('Username not found');
+      } else if (status === 400 && data.message === "Invalid credentials") {
+        setLoginError('Password is incorrect');
+      } else {
+        setLoginError('Something went wrong. Please try again.');
+      }
+    } else {
+      setLoginError('Network error. Please check your connection.');
+    }
+  }
+};
 
   return (
     <PageWrapper>
@@ -89,7 +104,7 @@ function Login() {
                 value={formData.username}
                 onChange={handleChange}
                 placeholder="Enter Username"
-                className="w-full h-14 pl-14 pr-4 rounded-md border border-[#565454] font-montserrat text-base font-medium placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#FF9090] hover:border-[#FF9090] transition-colors duration-300"
+                className="inputStyle"
               />
               <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
                 <UsernameIcon />

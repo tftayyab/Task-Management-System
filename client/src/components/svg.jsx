@@ -230,11 +230,18 @@ export const AddIcon = () => (
   </svg>
 );
 
-export const CircleIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="13" viewBox="0 0 12 13" fill="none">
+export const CircleIcon = ({ className = '', stroke = '#F21E1E' }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="12"
+    height="13"
+    viewBox="0 0 12 13"
+    fill="none"
+    className={className}
+  >
     <path
       d="M1 6.32239C1 7.65294 1.52678 8.92899 2.46447 9.86983C3.40215 10.8107 4.67392 11.3392 6 11.3392C7.32608 11.3392 8.59785 10.8107 9.53553 9.86983C10.4732 8.92899 11 7.65294 11 6.32239C11 4.99184 10.4732 3.71578 9.53553 2.77494C8.59785 1.8341 7.32608 1.30554 6 1.30554C4.67392 1.30554 3.40215 1.8341 2.46447 2.77494C1.52678 3.71578 1 4.99184 1 6.32239Z"
-      stroke="#F21E1E"
+      stroke={stroke}
       strokeWidth={2}
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -265,15 +272,14 @@ export const OptionIcon = () => (
   </svg>
 );
 
-export const DotIcon = () => (
+export const DotIcon = ({ className = '', fill = 'currentColor' }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="6"
-    height="6"
     viewBox="0 0 6 6"
+    className={className}
     fill="none"
   >
-    <circle cx="2.67254" cy="3.41196" r="2.53873" fill="#05A301" />
+    <circle cx="2.67254" cy="3.41196" r="2.53873" fill={fill} />
   </svg>
 );
 

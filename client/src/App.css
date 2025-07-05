@@ -7,7 +7,6 @@
   }
 }
 
-/* 👇 Add this manually */
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }

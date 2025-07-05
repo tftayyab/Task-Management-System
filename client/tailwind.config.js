@@ -7,11 +7,12 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        montserrat: ['Inter', 'sans-serif'],
+        montserrat: ['Montserrat', 'sans-serif'],
+        inter: ['Inter', 'sans-serif'],
       },
     },
   },
-   plugins: [
-    require('tailwind-scrollbar-hide')
+  plugins: [
+    require('tailwind-scrollbar-hide'),
   ],
-}
+};

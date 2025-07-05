@@ -99,7 +99,7 @@ const [loading, setLoading] = useState(false);
               <input
                 type="text"
                 placeholder="Enter First Name"
-                className="w-full h-14 sm:h-12 pl-12 pr-12 sm:pl-10 sm:pr-10 rounded-md border border-[#565454] font-montserrat text-base font-medium placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#FF9090] hover:border-[#FF9090] transition-colors duration-300"
+                className="RegisterInput"
                 value={formData.firstName}
                 onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
               />
@@ -113,7 +113,7 @@ const [loading, setLoading] = useState(false);
               <input
                 type="text"
                 placeholder="Enter Last Name"
-                className="w-full h-14 sm:h-12 pl-12 pr-12 sm:pl-10 sm:pr-10 rounded-md border border-[#565454] font-montserrat text-base font-medium placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#FF9090] hover:border-[#FF9090] transition-colors duration-300"
+                className="RegisterInput"
                 value={formData.lastName}
                 onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
               />
@@ -127,7 +127,7 @@ const [loading, setLoading] = useState(false);
               <input
                 type="text"
                 placeholder="Enter Username"
-                className="w-full h-14 sm:h-12 pl-12 pr-12 sm:pl-10 sm:pr-10 rounded-md border border-[#565454] font-montserrat text-base font-medium placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#FF9090] hover:border-[#FF9090] transition-colors duration-300"
+                className="RegisterInput"
                 value={formData.username}
                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
               />
@@ -141,7 +141,7 @@ const [loading, setLoading] = useState(false);
               <input
                 type="email"
                 placeholder="Enter Email"
-                className="w-full h-14 sm:h-12 pl-12 pr-12 sm:pl-10 sm:pr-10 rounded-md border border-[#565454] font-montserrat text-base font-medium placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#FF9090] hover:border-[#FF9090] transition-colors duration-300"
+                className="RegisterInput"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />
@@ -155,7 +155,7 @@ const [loading, setLoading] = useState(false);
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter Password"
-                className="w-full h-14 sm:h-12 pl-12 pr-12 sm:pl-10 sm:pr-10 rounded-md border border-[#565454] font-montserrat text-base font-medium placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#FF9090] hover:border-[#FF9090] transition-colors duration-300"
+                className="RegisterInput"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               />
@@ -181,7 +181,7 @@ const [loading, setLoading] = useState(false);
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Confirm Password"
-              className="w-full h-14 sm:h-12 pl-12 pr-12 sm:pl-10 sm:pr-10 rounded-md border border-[#565454] font-montserrat text-base font-medium placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#FF9090] hover:border-[#FF9090] transition-colors duration-300"
+              className="RegisterInput"
               value={formData.confirmPassword}
               onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
             />

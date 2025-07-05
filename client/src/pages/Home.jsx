@@ -40,13 +40,13 @@ function Home() {
           {/* Buttons */}
           <div className="flex gap-6">
             <button
-              className="text-[#F8F9FB] bg-[#FF9090] text-sm sm:text-base font-medium px-6 py-3 sm:px-10 sm:py-4 rounded sm:w-40 transition-all duration-300 ease-in-out hover:bg-[#FF6F6F] hover:shadow-lg active:scale-95"
+              className="homeBtn"
               onClick={() => navigate('/login')}
             >
               Login
             </button>
             <button
-              className="text-[#F8F9FB] bg-[#FF9090] text-sm sm:text-base font-medium px-6 py-3 sm:px-10 sm:py-4 rounded sm:w-40 transition-all duration-300 ease-in-out hover:bg-[#FF6F6F] hover:shadow-lg active:scale-95"
+              className="homeBtn"
               onClick={() => navigate('/register')}
             >
               Sign Up

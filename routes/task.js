@@ -1,5 +1,6 @@
 const express = require("express");
 const Task = require("../models/TaskMongoDB");
+const Team = require("../models/TeamMongoDB");
 const { validateTasks } = require("../validations/Tasksvalidation");
 const validateRequest = require("../middleware/validateRequest");
 const isValidObjectId = require("../utils/validateObjectId");
@@ -7,50 +8,110 @@ const asyncWrapper = require("../middleware/asyncWrapper");
 const verifyToken = require("../middleware/verifyToken");
 
 const router = express.Router();
-router.use(verifyToken); 
+router.use(verifyToken);
 
-// GET /tasks/:id
+// 📌 GET /tasks/:id - Get one task by ID
 router.get(
   "/:id",
   asyncWrapper(async (req, res) => {
-    if (!isValidObjectId(req.params.id)) {
+    const { id } = req.params;
+
+    if (!isValidObjectId(id)) {
       return res.status(400).json({ message: "Invalid Task ID format" });
     }
 
-    const task = await Task.findById(req.params.id);
+    const task = await Task.findById(id);
     if (!task) return res.status(404).json({ message: "Task not found" });
+
     res.json(task);
   })
 );
 
-// PUT /tasks/:id
+// ✏️ PUT /tasks/:id - Update a task
 router.put(
   "/:id",
   validateRequest(validateTasks),
   asyncWrapper(async (req, res) => {
-    if (!isValidObjectId(req.params.id)) {
+    const { id } = req.params;
+
+    if (!isValidObjectId(id)) {
       return res.status(400).json({ message: "Invalid Task ID format" });
     }
 
-    const task = await Task.findByIdAndUpdate(req.params.id, req.validatedBody, {
-      new: true,
-    });
-    if (!task) return res.status(404).json({ message: "Task not found" });
-    res.json({ message: "Task updated", task });
+    const updatedTask = await Task.findByIdAndUpdate(
+      id,
+      req.validatedBody,
+      { new: true }
+    );
+
+    if (!updatedTask) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    res.json({ message: "Task updated", task: updatedTask });
   })
 );
 
-// DELETE /tasks/:id
+// ✅ DELETE /tasks/:id - Only owner can delete
 router.delete(
   "/:id",
   asyncWrapper(async (req, res) => {
-    if (!isValidObjectId(req.params.id)) {
+    const { id } = req.params;
+    const username = req.user.username;
+
+    if (!isValidObjectId(id)) {
       return res.status(400).json({ message: "Invalid Task ID format" });
     }
 
-    const task = await Task.findByIdAndDelete(req.params.id);
-    if (!task) return res.status(404).json({ message: "Task not found" });
+    const task = await Task.findById(id);
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    if (task.owner !== username) {
+      return res.status(403).json({ message: "You are not allowed to delete this task" });
+    }
+
+    await Task.findByIdAndDelete(id);
     res.json({ message: "Task deleted", task });
+  })
+);
+
+// 📤 PUT /tasks/:id/share - Share task with a team
+router.put(
+  "/:id/share",
+  asyncWrapper(async (req, res) => {
+    const taskId = req.params.id;
+    const { teamName, usernames = [] } = req.body;
+    const owner = req.user.username;
+
+    if (!Array.isArray(usernames) || usernames.length > 5) {
+      return res.status(400).json({ message: "You can only add up to 5 users" });
+    }
+
+    if (!teamName || typeof teamName !== "string") {
+      return res.status(400).json({ message: "Team name is required" });
+    }
+
+    // 🔄 Upsert team info
+    const updatedTeam = await Team.findOneAndUpdate(
+      { owner, teamName },
+      {
+        $set: { owner, teamName },
+        $addToSet: { shareWith: { $each: usernames } },
+      },
+      { upsert: true, new: true }
+    );
+
+    // 🔄 Optionally update task owner and shareWith (optional)
+    const task = await Task.findById(taskId);
+    if (task) {
+      task.owner = owner;
+      task.shareWith = usernames;
+      await task.save();
+    }
+
+    res.json({ message: "Team shared/updated", team: updatedTeam });
   })
 );
 

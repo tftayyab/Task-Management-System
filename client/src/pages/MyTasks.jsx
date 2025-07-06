@@ -9,7 +9,9 @@ import PageHeader from '../components/PageHeader';
 import Menu from '../components/Menu';
 import api from '../api';
 import AddTasks from './AddTasks';
-import Edit from './Edit';
+import Edit from './EditTasks';
+import useAuthToken from '../utils/useAuthToken';
+import ShareTasks from './ShareTasks';
 
 function MyTasks() {
   const location = useLocation();
@@ -22,9 +24,11 @@ function MyTasks() {
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editTask, setEditTask] = useState(null);
+  const [shareTask, setShareTask] = useState(null); // ✅ NEW
   const [searchTerm, setSearchTerm] = useState('');
 
   const navigate = useNavigate();
+  useAuthToken();
 
   useEffect(() => {
     const tryFetch = async () => {
@@ -87,42 +91,28 @@ function MyTasks() {
       {/* ✅ Row: Menu + Main Content Box */}
       <div className="flex flex-row mt-[2rem] gap-x-20 sm:mt-[1rem]">
 
-        {/* ✅ Menu - only once */}
+        {/* ✅ Menu */}
         <div className="hidden sm:block h-screen w-[16rem] z-50">
           <Menu />
         </div>
 
-        {/* ✅ Full Task + Task Preview Box */}
+        {/* ✅ Main Content */}
         <div className="flex-1 flex justify-center px-4 pb-6">
           {!isMenuOpen && (
             <div className="relative z-0 border sm:h-[76vh] border-[rgba(161,163,171,0.63)] shadow-lg rounded-2xl p-4 flex flex-col sm:flex-row sm:gap-6 sm:w-[150vh] w-[40vh] bg-white transition-all duration-300">
 
               {/* 🔶 Task List */}
               <div className="order-2 sm:order-1 sm:h-full flex-1 bg-[#F5F8FF] rounded-xl p-6 overflow-y-auto scrollbar-hide">
-                <div className="flex items-center justify-between mb-4">
-                  <div
-                    onClick={() => navigate('/mytasks')}
-                    className="flex items-center gap-x-2 cursor-pointer group"
-                  >
-                    <TaskIcon className="w-4 h-4" />
-                    <p className="text-[#FF6767] text-sm font-medium group-hover:underline">Tasks</p>
-                  </div>
-                  <button
-                    onClick={() => setShowAddModal(true)}
-                    className="flex items-center gap-x-2 text-sm text-[#A1A3AB] hover:text-[#FF6767] transition-all"
-                  >
-                    <AddIcon className="w-4 h-4" />
-                    <span>Add Task</span>
-                  </button>
-                </div>
 
                 <TaskList
                   tasks={filteredTasksList}
                   statuses={["Pending", "In Progress", "Completed"]}
                   setEditTask={setEditTask}
+                  setShareTask={setShareTask} // ✅ NEW
                   fetchTasksWithRetry={fetchTasksWithRetry}
                   onTaskClick={(id) => setSelectedTaskId(id)}
                   searchTerm={searchTerm}
+                  onAddTaskClick={() => setShowAddModal(true)}
                 />
               </div>
 
@@ -158,6 +148,13 @@ function MyTasks() {
         <Edit
           taskData={editTask}
           onClose={() => setEditTask(null)}
+          fetchTasksWithRetry={fetchTasksWithRetry}
+        />
+      )}
+      {shareTask && (
+        <ShareTasks
+          taskData={shareTask}
+          onClose={() => setShareTask(null)}
           fetchTasksWithRetry={fetchTasksWithRetry}
         />
       )}

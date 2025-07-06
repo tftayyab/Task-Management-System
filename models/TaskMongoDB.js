@@ -1,21 +1,24 @@
 const mongoose = require('mongoose');
 
 const taskSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: true, // so every task is linked to a user
-  },
-  title: {
-    type: String,
-    required: true
-  },
+  owner: { type: String, required: true },
+  title: { type: String, required: true },
   description: String,
   status: {
     type: String,
     enum: ['Pending', 'In Progress', 'Completed'],
-    default: 'Pending'
+    default: 'Pending',
   },
-  dueDate: Date
+  dueDate: Date,
+  shareWith: {
+    type: [String],
+    default: [],
+  },
+  teamId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Team',
+    default: null,
+  },
 });
 
 const Task = mongoose.model('Task', taskSchema);

@@ -25,16 +25,20 @@ api.interceptors.response.use(
       try {
         console.log('🔁 Trying to refresh token...');
 
-        const res = await api.get('/auth/refresh-token');
-        const newToken = res.data.accessToken;
+        // 🛠 Use plain axios here instead of api to avoid interceptor
+        const refreshResponse = await axios.get(
+          `${import.meta.env.VITE_API_URL}/auth/refresh-token`,
+          { withCredentials: true }
+        );
 
-        if (!newToken) throw new Error("No token from refresh");
+        const newToken = refreshResponse.data.accessToken;
+        if (!newToken) throw new Error("No token returned from refresh");
 
         localStorage.setItem('token', newToken);
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         console.log('✅ Token refreshed via interceptor');
 
-        return api(originalRequest);
+        return api(originalRequest); // retry original request
       } catch (err) {
         console.error("❌ Refresh failed in interceptor:", err.response?.data || err.message);
         localStorage.clear();

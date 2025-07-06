@@ -41,6 +41,7 @@ const Collaborate = require('./routes/Collaborate');
 const Edit = require('./routes/Edit');
 const AddTasks = require('./routes/AddTasks');
 const AuthRoutes = require('./routes/auth');
+const Teams = require('./routes/teams');
 
 // ==== Mount Routes ====
 app.use('/tasks', tasks);
@@ -54,6 +55,8 @@ app.use('/collaborate', Collaborate);
 app.use('/register', Register);
 app.use('/addtasks', AddTasks);
 app.use('/auth', AuthRoutes);
+app.use("/teams", Teams);
+
 
 // ==== Home Page ====
 app.get("/", (req, res) => {

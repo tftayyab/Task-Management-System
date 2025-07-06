@@ -104,7 +104,7 @@ function Login() {
                 value={formData.username}
                 onChange={handleChange}
                 placeholder="Enter Username"
-                className="inputStyle"
+                className="w-full h-14 pl-14 pr-4 rounded-md border border-[#565454] font-montserrat text-base font-medium placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#FF9090] hover:border-[#FF9090] transition-colors duration-300"
               />
               <div className="absolute inset-y-0 left-6 flex items-center pointer-events-none">
                 <UsernameIcon />

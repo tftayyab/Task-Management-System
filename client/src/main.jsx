@@ -8,8 +8,9 @@ import MyTasks from './pages/MyTasks';
 import ViewTasks from './pages/ViewTasks';
 import AddTasks from './pages/AddTasks';
 import Dashboard from './pages/Dashboard';
-import Edit from './pages/Edit';
+import Edit from './pages/EditTasks';
 import Register from './pages/Register';
+import Collaborate from './pages/Collaborate';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -23,6 +24,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/register" element={<Register />} />
         <Route path="/edit" element={<Edit />} />
+        <Route path="/collaborate" element={<Collaborate />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

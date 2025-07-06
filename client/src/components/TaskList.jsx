@@ -1,15 +1,26 @@
 import { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CircleIcon, OptionIcon } from './svg';
+import { CircleIcon, OptionIcon, AddIcon, TaskIcon } from './svg';
 import Actions from './actions';
 import useIsMobile from '../utils/useScreenSize';
 import { getDueLabel } from '../utils/DayDate';
 
-function TaskList({ tasks, fetchTasksWithRetry, statuses = [], searchTerm = '', setEditTask, onTaskClick, mode = '' }) {
+function TaskList({
+  tasks,
+  fetchTasksWithRetry,
+  statuses = [],
+  searchTerm = '',
+  setEditTask,
+  onTaskClick,
+  onAddTaskClick,  // ✅ New prop for "Add Task" button
+  mode = '',
+  setShareTask,
+}) {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [openActionId, setOpenActionId] = useState(null);
   const clickTimeout = useRef(null);
+
   const search = searchTerm.toLowerCase().trim();
 
   useEffect(() => {
@@ -23,13 +34,15 @@ function TaskList({ tasks, fetchTasksWithRetry, statuses = [], searchTerm = '', 
     };
   }, []);
 
-  const filtered = tasks.filter(task => {
-    const matchesSearch = !search || [
-      task.title?.toLowerCase(),
-      task.description?.toLowerCase(),
-      task.status?.toLowerCase(),
-      task.dueDate
-    ].some(field => field?.includes(search));
+  const filtered = tasks.filter((task) => {
+    const matchesSearch =
+      !search ||
+      [
+        task.title?.toLowerCase(),
+        task.description?.toLowerCase(),
+        task.status?.toLowerCase(),
+        task.dueDate,
+      ].some((field) => field?.includes(search));
 
     if (search) return matchesSearch;
     return statuses.includes(task.status);
@@ -38,9 +51,31 @@ function TaskList({ tasks, fetchTasksWithRetry, statuses = [], searchTerm = '', 
   const strokeColors = ['#F21E1E', '#FFB347', '#3ABEFF', '#4CAF50'];
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full">
+    <div className="w-full h-full flex flex-col">
+      {/* ✅ Header (only show if not viewing completed-only) */}
+      {!(statuses.length === 1 && statuses[0]?.toLowerCase() === 'completed') && (
+        <div className="flex items-center justify-between mb-4">
+          <div
+            onClick={() => navigate('/mytasks')}
+            className="flex items-center gap-x-2 cursor-pointer group"
+          >
+            <TaskIcon className="w-4 h-4" />
+            <p className="text-[#FF6767] text-sm font-medium group-hover:underline">Tasks</p>
+          </div>
+
+          <button
+            onClick={() => onAddTaskClick?.()}
+            className="flex items-center gap-x-2 text-sm text-[#A1A3AB] hover:text-[#FF6767] transition-all"
+          >
+            <AddIcon className="w-4 h-4" />
+            <span>Add Task</span>
+          </button>
+        </div>
+      )}
+
+      {/* ✅ Task List */}
       {filtered.length === 0 ? (
-        <p className="text-gray-400 text-lg font-inter">No Task</p>
+        <p className="text-gray-400 text-lg font-inter text-center">No Task</p>
       ) : (
         <ul className="flex flex-col gap-4 w-full h-full overflow-y-auto pr-1 scrollbar-hide">
           {filtered.map((task, index) => {
@@ -56,7 +91,9 @@ function TaskList({ tasks, fetchTasksWithRetry, statuses = [], searchTerm = '', 
                     onTaskClick?.(task._id);
                   }
                 }}
-                className="cursor-pointer group p-4 rounded-xl border border-[#A1A3AB] bg-white shadow transition-all duration-200 hover:shadow-lg hover:scale-[1.001] relative"
+                  className={`cursor-pointer group p-4 rounded-xl border border-[#A1A3AB] bg-white shadow transition-all duration-200 hover:shadow-lg hover:scale-[1.001] relative ${
+                    openActionId === task._id ? 'z-[60]' : 'z-10'
+                  }`}
               >
                 {/* Top Row */}
                 <div className="flex justify-between items-start gap-2 flex-wrap">
@@ -70,6 +107,7 @@ function TaskList({ tasks, fetchTasksWithRetry, statuses = [], searchTerm = '', 
                     </p>
                   </div>
 
+                  {/* Options */}
                   <div className="relative hidden sm:block flex-shrink-0">
                     <button
                       onClick={(e) => {
@@ -88,6 +126,7 @@ function TaskList({ tasks, fetchTasksWithRetry, statuses = [], searchTerm = '', 
                           task={task}
                           fetchTasksWithRetry={fetchTasksWithRetry}
                           setEditTask={setEditTask}
+                          setShareTask={setShareTask} // ✅ new prop
                         />
                       </div>
                     )}

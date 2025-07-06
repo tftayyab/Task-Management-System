@@ -9,10 +9,7 @@ export const handleChange = (e, setNewTask) => {
 // ✅ Handle task creation
 export const handleSubmit = async ({ newTask, setNewTask, fetchTasksWithRetry, onClose }) => {
   try {
-    const username = localStorage.getItem("username");
-    const taskData = { ...newTask, username };
-
-    await api.post('/tasks', taskData);
+    await api.post('/tasks', newTask); // ✅ server sets owner
 
     if (fetchTasksWithRetry) fetchTasksWithRetry();
     if (setNewTask) {
@@ -32,8 +29,7 @@ export const handleSubmit = async ({ newTask, setNewTask, fetchTasksWithRetry, o
 // ✏️ Handle task update
 export const handleUpdate = async ({ newTask, taskData, fetchTasksWithRetry, onClose }) => {
   try {
-    const username = localStorage.getItem('username');
-    const taskPayload = { ...newTask, username };
+    const taskPayload = { ...newTask }; // ✅ no username
 
     await api.put(`/task/${taskData._id}`, taskPayload);
 
@@ -60,4 +56,3 @@ export const handleLogout = async (navigate) => {
   localStorage.removeItem('email');
   navigate('/login');
 };
-

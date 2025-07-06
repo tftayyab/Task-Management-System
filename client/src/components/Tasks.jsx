@@ -1,8 +1,7 @@
 import { useNavigate } from 'react-router-dom';
-import { DeleteTasksIcon, EditTasksIcon } from './svg';
+import { DeleteTasksIcon, EditTasksIcon, ShareIcon } from './svg';
 import { formatDueDate } from '../utils/DayDate';
 import api from '../api'; 
-
 
 function Tasks({
   tasks,
@@ -10,7 +9,8 @@ function Tasks({
   statuses = [],
   searchTerm = '',
   task_id = null,
-  setEditTask, // ✅ Add this
+  setEditTask,
+  setShareTask,
 }) {
 
   const navigate = useNavigate();
@@ -105,6 +105,19 @@ function Tasks({
                 >
                   <EditTasksIcon className="w-8 h-8" />
                 </button>
+              <button
+              type="button"
+              className="hover:scale-110 transition-transform"
+              onClick={(e) => {
+                e.stopPropagation(); // ✅ stop from triggering view
+                const task = tasks.find((t) => t._id); // You can customize this logic
+                if (task) {
+                  setShareTask(task);
+                }
+              }}
+            >
+              <ShareIcon className="w-8 h-8" />
+            </button>
               </div>
           </li>
         ))}

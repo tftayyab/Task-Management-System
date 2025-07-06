@@ -434,3 +434,126 @@ export const CrossIcon = ({ className = "w-5 h-5" }) => (
     />
   </svg>
 );
+
+export const CollaborationSelectedIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+  >
+    <path
+      d="M17 20H22V18C22 15.7909 20.2091 14 18 14H17"
+      stroke="#FF6767"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M7 20H2V18C2 15.7909 3.79086 14 6 14H7"
+      stroke="#FF6767"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <circle
+      cx="12"
+      cy="8"
+      r="4"
+      stroke="#FF6767"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const CollaborationNotSelectedIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+  >
+    <path
+      d="M17 20H22V18C22 15.7909 20.2091 14 18 14H17"
+      stroke="white"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M7 20H2V18C2 15.7909 3.79086 14 6 14H7"
+      stroke="white"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <circle
+      cx="12"
+      cy="8"
+      r="4"
+      stroke="white"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export const TeamIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+  >
+    {/* Main User */}
+    <path
+      d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z"
+      fill="#888888"
+      stroke="#A1A3AB"
+      strokeWidth="1.5"
+    />
+    {/* Main User's Group */}
+    <path
+      d="M4 20C4 17.2386 7.58172 15 12 15C16.4183 15 20 17.2386 20 20"
+      stroke="#A1A3AB"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+    />
+    {/* Side user */}
+    <path
+      d="M18 11C19.6569 11 21 9.65685 21 8C21 6.34315 19.6569 5 18 5"
+      stroke="#A1A3AB"
+      strokeWidth="1.5"
+    />
+    <path
+      d="M6 5C4.34315 5 3 6.34315 3 8C3 9.65685 4.34315 11 6 11"
+      stroke="#A1A3AB"
+      strokeWidth="1.5"
+    />
+  </svg>
+);
+
+export const ShareIcon = ({ className = "w-5 h-5 text-[#F24E1E]" }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="36"
+    height="36"
+    viewBox="0 0 36 36"
+    fill="none"
+    className={className}
+  >
+    <rect width="36" height="36" rx="8" fill="#FF6767" />
+    <path
+      d="M25 23C24.337 23 23.737 23.262 23.293 23.695L13.91 18.861C13.969 18.584 14 18.296 14 18C14 17.704 13.969 17.416 13.91 17.139L23.293 12.305C23.737 12.738 24.337 13 25 13C26.657 13 28 11.657 28 10C28 8.343 26.657 7 25 7C23.343 7 22 8.343 22 10C22 10.296 22.031 10.584 22.09 10.861L12.707 15.695C12.263 15.262 11.663 15 11 15C9.343 15 8 16.343 8 18C8 19.657 9.343 21 11 21C11.663 21 12.263 20.738 12.707 20.305L22.09 25.139C22.031 25.416 22 25.704 22 26C22 27.657 23.343 29 25 29C26.657 29 28 27.657 28 26C28 24.343 26.657 23 25 23Z"
+      fill="white"
+    />
+  </svg>
+);
+
+

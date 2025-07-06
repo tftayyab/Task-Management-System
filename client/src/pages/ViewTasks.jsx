@@ -4,7 +4,10 @@ import Tasks from '../components/Tasks';
 import PageHeader from '../components/PageHeader';
 import Menu from '../components/Menu';
 import api from '../api';
-import Edit from './Edit';
+import Edit from './EditTasks';
+import useAuthToken from '../utils/useAuthToken';
+import ShareTasks from './ShareTasks';
+
 
 function ViewTasks() {
   const { id } = useParams();
@@ -14,8 +17,12 @@ function ViewTasks() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [editTask, setEditTask] = useState(null);
+  const [shareTask, setShareTask] = useState(null);
+
 
   const navigate = useNavigate();
+
+  useAuthToken();
 
   useEffect(() => {
     const tryFetch = async () => {
@@ -97,6 +104,7 @@ function ViewTasks() {
                     task_id={selectedTaskId}
                     setEditTask={setEditTask}
                     fetchTasksWithRetry={fetchTasksWithRetry}
+                    setShareTask={setShareTask}
                   />
                   </div>
                 )}
@@ -112,6 +120,13 @@ function ViewTasks() {
         <Edit
           taskData={editTask}
           onClose={() => setEditTask(null)}
+          fetchTasksWithRetry={fetchTasksWithRetry}
+        />
+      )}
+      {shareTask && (
+        <ShareTasks
+          taskData={shareTask}
+          onClose={() => setShareTask(null)}
           fetchTasksWithRetry={fetchTasksWithRetry}
         />
       )}

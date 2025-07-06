@@ -3,7 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
   DashboardSelectedIcon, DashboardNotSelectedIcon,
   LogoutIcon,
-  MyTasksSelectedIcon, MyTasksNotSelectedIcon
+  MyTasksSelectedIcon, MyTasksNotSelectedIcon,
+  CollaborationNotSelectedIcon, CollaborationSelectedIcon
 } from './svg';
 import { handleLogout } from '../utils/handleTasks';
 
@@ -24,6 +25,7 @@ function Menu({ onClose }) {
 
   const isDashboard = location.pathname === '/dashboard';
   const isTasks = location.pathname === '/mytasks';
+  const isCollaborate = location.pathname === '/collaborate';
 
   return (
     <>
@@ -65,6 +67,16 @@ function Menu({ onClose }) {
               IconInactive={MyTasksNotSelectedIcon}
               onClick={() => {
                 navigate('/mytasks');
+                onClose?.();
+              }}
+            />
+            <MenuButton
+              label="Collaborate"
+              isActive={isCollaborate}
+              IconActive={CollaborationSelectedIcon}
+              IconInactive={CollaborationNotSelectedIcon}
+              onClick={() => {
+                navigate('/collaborate');
                 onClose?.();
               }}
             />

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   DashboardSelectedIcon, DashboardNotSelectedIcon,
@@ -7,11 +7,11 @@ import {
   CollaborationNotSelectedIcon, CollaborationSelectedIcon
 } from './svg';
 import { handleLogout } from '../utils/handleTasks';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function Menu({ onClose }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const menuRef = useRef(null);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
 
@@ -22,63 +22,58 @@ function Menu({ onClose }) {
     if (storedEmail) setEmail(storedEmail);
   }, []);
 
-
   const isDashboard = location.pathname === '/dashboard';
   const isTasks = location.pathname === '/mytasks';
   const isCollaborate = location.pathname === '/collaborate';
 
+  const handleNavigate = (path) => {
+    navigate(path);
+    onClose?.();
+  };
+
   return (
     <>
-      {/* Transparent Overlay (Mobile Only) */}
-      <div
-        className="fixed top-0 right-0 w-[15%] h-full bg-black/30 z-40 sm:hidden"
-        onClick={onClose}
-      ></div>
+      <AnimatePresence>
+        {/* Fade overlay (Mobile only) */}
+        <motion.div
+          className="fixed top-0 left-0 w-full h-full bg-black/30 z-40 sm:hidden"
+          onClick={onClose}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        />
+      </AnimatePresence>
 
-      {/* Menu Drawer */}
-      <div
-        ref={menuRef}
-        className="fixed sm:bottom-0 left-0 w-[95%] z-50 h-full sm:w-[20rem] sm:h-[80vh] bg-[#1c1c1e] rounded-tr-2xl rounded-br-2xl shadow-2xl transition-transform duration-300 transform translate-x-0 flex flex-col justify-between"
-      >
-        {/* Top Section */}
+      {/* Static menu drawer (no animation) */}
+      <div className="fixed sm:bottom-0 left-0 w-[95%] z-50 h-full sm:w-[20rem] sm:h-[80vh] bg-[#1c1c1e] rounded-tr-2xl rounded-br-2xl shadow-2xl flex flex-col justify-between">
+        {/* Top */}
         <div className="p-6 flex flex-col gap-6">
-          {/* User Info */}
           <div className="text-white text-center mt-4 space-y-1">
             <p className="text-lg font-semibold tracking-wide">{username}</p>
             <p className="text-sm font-light text-gray-400">{email}</p>
           </div>
 
-          {/* Navigation Buttons */}
           <nav className="mt-6 flex flex-col gap-2">
             <MenuButton
               label="Dashboard"
               isActive={isDashboard}
               IconActive={DashboardSelectedIcon}
               IconInactive={DashboardNotSelectedIcon}
-              onClick={() => {
-                navigate('/dashboard');
-                onClose?.();
-              }}
+              onClick={() => handleNavigate('/dashboard')}
             />
             <MenuButton
               label="My Tasks"
               isActive={isTasks}
               IconActive={MyTasksSelectedIcon}
               IconInactive={MyTasksNotSelectedIcon}
-              onClick={() => {
-                navigate('/mytasks');
-                onClose?.();
-              }}
+              onClick={() => handleNavigate('/mytasks')}
             />
             <MenuButton
               label="Collaborate"
               isActive={isCollaborate}
               IconActive={CollaborationSelectedIcon}
               IconInactive={CollaborationNotSelectedIcon}
-              onClick={() => {
-                navigate('/collaborate');
-                onClose?.();
-              }}
+              onClick={() => handleNavigate('/collaborate')}
             />
           </nav>
         </div>
@@ -86,7 +81,7 @@ function Menu({ onClose }) {
         {/* Bottom - Logout */}
         <div className="p-6 border-t border-white/10">
           <button
-             onClick={() => handleLogout(navigate)}
+            onClick={() => handleLogout(navigate)}
             className="group flex items-center gap-3 px-5 py-3 w-full rounded-lg font-medium text-white hover:bg-red-500/90 transition-all duration-200"
           >
             <LogoutIcon className="w-6 h-6 group-hover:scale-110 transition-transform" />

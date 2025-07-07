@@ -1,27 +1,30 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Tasks from '../components/Tasks';
-import PageHeader from '../components/PageHeader';
-import Menu from '../components/Menu';
 import api from '../api';
 import Edit from './EditTasks';
 import useAuthToken from '../utils/useAuthToken';
 import ShareTasks from './ShareTasks';
-
+import { useOutletContext } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 function ViewTasks() {
+  const {
+    searchTerm,
+    setSearchTerm,
+    isMenuOpen,
+    setIsMenuOpen
+  } = useOutletContext();
+
   const { id } = useParams();
   const [tasks, setTasks] = useState([]);
   const [filteredTasksList, setFilteredTasksList] = useState([]);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [editTask, setEditTask] = useState(null);
   const [shareTask, setShareTask] = useState(null);
 
-
   const navigate = useNavigate();
-
   useAuthToken();
 
   useEffect(() => {
@@ -68,30 +71,21 @@ function ViewTasks() {
   }, [id, filteredTasksList, selectedTaskId]);
 
   return (
-    <div className="min-h-screen h-screen bg-white flex flex-col overflow-hidden">
-
-      {/* ✅ Top Header */}
-      <div className="w-full z-40">
-        <PageHeader
-          redTitle="Ta"
-          blackTitle="sks"
-          tasks={tasks}
-          setTasks={setTasks}
-          setFilteredTasksList={setFilteredTasksList}
-          setIsMenuOpen={setIsMenuOpen}
-        />
-      </div>
-
+    <motion.div
+      className="min-h-screen h-screen bg-white flex flex-col overflow-hidden"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+    >
       {/* ✅ Row: Menu + Main Box */}
-      <div className="flex flex-row mt-[2rem] gap-x-20 sm:mt-[1rem]">
-
-        {/* ✅ Left-side Menu */}
-        <div className="hidden sm:block h-screen w-[16rem] z-50">
-          <Menu />
-        </div>
-
+      <motion.div
+        className="flex flex-row mt-[2rem] gap-x-20 sm:mt-[1rem]"
+        initial={{ scale: 0.98, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.4, delay: 0.1 }}
+      >
         {/* ✅ Task Preview Box */}
-        <div className="flex-1 flex justify-center px-4 pb-6">
+        <div className="flex-1 flex justify-center sm:justify-end sm:mr-5 px-4 pb-6">
           {!isMenuOpen && (
             <div className="relative z-0 border sm:h-[76vh] border-[rgba(161,163,171,0.63)] shadow-lg rounded-2xl p-4 flex flex-col sm:flex-row sm:gap-6 sm:w-[150vh] w-[40vh] bg-white transition-all duration-300">
 
@@ -99,13 +93,13 @@ function ViewTasks() {
               <div className="order-1 sm:order-2 w-full flex flex-col gap-6 mt-6 sm:mt-0">
                 {selectedTaskId && (
                   <div className="h-[31rem] bg-[#F5F8FF] p-4 rounded-xl border border-[rgba(161,163,171,0.63)] shadow overflow-y-auto scrollbar-hide">
-                 <Tasks
-                    tasks={tasks}
-                    task_id={selectedTaskId}
-                    setEditTask={setEditTask}
-                    fetchTasksWithRetry={fetchTasksWithRetry}
-                    setShareTask={setShareTask}
-                  />
+                    <Tasks
+                      tasks={tasks}
+                      task_id={selectedTaskId}
+                      setEditTask={setEditTask}
+                      fetchTasksWithRetry={fetchTasksWithRetry}
+                      setShareTask={setShareTask}
+                    />
                   </div>
                 )}
               </div>
@@ -113,7 +107,7 @@ function ViewTasks() {
             </div>
           )}
         </div>
-      </div>
+      </motion.div>
 
       {/* ✅ Modal for Edit */}
       {editTask && (
@@ -123,6 +117,7 @@ function ViewTasks() {
           fetchTasksWithRetry={fetchTasksWithRetry}
         />
       )}
+
       {shareTask && (
         <ShareTasks
           taskData={shareTask}
@@ -130,7 +125,7 @@ function ViewTasks() {
           fetchTasksWithRetry={fetchTasksWithRetry}
         />
       )}
-    </div>
+    </motion.div>
   );
 }
 

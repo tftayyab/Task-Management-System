@@ -35,29 +35,51 @@ router.get(
 
 
 // ✏️ PUT /tasks/:id - Update a task
+// ✏️ PUT /tasks/:id - Update a task
 router.put(
   "/:id",
   validateRequest(validateTasks),
   asyncWrapper(async (req, res) => {
     const { id } = req.params;
+    const username = req.user.username;
 
     if (!isValidObjectId(id)) {
       return res.status(400).json({ message: "Invalid Task ID format" });
     }
 
-    const updatedTask = await Task.findByIdAndUpdate(
-      id,
-      req.validatedBody,
-      { new: true }
-    );
-
-    if (!updatedTask) {
+    const existingTask = await Task.findById(id);
+    if (!existingTask) {
       return res.status(404).json({ message: "Task not found" });
     }
+
+    // ✅ Only owner can update
+    if (existingTask.owner !== username) {
+      return res.status(403).json({ message: "You are not allowed to update this task" });
+    }
+
+    const { teamIds = [] } = req.validatedBody;
+
+    let shareWith = [];
+    if (teamIds.length > 0) {
+      const teams = await Team.find({ _id: { $in: teamIds } });
+      const members = teams.flatMap((team) => team.shareWith || []);
+      shareWith = [...new Set(members)].filter((user) => user !== username);
+    }
+
+    const updatedTask = await Task.findByIdAndUpdate(
+      id,
+      {
+        ...req.validatedBody,
+        teamIds,
+        shareWith,
+      },
+      { new: true }
+    );
 
     res.json({ message: "Task updated", task: updatedTask });
   })
 );
+
 
 // ✅ DELETE /tasks/:id - Only owner can delete
 router.delete(

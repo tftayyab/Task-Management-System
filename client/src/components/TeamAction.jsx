@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import api from '../api';
 
 const TeamActions = ({ team, fetchTeamsWithRetry, setEditTeam, selectedTeam, setSelectedTeam }) => {
@@ -5,7 +6,6 @@ const TeamActions = ({ team, fetchTeamsWithRetry, setEditTeam, selectedTeam, set
     try {
       await api.delete(`/teams/${id}`);
 
-      // If the deleted team is currently selected, reset selection
       if (selectedTeam && selectedTeam._id === id) {
         setSelectedTeam(null);
       }
@@ -17,7 +17,12 @@ const TeamActions = ({ team, fetchTeamsWithRetry, setEditTeam, selectedTeam, set
   };
 
   return (
-    <div className="flex flex-col min-w-[6rem] bg-white rounded-xl shadow-lg ring-1 ring-gray-200 overflow-hidden transition-all duration-300 ease-in-out">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.2 }}
+      className="flex flex-col min-w-[6rem] bg-white rounded-xl shadow-lg ring-1 ring-gray-200 overflow-hidden transition-all duration-300 ease-in-out"
+    >
       <button
         onClick={(e) => {
           e.stopPropagation();
@@ -37,7 +42,7 @@ const TeamActions = ({ team, fetchTeamsWithRetry, setEditTeam, selectedTeam, set
       >
         🗑️ Delete
       </button>
-    </div>
+    </motion.div>
   );
 };
 

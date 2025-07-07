@@ -2,15 +2,15 @@ import { useEffect, useState } from 'react';
 import { CrossIcon } from '../components/svg';
 import { handleTeamSubmit, handleTeamUpdate, handleTeamEditDirect } from '../utils/handleTeams';
 import api from '../api';
+import { motion } from 'framer-motion';
 
 function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry }) {
   const [originalTitle, setOriginalTitle] = useState(document.title);
   const [teamData, setTeamData] = useState({
     teamName: '',
     members: ['', '', '', '', ''],
-    _id: null, // Needed for edit
+    _id: null,
   });
-
   const [userTeams, setUserTeams] = useState([]);
   const [step, setStep] = useState('select');
 
@@ -73,13 +73,18 @@ function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry 
 
   return (
     <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 backdrop-blur-sm px-2 sm:px-4">
-      <div className="relative w-full sm:w-[90vw] max-w-3xl bg-[#F9F9F9] rounded-xl shadow-2xl p-4 sm:p-8 space-y-6">
-        {/* ❌ Close */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.25 }}
+        className="relative w-full sm:w-[90vw] max-w-3xl bg-[#F9F9F9] rounded-xl shadow-2xl p-4 sm:p-8 space-y-6"
+      >
+        {/* Close */}
         <div onClick={onClose} className="absolute top-4 right-4 cursor-pointer">
           <CrossIcon className="w-6 h-6 hover:scale-110 transition-transform" />
         </div>
 
-        {/* 🧾 Header */}
+        {/* Header */}
         <div className="text-center">
           <p className="text-black font-semibold text-xl sm:text-2xl">
             {mode === 'edit'
@@ -91,12 +96,10 @@ function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry 
           <div className="mt-1 mx-auto w-12 sm:w-20 h-1 bg-[#F24E1E] rounded-full" />
         </div>
 
-        {/* 👥 Share Mode Step 1 */}
+        {/* Step: Share Mode Select */}
         {mode === 'share' && step === 'select' && (
           <div className="space-y-4 text-center">
-            <p className="text-sm text-gray-700 font-medium">
-              Choose how you want to share the task:
-            </p>
+            <p className="text-sm text-gray-700 font-medium">Choose how you want to share the task:</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={() => setStep('create')}
@@ -114,12 +117,10 @@ function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry 
           </div>
         )}
 
-        {/* 👤 Share Mode Step 2 */}
+        {/* Step: Share Mode Team List */}
         {mode === 'share' && step === 'list' && (
           <div className="space-y-4">
-            <p className="text-sm font-semibold text-black text-center">
-              Select a team to share this task with:
-            </p>
+            <p className="text-sm font-semibold text-black text-center">Select a team to share this task with:</p>
             <ul className="space-y-3 max-h-[40vh] overflow-y-auto pr-1 scrollbar-hide">
               {userTeams.length === 0 ? (
                 <p className="text-gray-500 text-center">No teams available</p>
@@ -141,7 +142,7 @@ function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry 
           </div>
         )}
 
-        {/* ✍️ Add/Edit/Create Team Form */}
+        {/* Add/Edit/Create Form */}
         {(mode === 'add' || mode === 'edit' || step === 'create') && (
           <div className="space-y-4">
             <div>
@@ -186,7 +187,7 @@ function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry 
             </div>
           </div>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import api from '../api';
 
 const Actions = ({ task, fetchTasksWithRetry, setEditTask, setShareTask }) => {
@@ -24,8 +25,12 @@ const Actions = ({ task, fetchTasksWithRetry, setEditTask, setShareTask }) => {
   };
 
   return (
-    <div className="flex flex-col -mt-4 min-w-[6rem] bg-white rounded-xl shadow-lg ring-1 ring-gray-200 overflow-hidden transition-all duration-300 ease-in-out">
-      
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.2 }}
+      className="flex flex-col -mt-4 min-w-[6rem] bg-white rounded-xl shadow-lg ring-1 ring-gray-200 overflow-hidden"
+    >
       {/* ✏️ Edit */}
       <button
         onClick={(e) => {
@@ -40,7 +45,7 @@ const Actions = ({ task, fetchTasksWithRetry, setEditTask, setShareTask }) => {
       {/* 🗑️ Delete */}
       <button
         onClick={() => handleDelete(task._id)}
-        className="px-4 whitespace-nowrap py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-800 transition-all font-medium text-left"
+        className="px-4 py-2 text-sm text-red-600 whitespace-nowrap hover:bg-red-50 hover:text-red-800 transition-all font-medium text-left"
       >
         🗑️ Delete
       </button>
@@ -49,14 +54,13 @@ const Actions = ({ task, fetchTasksWithRetry, setEditTask, setShareTask }) => {
       <button
         onClick={(e) => {
           e.stopPropagation();
-          setShareTask(task); // 👈 opens TeamForm in share mode
+          setShareTask(task);
         }}
         className="px-4 py-2 text-sm text-purple-600 hover:bg-purple-50 hover:text-purple-800 transition-all font-medium text-left"
       >
         🔗 Share
       </button>
-
-    </div>
+    </motion.div>
   );
 };
 

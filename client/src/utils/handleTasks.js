@@ -52,7 +52,7 @@ export const handleUpdate = async ({
       teamIds: team ? [team._id] : taskData.teamIds || [], // ✅ Retain or add team
     };
 
-    await api.put(`/tasks/${taskData._id}`, taskPayload);
+    await api.put(`/task/${taskData._id}`, taskPayload);
 
     if (fetchTasksWithRetry) fetchTasksWithRetry();
     if (onClose) onClose();

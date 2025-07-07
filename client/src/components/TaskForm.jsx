@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { CrossIcon } from '../components/svg';
 import { handleChange, handleSubmit, handleUpdate } from '../utils/handleTasks';
+import { motion } from 'framer-motion';
 
 function TaskForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry, team = null }) {
   const [originalTitle, setOriginalTitle] = useState(document.title);
@@ -33,32 +34,37 @@ function TaskForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry,
     };
   }, [mode, taskData]);
 
-const handleTaskSubmit = () => {
-  const owner = localStorage.getItem('username');
+  const handleTaskSubmit = () => {
+    const owner = localStorage.getItem('username');
 
-  const fullTask = {
-    ...newTask,
-    owner,
-    shareWith: team?.shareWith || [],
-    teamIds: team ? [team._id] : [],
+    const fullTask = {
+      ...newTask,
+      owner,
+      shareWith: team?.shareWith || [],
+      teamIds: team ? [team._id] : [],
+    };
+
+    if (mode === 'edit') {
+      handleUpdate({ newTask: fullTask, taskData, fetchTasksWithRetry, onClose, team });
+    } else {
+      handleSubmit({
+        newTask: fullTask,
+        setNewTask,
+        fetchTasksWithRetry,
+        onClose,
+        team,
+      });
+    }
   };
-
-  if (mode === 'edit') {
-    handleUpdate({ newTask: fullTask, taskData, fetchTasksWithRetry, onClose, team });
-  } else {
-    handleSubmit({
-      newTask: fullTask,
-      setNewTask,
-      fetchTasksWithRetry,
-      onClose,
-      team, // ✅ this is what was missing before
-    });
-  }
-};
 
   return (
     <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 backdrop-blur-sm px-2 sm:px-4">
-      <div className="relative w-full sm:w-[90vw] max-w-3xl bg-[#F9F9F9] rounded-xl shadow-2xl p-4 sm:p-8 space-y-6">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.25 }}
+        className="relative w-full sm:w-[90vw] max-w-3xl bg-[#F9F9F9] rounded-xl shadow-2xl p-4 sm:p-8 space-y-6"
+      >
         {/* Close */}
         <div onClick={onClose} className="absolute top-4 right-4 cursor-pointer">
           <CrossIcon className="w-6 h-6 hover:scale-110 transition-transform" />
@@ -142,7 +148,7 @@ const handleTaskSubmit = () => {
             </button>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

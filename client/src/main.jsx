@@ -1,31 +1,38 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
+import MainLayout from './layouts/MainLayout';
 import Home from './pages/Home';
 import Login from './pages/Login';
+import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
 import MyTasks from './pages/MyTasks';
 import ViewTasks from './pages/ViewTasks';
 import AddTasks from './pages/AddTasks';
-import Dashboard from './pages/Dashboard';
 import Edit from './pages/EditTasks';
-import Register from './pages/Register';
 import Collaborate from './pages/Collaborate';
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <MainLayout />, // This wraps the children with PageHeader
+    children: [
+      { path: '', element: <Home /> },
+      { path: 'dashboard', element: <Dashboard /> },
+      { path: 'mytasks', element: <MyTasks /> },
+      { path: 'viewtask/:id', element: <ViewTasks /> },
+      { path: 'addtasks', element: <AddTasks /> },
+      { path: 'edit', element: <Edit /> },
+      { path: 'collaborate', element: <Collaborate /> },
+    ]
+  },
+  { path: '/login', element: <Login /> },
+  { path: '/register', element: <Register /> }
+]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/mytasks" element={<MyTasks />} />
-        <Route path="/viewtask/:id" element={<ViewTasks />} />
-        <Route path="/addtasks" element={<AddTasks />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/edit" element={<Edit />} />
-        <Route path="/collaborate" element={<Collaborate />} />
-      </Routes>
-    </BrowserRouter>
+    <RouterProvider router={router} />
   </React.StrictMode>
 );

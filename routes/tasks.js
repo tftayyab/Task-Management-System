@@ -9,18 +9,27 @@ const verifyToken = require("../middleware/verifyToken");
 const router = express.Router();
 router.use(verifyToken);
 
-// ✅ POST /tasks - Create a new task with authenticated user as owner
+// ✅ POST /tasks - Create a new task
 router.post(
   "/",
   validateRequest(validateTasks),
   asyncWrapper(async (req, res) => {
     const owner = req.user.username;
-    const { teamId } = req.body; // ✅ Receive from frontend
+    const { teamIds = [] } = req.validatedBody;
+
+    let shareWith = [];
+
+    if (teamIds.length > 0) {
+      const teams = await Team.find({ _id: { $in: teamIds } });
+      const members = teams.flatMap(team => team.shareWith || []);
+      shareWith = [...new Set(members)].filter(username => username !== owner);
+    }
 
     const task = new Task({
       ...req.validatedBody,
       owner,
-      teamId: teamId || null, // ✅ Save team ID if provided
+      teamIds,
+      shareWith,
     });
 
     await task.save();
@@ -50,7 +59,7 @@ router.get(
   })
 );
 
-// ✅ GET /tasks/shared - Get tasks from teams where user is owner or shared with
+// ✅ GET /tasks/shared - Tasks linked to shared teams
 router.get(
   "/shared",
   asyncWrapper(async (req, res) => {
@@ -63,7 +72,7 @@ router.get(
 
     const teamIds = teams.map(t => t._id);
 
-    const tasks = await Task.find({ teamId: { $in: teamIds } });
+    const tasks = await Task.find({ teamIds: { $in: teamIds } });
 
     res.json({ teams, tasks });
   })

@@ -5,7 +5,7 @@ import { CircleIcon, TeamIcon, AddIcon, OptionIcon } from './svg';
 import TeamActions from './TeamAction';
 import useIsMobile from '../utils/useScreenSize';
 
-function TeamList({ teams = [], onTeamClick, onAddTeamClick, fetchTeamsWithRetry, setEditTeam }) {
+function TeamList({ teams = [], onTeamClick, onAddTeamClick, fetchTeamsWithRetry, setEditTeam, selectedTeam, setSelectedTeam  }) {
   const [openActionId, setOpenActionId] = useState(null);
   const isMobile = useIsMobile();
   const navigate = useNavigate();
@@ -80,6 +80,8 @@ function TeamList({ teams = [], onTeamClick, onAddTeamClick, fetchTeamsWithRetry
                           team={team}
                           fetchTeamsWithRetry={fetchTeamsWithRetry}
                           setEditTeam={setEditTeam}
+                          selectedTeam={selectedTeam}          // ✅ pass selected team
+                          setSelectedTeam={setSelectedTeam}
                         />
                       </div>
                     )}

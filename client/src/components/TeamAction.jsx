@@ -1,11 +1,16 @@
-// src/components/TeamActions.jsx
 import api from '../api';
 
-const TeamActions = ({ team, fetchTeamsWithRetry, setEditTeam }) => {
+const TeamActions = ({ team, fetchTeamsWithRetry, setEditTeam, selectedTeam, setSelectedTeam }) => {
   const handleDelete = async (id) => {
     try {
       await api.delete(`/teams/${id}`);
-      fetchTeamsWithRetry?.();
+
+      // If the deleted team is currently selected, reset selection
+      if (selectedTeam && selectedTeam._id === id) {
+        setSelectedTeam(null);
+      }
+
+      await fetchTeamsWithRetry?.();
     } catch (error) {
       console.error('❌ Failed to delete team:', error);
     }
@@ -24,7 +29,10 @@ const TeamActions = ({ team, fetchTeamsWithRetry, setEditTeam }) => {
       </button>
 
       <button
-        onClick={() => handleDelete(team._id)}
+        onClick={(e) => {
+          e.stopPropagation();
+          handleDelete(team._id);
+        }}
         className="px-4 py-2 whitespace-nowrap text-sm text-red-600 hover:bg-red-50 hover:text-red-800 font-medium text-left"
       >
         🗑️ Delete

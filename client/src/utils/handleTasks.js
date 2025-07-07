@@ -7,9 +7,21 @@ export const handleChange = (e, setNewTask) => {
 };
 
 // ✅ Handle task creation
-export const handleSubmit = async ({ newTask, setNewTask, fetchTasksWithRetry, onClose }) => {
+export const handleSubmit = async ({
+  newTask,
+  setNewTask,
+  fetchTasksWithRetry,
+  onClose,
+  team = null,
+}) => {
   try {
-    await api.post('/tasks', newTask); // ✅ server sets owner
+    const payload = {
+      ...newTask,
+      teamIds: team ? [team._id] : [],
+      shareWith: team?.shareWith?.filter(user => user !== localStorage.getItem('username')) || [],
+    };
+
+    await api.post('/tasks', payload); // ✅ server sets owner
 
     if (fetchTasksWithRetry) fetchTasksWithRetry();
     if (setNewTask) {
@@ -17,7 +29,7 @@ export const handleSubmit = async ({ newTask, setNewTask, fetchTasksWithRetry, o
         title: '',
         description: '',
         status: 'In Progress',
-        dueDate: ''
+        dueDate: '',
       });
     }
     if (onClose) onClose();
@@ -27,11 +39,20 @@ export const handleSubmit = async ({ newTask, setNewTask, fetchTasksWithRetry, o
 };
 
 // ✏️ Handle task update
-export const handleUpdate = async ({ newTask, taskData, fetchTasksWithRetry, onClose }) => {
+export const handleUpdate = async ({
+  newTask,
+  taskData,
+  fetchTasksWithRetry,
+  onClose,
+  team = null, // ✅ Add team if needed for updating teamIds
+}) => {
   try {
-    const taskPayload = { ...newTask }; // ✅ no username
+    const taskPayload = {
+      ...newTask,
+      teamIds: team ? [team._id] : taskData.teamIds || [], // ✅ Retain or add team
+    };
 
-    await api.put(`/task/${taskData._id}`, taskPayload);
+    await api.put(`/tasks/${taskData._id}`, taskPayload);
 
     if (fetchTasksWithRetry) fetchTasksWithRetry();
     if (onClose) onClose();

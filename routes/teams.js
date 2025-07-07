@@ -1,5 +1,6 @@
 const express = require("express");
 const Team = require("../models/TeamMongoDB");
+const Task = require("../models/TaskMongoDB");
 const asyncWrapper = require("../middleware/asyncWrapper");
 const verifyToken = require("../middleware/verifyToken");
 
@@ -37,7 +38,7 @@ router.post(
   })
 );
 
-// ✅ DELETE /teams/:id - Delete a team (only owner allowed)
+// ✅ DELETE /teams/:id - Delete a team (only owner can delete)
 router.delete(
   "/:id",
   asyncWrapper(async (req, res) => {
@@ -45,7 +46,6 @@ router.delete(
     const username = req.user.username;
 
     const team = await Team.findById(teamId);
-
     if (!team) {
       return res.status(404).json({ message: "Team not found" });
     }
@@ -54,11 +54,55 @@ router.delete(
       return res.status(403).json({ message: "Only the team owner can delete this team" });
     }
 
+    // ✅ Delete team
     await Team.findByIdAndDelete(teamId);
+
+    // ✅ Remove teamId from all tasks' teamIds array
+    await Task.updateMany(
+      { teamIds: teamId },
+      { $pull: { teamIds: teamId } }
+    );
 
     res.json({ message: "Team deleted successfully" });
   })
 );
+
+// ✅ PUT /teams/:id - Edit a team (name + members)
+router.put(
+  "/:id",
+  asyncWrapper(async (req, res) => {
+    const teamId = req.params.id;
+    const { teamName, usernames = [] } = req.body;
+    const username = req.user.username;
+
+    // ✅ Validate inputs
+    if (!teamName || typeof teamName !== "string") {
+      return res.status(400).json({ message: "Team name is required" });
+    }
+
+    if (!Array.isArray(usernames) || usernames.length > 5) {
+      return res.status(400).json({ message: "Max 5 members allowed" });
+    }
+
+    // 🔒 Make sure team exists and belongs to the user
+    const team = await Team.findById(teamId);
+    if (!team) {
+      return res.status(404).json({ message: "Team not found" });
+    }
+
+    if (team.owner !== username) {
+      return res.status(403).json({ message: "You cannot edit this team" });
+    }
+
+    // ✅ Update team
+    team.teamName = teamName;
+    team.shareWith = usernames;
+    await team.save();
+
+    res.json({ message: "Team updated successfully", team });
+  })
+);
+
 
 
 module.exports = router;

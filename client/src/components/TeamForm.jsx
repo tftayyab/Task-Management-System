@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { CrossIcon } from '../components/svg';
-import { handleTeamSubmit, handleTeamUpdate } from '../utils/handleTeams';
+import { handleTeamSubmit, handleTeamUpdate, handleTeamEditDirect } from '../utils/handleTeams';
 import api from '../api';
 
 function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry }) {
@@ -8,19 +8,25 @@ function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry 
   const [teamData, setTeamData] = useState({
     teamName: '',
     members: ['', '', '', '', ''],
+    _id: null, // Needed for edit
   });
 
   const [userTeams, setUserTeams] = useState([]);
-  const [step, setStep] = useState('select'); // For share mode: 'select' or 'list'
+  const [step, setStep] = useState('select');
 
   useEffect(() => {
     setOriginalTitle(document.title);
 
     if (mode === 'edit' && taskData) {
+      const existingMembers = taskData.shareWith || [];
+      const paddedMembers = [...existingMembers, ...Array(5 - existingMembers.length).fill('')];
+
       setTeamData({
         teamName: taskData.teamName || '',
-        members: taskData.shareWith || ['', '', '', '', ''],
+        members: paddedMembers,
+        _id: taskData._id || null,
       });
+
       document.title = 'Edit Team';
     } else if (mode === 'add') {
       document.title = 'Add Team';
@@ -56,7 +62,7 @@ function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry 
         usernames: team.shareWith,
       };
 
-      await api.put(`/tasks/${taskData._id}/share`, payload);
+      await api.put(`/task/${taskData._id}/share`, payload);
 
       if (fetchTasksWithRetry) fetchTasksWithRetry();
       if (onClose) onClose();
@@ -108,7 +114,7 @@ function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry 
           </div>
         )}
 
-        {/* 👤 Share Mode Step 2 (existing team list) */}
+        {/* 👤 Share Mode Step 2 */}
         {mode === 'share' && step === 'list' && (
           <div className="space-y-4">
             <p className="text-sm font-semibold text-black text-center">
@@ -124,9 +130,7 @@ function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry 
                     onClick={() => handleAddToTeam(team)}
                     className="cursor-pointer px-4 py-3 rounded-md bg-white border border-[#A1A3AB] hover:shadow hover:bg-gray-50 transition-all"
                   >
-                    <p className="text-sm font-medium text-black">
-                      {team.teamName}
-                    </p>
+                    <p className="text-sm font-medium text-black">{team.teamName}</p>
                     <p className="text-xs text-gray-500">
                       Shared with: {team.shareWith.join(', ') || 'None'}
                     </p>
@@ -137,28 +141,22 @@ function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry 
           </div>
         )}
 
-        {/* ✍️ Team Form for add/edit/create */}
+        {/* ✍️ Add/Edit/Create Team Form */}
         {(mode === 'add' || mode === 'edit' || step === 'create') && (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-black mb-1">
-                Team Name
-              </label>
+              <label className="block text-sm font-semibold text-black mb-1">Team Name</label>
               <input
                 type="text"
                 placeholder="Enter team name"
                 value={teamData.teamName}
-                onChange={(e) =>
-                  setTeamData({ ...teamData, teamName: e.target.value })
-                }
+                onChange={(e) => setTeamData({ ...teamData, teamName: e.target.value })}
                 className="w-full border border-[#A1A3AB] rounded-md px-3 py-2 text-sm"
               />
             </div>
 
             <div className="space-y-2">
-              <p className="text-sm font-semibold text-black">
-                Team Members (Max 5)
-              </p>
+              <p className="text-sm font-semibold text-black">Team Members (Max 5)</p>
               {teamData.members.map((member, idx) => (
                 <input
                   key={idx}
@@ -173,11 +171,13 @@ function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry 
 
             <div className="pt-2">
               <button
-                onClick={() =>
-                  mode === 'edit'
-                    ? handleTeamUpdate({ teamData, taskData, fetchTasksWithRetry, onClose })
-                    : handleTeamSubmit({ teamData, fetchTasksWithRetry, onClose })
-                }
+                onClick={() => {
+                  if (mode === 'edit') {
+                    handleTeamEditDirect({ teamData, fetchTasksWithRetry, onClose });
+                  } else {
+                    handleTeamSubmit({ teamData, fetchTasksWithRetry, onClose, taskData });
+                  }
+                }}
                 disabled={!teamData.teamName}
                 className="bg-[#FF9090] hover:bg-[#FF6F6F] text-white px-6 py-2 rounded-md text-sm font-medium shadow transition-all"
               >

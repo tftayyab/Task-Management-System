@@ -103,11 +103,20 @@ router.put(
       { upsert: true, new: true }
     );
 
-    // 🔄 Optionally update task owner and shareWith (optional)
     const task = await Task.findById(taskId);
     if (task) {
       task.owner = owner;
       task.shareWith = usernames;
+
+      // ✅ Add team ID to teamIds[] if not already present
+      if (!task.teamIds) task.teamIds = [];
+      const alreadyAdded = task.teamIds.some(
+        (id) => id.toString() === updatedTeam._id.toString()
+      );
+      if (!alreadyAdded) {
+        task.teamIds.push(updatedTeam._id);
+      }
+
       await task.save();
     }
 

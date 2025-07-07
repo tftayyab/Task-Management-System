@@ -27,15 +27,13 @@ const taskSchema = Joi.object({
     'string.base': 'Each item in ShareWith must be a string.',
   }),
 
-  // ✅ Allow string or null for teamId
-  teamId: Joi.alternatives()
-    .try(
-      Joi.string().pattern(/^[0-9a-fA-F]{24}$/),
-      Joi.valid(null)
-    )
+  // ✅ Replace teamId with teamIds
+  teamIds: Joi.array()
+    .items(Joi.string().pattern(/^[0-9a-fA-F]{24}$/))
     .optional()
     .messages({
-      'string.pattern.base': 'Team ID must be a valid MongoDB ObjectId.',
+      'array.base': 'Team IDs must be an array of MongoDB ObjectIds.',
+      'string.pattern.base': 'Each team ID must be a valid MongoDB ObjectId.',
     }),
 });
 

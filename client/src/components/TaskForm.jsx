@@ -40,16 +40,21 @@ const handleTaskSubmit = () => {
     ...newTask,
     owner,
     shareWith: team?.shareWith || [],
-    teamId: team?._id || null, // ✅ Include teamId
+    teamIds: team ? [team._id] : [],
   };
 
   if (mode === 'edit') {
-    handleUpdate({ newTask: fullTask, taskData, fetchTasksWithRetry, onClose });
+    handleUpdate({ newTask: fullTask, taskData, fetchTasksWithRetry, onClose, team });
   } else {
-    handleSubmit({ newTask: fullTask, setNewTask, fetchTasksWithRetry, onClose });
+    handleSubmit({
+      newTask: fullTask,
+      setNewTask,
+      fetchTasksWithRetry,
+      onClose,
+      team, // ✅ this is what was missing before
+    });
   }
 };
-
 
   return (
     <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 backdrop-blur-sm px-2 sm:px-4">

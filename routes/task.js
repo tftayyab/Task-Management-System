@@ -15,6 +15,7 @@ router.get(
   "/:id",
   asyncWrapper(async (req, res) => {
     const { id } = req.params;
+    const username = req.user.username; // ✅ get logged-in user
 
     if (!isValidObjectId(id)) {
       return res.status(400).json({ message: "Invalid Task ID format" });
@@ -23,9 +24,15 @@ router.get(
     const task = await Task.findById(id);
     if (!task) return res.status(404).json({ message: "Task not found" });
 
+    // ✅ Only allow owner or shared user
+    if (task.owner !== username && !task.shareWith.includes(username)) {
+      return res.status(403).json({ message: "You are not allowed to view this task" });
+    }
+
     res.json(task);
   })
 );
+
 
 // ✏️ PUT /tasks/:id - Update a task
 router.put(

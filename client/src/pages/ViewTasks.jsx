@@ -48,7 +48,7 @@ function ViewTasks() {
   const fetchTasksWithRetry = async () => {
     try {
       const username = localStorage.getItem('username');
-      const res = await api.get(`/tasks?username=${username}`);
+      const res = await api.get(`/tasks`);
       setTasks(res.data);
       setFilteredTasksList(res.data);
     } catch (err) {

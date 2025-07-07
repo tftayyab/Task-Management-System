@@ -9,6 +9,8 @@ import TeamForm from '../components/TeamForm';
 import api from '../api';
 import useAuthToken from '../utils/useAuthToken';
 import ShareTasks from './ShareTasks';
+import { useNavigate } from 'react-router-dom';
+
 
 function Collaborate() {
   const location = useLocation();
@@ -24,6 +26,8 @@ function Collaborate() {
   const [showTeamForm, setShowTeamForm] = useState(false);
   const [editTask, setEditTask] = useState(null);
   const [editTeam, setEditTeam] = useState(null);
+
+  const navigate = useNavigate();
 
   useAuthToken();
 
@@ -119,7 +123,7 @@ const filteredTasks = selectedTeam
                     setEditTask={setEditTask}
                     fetchTasksWithRetry={fetchSharedData}
                     setShareTask={setShareTask}
-                    onTaskClick={() => {}}
+                    onTaskClick={(taskId) => navigate(`/viewtask/${taskId}`)}
                     onAddTaskClick={() => setShowTaskForm(true)}
                     searchTerm={searchTerm}
                   />

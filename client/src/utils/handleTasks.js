@@ -13,15 +13,17 @@ export const handleSubmit = async ({
   fetchTasksWithRetry,
   onClose,
   team = null,
+  setNotification, // ✅ new
 }) => {
   try {
     const payload = {
       ...newTask,
       teamIds: team ? [team._id] : [],
-      shareWith: team?.shareWith?.filter(user => user !== localStorage.getItem('username')) || [],
+      shareWith:
+        team?.shareWith?.filter(user => user !== localStorage.getItem('username')) || [],
     };
 
-    await api.post('/tasks', payload); // ✅ server sets owner
+    await api.post('/tasks', payload);
 
     if (fetchTasksWithRetry) fetchTasksWithRetry();
     if (setNewTask) {
@@ -33,8 +35,10 @@ export const handleSubmit = async ({
       });
     }
     if (onClose) onClose();
+    if (setNotification) setNotification("✅ Task created!");
   } catch (error) {
     console.error("❌ Failed to submit task:", error);
+    if (setNotification) setNotification("❌ Task creation failed!");
   }
 };
 
@@ -44,20 +48,23 @@ export const handleUpdate = async ({
   taskData,
   fetchTasksWithRetry,
   onClose,
-  team = null, // ✅ Add team if needed for updating teamIds
+  team = null,
+  setNotification, // ✅
 }) => {
   try {
     const taskPayload = {
       ...newTask,
-      teamIds: team ? [team._id] : taskData.teamIds || [], // ✅ Retain or add team
+      teamIds: team ? [team._id] : taskData.teamIds || [],
     };
 
     await api.put(`/task/${taskData._id}`, taskPayload);
 
     if (fetchTasksWithRetry) fetchTasksWithRetry();
     if (onClose) onClose();
+    if (setNotification) setNotification("✏️ Task updated!");
   } catch (error) {
     console.error("❌ Failed to update task:", error);
+    if (setNotification) setNotification("❌ Task update failed!");
   }
 };
 
@@ -87,6 +94,7 @@ export const handleTaskSubmit = ({
   onClose,
   setNewTask,
   team = null,
+  setNotification, // ✅
 }) => {
   const owner = localStorage.getItem('username');
 
@@ -104,6 +112,7 @@ export const handleTaskSubmit = ({
       fetchTasksWithRetry,
       onClose,
       team,
+      setNotification, // ✅ pass it
     });
   } else {
     handleSubmit({
@@ -112,14 +121,16 @@ export const handleTaskSubmit = ({
       fetchTasksWithRetry,
       onClose,
       team,
+      setNotification, // ✅ pass it
     });
   }
 };
 
 // ❌ Delete task with token refresh fallback
-export const handleDelete = async (id) => {
+export const handleDelete = async (id, setNotification) => {
   try {
     await api.delete(`/task/${id}`);
+    if (setNotification) setNotification("🗑️ Task deleted!");
   } catch (error) {
     if (error.response?.status === 401) {
       try {
@@ -127,6 +138,7 @@ export const handleDelete = async (id) => {
         const newToken = refreshRes.data.accessToken;
         localStorage.setItem('token', newToken);
         await api.delete(`/task/${id}`);
+        if (setNotification) setNotification("🗑️ Task deleted!");
       } catch (refreshError) {
         console.error('❌ Token refresh failed during delete');
         window.location.href = '/login';
@@ -134,8 +146,10 @@ export const handleDelete = async (id) => {
       }
     } else {
       console.error('❌ Delete failed:', error);
+      if (setNotification) setNotification("❌ Failed to delete task!");
       throw error;
     }
   }
 };
+
 

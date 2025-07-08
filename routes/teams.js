@@ -3,36 +3,51 @@ const Team = require("../models/TeamMongoDB");
 const Task = require("../models/TaskMongoDB");
 const asyncWrapper = require("../middleware/asyncWrapper");
 const verifyToken = require("../middleware/verifyToken");
+const { getIO } = require('../socket');
 
 const router = express.Router();
 router.use(verifyToken);
 
 // ✅ POST /teams - Create or update a team
+// ✅ POST /teams - Create or update a team
 router.post(
   "/",
   asyncWrapper(async (req, res) => {
     const { teamName, usernames = [] } = req.body;
-    const owner = req.user.username; // 🔐 Secure: get from token
+    const owner = req.user.username;
 
-    // ✅ Validate team name
     if (!teamName || typeof teamName !== "string") {
       return res.status(400).json({ message: "Team name is required" });
     }
 
-    // ✅ Validate members
     if (!Array.isArray(usernames) || usernames.length > 5) {
       return res.status(400).json({ message: "You can only add up to 5 users" });
     }
 
-    // ✅ Create or update team
     const team = await Team.findOneAndUpdate(
-      { owner, teamName }, // Unique per user
+      { owner, teamName },
       {
         $set: { owner, teamName },
         $addToSet: { shareWith: { $each: usernames } },
       },
       { upsert: true, new: true }
     );
+
+    const io = getIO();
+
+    // 1. Emit to all usernames in the team
+    usernames.forEach(username => {
+      io.to(username).emit('team_added', {
+        message: `You've been added to team "${team.teamName}"`,
+        teamId: team._id,
+      });
+    });
+
+    // 2. Emit to team room (if anyone else is already in it)
+    io.to(team._id.toString()).emit('team_updated', {
+      message: `Team "${team.teamName}" was updated`,
+      teamId: team._id,
+    });
 
     res.status(201).json({ message: "Team created/updated", team });
   })

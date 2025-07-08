@@ -1,11 +1,19 @@
 import { useState, useEffect } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import PageHeader from '../components/PageHeader';
+import Notification from '../components/notification'; // ✅ Import
+import useSocketNotifications from '../hooks/useSocketNotifications'; // ✅ Import the hook
+
 
 function MainLayout() {
   const [searchTerm, setSearchTerm] = useState('');
+  const [notification, setNotification] = useState(null); // ✅ State for notification
+
   const location = useLocation();
   const path = location.pathname;
+
+  useSocketNotifications(setNotification); // ✅ Activate socket listeners
+
 
   // Reset search term on page change
   useEffect(() => {
@@ -36,6 +44,14 @@ function MainLayout() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col overflow-hidden">
+      {/* ✅ Global notification */}
+      {notification && (
+        <Notification
+          message={notification}
+          onClose={() => setNotification(null)}
+        />
+      )}
+
       {shouldShowHeader && (
         <PageHeader
           redTitle={red}
@@ -45,9 +61,9 @@ function MainLayout() {
         />
       )}
 
-      {/* ✅ Remove overflow-y-auto here */}
       <main className="flex-1">
-        <Outlet context={{ searchTerm, setSearchTerm }} />
+        {/* ✅ Pass setNotification to children via Outlet */}
+        <Outlet context={{ searchTerm, setSearchTerm, setNotification }} />
       </main>
     </div>
   );

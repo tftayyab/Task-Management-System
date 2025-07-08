@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { CompletedTasksIcon } from '../components/svg';
 import TaskStatusCard from '../components/TaskStatusCard';
 import TaskList from '../components/TaskList';
@@ -9,7 +9,6 @@ import ShareTasks from './ShareTasks';
 import api from '../api';
 import useIsMobile from '../utils/useScreenSize';
 import useAuthToken from '../utils/useAuthToken';
-import { useOutletContext } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 function Dashboard() {
@@ -18,6 +17,7 @@ function Dashboard() {
     setSearchTerm,
     isMenuOpen,
     setIsMenuOpen,
+    setNotification, // ✅ Access from context
   } = useOutletContext();
 
   const [tasks, setTasks] = useState([]);
@@ -37,18 +37,30 @@ function Dashboard() {
   }, []);
 
   const fetchTasksWithRetry = async () => {
-  setLoading(true); // ✅ Start loading
-  try {
-    const username = localStorage.getItem('username');
-    const res = await api.get(`/tasks?username=${username}`);
-    setTasks(res.data);
-    setFilteredTasksList(res.data);
-  } catch (err) {
-    console.error('❌ Failed to fetch tasks:', err.response?.data || err.message);
-  } finally {
-    setLoading(false); // ✅ End loading (success or error)
-  }
-};
+    setLoading(true);
+    try {
+      const username = localStorage.getItem('username');
+      const res = await api.get(`/tasks?username=${username}`);
+      setTasks(res.data);
+      setFilteredTasksList(res.data);
+    } catch (err) {
+      console.error('❌ Failed to fetch tasks:', err.response?.data || err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTaskAdd = () => {
+    setShowAddModal(true);
+  };
+
+  const handleTaskEdit = (task) => {
+    setEditTask(task);
+  };
+
+  const handleTaskShare = (task) => {
+    setShareTask(task);
+  };
 
   return (
     <motion.div
@@ -57,14 +69,12 @@ function Dashboard() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
     >
-      {/* Row: Menu + Main Content Box */}
       <motion.div
         className="flex flex-row mt-[2rem] gap-x-20 sm:mt-[1rem]"
         initial={{ scale: 0.98, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.4, delay: 0.1 }}
       >
-        {/* Main Panel */}
         <div className="flex-1 flex justify-center sm:justify-end sm:mr-5 px-4 pb-6">
           {!isMenuOpen && (
             <div className="relative z-0 border sm:h-[76vh] border-[rgba(161,163,171,0.63)] shadow-lg rounded-2xl p-4 flex flex-col sm:flex-row sm:gap-6 sm:w-[150vh] w-[40vh] bg-white transition-all duration-300">
@@ -74,19 +84,19 @@ function Dashboard() {
                   tasks={filteredTasksList}
                   mode="dashboard"
                   loading={loading}
-                  setShareTask={setShareTask}
+                  setShareTask={handleTaskShare} // ✅ setNotification inside
                   fetchTasksWithRetry={fetchTasksWithRetry}
                   statuses={['Pending', 'In Progress']}
-                  onAddTaskClick={() => setShowAddModal(true)}
+                  onAddTaskClick={handleTaskAdd}
                   onTaskClick={(id) => {
                     if (isMobile) {
                       const taskToEdit = tasks.find((task) => task._id === id);
-                      if (taskToEdit) setEditTask(taskToEdit);
+                      if (taskToEdit) handleTaskEdit(taskToEdit);
                     } else {
                       navigate(`/mytasks?taskId=${id}`);
                     }
                   }}
-                  setEditTask={setEditTask}
+                  setEditTask={handleTaskEdit}
                   searchTerm={searchTerm}
                 />
               </div>
@@ -109,18 +119,18 @@ function Dashboard() {
                     tasks={tasks}
                     fetchTasksWithRetry={fetchTasksWithRetry}
                     statuses={['Completed']}
-                    setShareTask={setShareTask}
+                    setShareTask={handleTaskShare}
                     mode="dashboard"
                     loading={loading}
                     onTaskClick={(id) => {
                       if (isMobile) {
                         const taskToEdit = tasks.find((task) => task._id === id);
-                        if (taskToEdit) setEditTask(taskToEdit);
+                        if (taskToEdit) handleTaskEdit(taskToEdit);
                       } else {
                         navigate(`/mytasks?taskId=${id}`);
                       }
                     }}
-                    setEditTask={setEditTask}
+                    setEditTask={handleTaskEdit}
                   />
                 </div>
               </div>
@@ -133,7 +143,10 @@ function Dashboard() {
       {showAddModal && (
         <AddTasks
           onClose={() => setShowAddModal(false)}
-          fetchTasksWithRetry={fetchTasksWithRetry}
+          fetchTasksWithRetry={() => {
+            fetchTasksWithRetry();
+            setNotification('Task created successfully');
+          }}
         />
       )}
 
@@ -141,7 +154,10 @@ function Dashboard() {
         <Edit
           taskData={editTask}
           onClose={() => setEditTask(null)}
-          fetchTasksWithRetry={fetchTasksWithRetry}
+          fetchTasksWithRetry={() => {
+            fetchTasksWithRetry();
+            setNotification('Task updated successfully');
+          }}
         />
       )}
 
@@ -149,7 +165,10 @@ function Dashboard() {
         <ShareTasks
           taskData={shareTask}
           onClose={() => setShareTask(null)}
-          fetchTasksWithRetry={fetchTasksWithRetry}
+          fetchTasksWithRetry={() => {
+            fetchTasksWithRetry();
+            setNotification('Task shared with team');
+          }}
         />
       )}
     </motion.div>

@@ -5,6 +5,7 @@ const { validateTasks } = require("../validations/Tasksvalidation");
 const validateRequest = require("../middleware/validateRequest");
 const asyncWrapper = require("../middleware/asyncWrapper");
 const verifyToken = require("../middleware/verifyToken");
+const { getIO } = require('../socket');
 
 const router = express.Router();
 router.use(verifyToken);
@@ -16,6 +17,8 @@ router.post(
   asyncWrapper(async (req, res) => {
     const owner = req.user.username;
     const { teamIds = [] } = req.validatedBody;
+
+    const io = getIO(); // ✅ Get io before using it
 
     let shareWith = [];
 
@@ -33,6 +36,32 @@ router.post(
     });
 
     await task.save();
+
+    // ✅ Notify team rooms (if online)
+    teamIds.forEach(teamId => {
+      io.to(teamId.toString()).emit('task_created', {
+        message: `New task "${task.title}" added to your team`,
+        teamId,
+      });
+    });
+
+    // ✅ Notify users directly
+    shareWith.forEach(username => {
+      io.to(username).emit('task_created', {
+        message: `A new task "${task.title}" was shared with you`,
+        teamId: teamIds[0], // optional: handle multiple if needed
+      });
+    });
+
+    // (Optional) Second team-wide event – might be redundant
+    teamIds.forEach(teamId => {
+      io.to(teamId.toString()).emit('task_added', {
+        message: `New task added to your team`,
+        teamId,
+        taskTitle: task.title,
+      });
+    });
+
     res.status(201).json({ message: "Task created", task });
   })
 );

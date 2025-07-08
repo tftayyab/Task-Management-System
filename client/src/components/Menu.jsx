@@ -36,7 +36,7 @@ function Menu({ onClose }) {
       <AnimatePresence>
         {/* Fade overlay (Mobile only) */}
         <motion.div
-          className=" w-full h-full bg-black/30 z-40 sm:hidden"
+          className="fixed top-0 left-0 w-full h-full bg-black/30 z-40 sm:hidden"
           onClick={onClose}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

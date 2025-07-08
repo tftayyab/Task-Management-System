@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { CrossIcon } from '../components/svg';
-import { handleChange, handleSubmit, handleUpdate, handleTaskSubmit } from '../utils/handleTasks';
+import { handleChange, handleTaskSubmit } from '../utils/handleTasks';
 import { motion } from 'framer-motion';
 
-function TaskForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry, team = null }) {
+function TaskForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry, team = null, setNotification }) {
   const [originalTitle, setOriginalTitle] = useState(document.title);
   const [newTask, setNewTask] = useState({
     title: '',
@@ -42,8 +42,11 @@ function TaskForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry,
         className="relative w-full sm:w-[90vw] max-w-3xl bg-[#F9F9F9] rounded-xl shadow-2xl p-4 sm:p-8 space-y-6"
       >
         {/* Close */}
-        <div onClick={onClose} className="absolute top-4 right-4 cursor-pointer">
-          <CrossIcon className="w-6 h-6 hover:scale-110 transition-transform" />
+        <div
+          onClick={onClose}
+          className="absolute top-4 right-4 cursor-pointer hover:scale-110 transition-transform"
+        >
+          <CrossIcon className="w-6 h-6" />
         </div>
 
         {/* Header */}
@@ -64,7 +67,10 @@ function TaskForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry,
               name="title"
               value={newTask.title}
               onChange={(e) => handleChange(e, setNewTask)}
-              className="w-full rounded-md border border-[#A1A3AB] px-3 py-2 text-sm"
+              className="w-full rounded-md border border-[#A1A3AB] px-3 py-2 text-sm
+                         hover:border-[#FFAFAF] focus:border-[#F24E1E]
+                         focus:outline-none focus:ring-1 focus:ring-[#F24E1E]
+                         transition-all"
             />
           </div>
 
@@ -76,7 +82,10 @@ function TaskForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry,
               value={newTask.description}
               onChange={(e) => handleChange(e, setNewTask)}
               rows="4"
-              className="w-full rounded-md border border-[#A1A3AB] px-3 py-2 text-sm resize-none"
+              className="w-full rounded-md border border-[#A1A3AB] px-3 py-2 text-sm resize-none
+                         hover:border-[#FFAFAF] focus:border-[#F24E1E]
+                         focus:outline-none focus:ring-1 focus:ring-[#F24E1E]
+                         transition-all"
             />
           </div>
 
@@ -88,7 +97,10 @@ function TaskForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry,
               name="dueDate"
               value={newTask.dueDate}
               onChange={(e) => handleChange(e, setNewTask)}
-              className="w-full rounded-md border border-[#A1A3AB] px-3 py-2 text-sm"
+              className="w-full rounded-md border border-[#A1A3AB] px-3 py-2 text-sm
+                         hover:border-[#FFAFAF] focus:border-[#F24E1E]
+                         focus:outline-none focus:ring-1 focus:ring-[#F24E1E]
+                         transition-all"
             />
           </div>
 
@@ -97,14 +109,18 @@ function TaskForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry,
             <p className="text-sm font-semibold text-black mb-2">Status</p>
             <div className="flex flex-wrap gap-4">
               {["Pending", "In Progress", "Completed"].map((status) => (
-                <label key={status} className="inline-flex items-center gap-2 text-sm font-medium text-gray-700">
+                <label
+                  key={status}
+                  className="inline-flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer
+                             hover:text-[#F24E1E] transition-colors"
+                >
                   <input
                     type="radio"
                     name="status"
                     value={status}
                     checked={newTask.status === status}
                     onChange={(e) => handleChange(e, setNewTask)}
-                    className="accent-orange-500"
+                    className="accent-[#F24E1E] cursor-pointer"
                   />
                   {status}
                 </label>
@@ -124,10 +140,11 @@ function TaskForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry,
                   onClose,
                   setNewTask,
                   team,
+                  setNotification,
                 })
               }
               disabled={!newTask.title || !newTask.description || !newTask.dueDate}
-              className={`bg-[#FF9090] hover:bg-[#FF6F6F] text-white px-6 py-2 rounded-md text-sm font-medium shadow transition-all
+              className={`bg-[#FF9090] hover:bg-[#FF6F6F] hover:scale-[1.03] text-white px-6 py-2 rounded-md text-sm font-medium shadow transition-all duration-300
                 ${(!newTask.title || !newTask.description || !newTask.dueDate) && 'opacity-50 cursor-not-allowed'}`}
             >
               Done

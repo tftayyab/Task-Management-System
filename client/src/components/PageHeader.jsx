@@ -29,11 +29,9 @@ const PageHeader = ({
       transition={{ duration: 0.4, ease: 'easeOut' }}
       className="relative w-full bg-[#fad3d3] shadow-md py-4 sm:py-6 px-4 sm:px-10 z-10"
     >
-      {/* Desktop Menu - no animation, fixed to bottom-left */}
-      <div className="hidden sm:block">
-        <div className="fixed bottom-0 left-0 z-50 w-[20rem] h-[80vh]">
-          <Menu />
-        </div>
+      {/* Desktop Menu */}
+      <div className="hidden sm:block border-r border-gray-200">
+        <Menu />
       </div>
 
       {/* Mobile Menu */}

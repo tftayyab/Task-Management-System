@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useOutletContext } from 'react-router-dom';
 import TaskList from '../components/TaskList';
 import Tasks from '../components/Tasks';
 import api from '../api';
@@ -7,7 +7,6 @@ import AddTasks from './AddTasks';
 import Edit from './EditTasks';
 import ShareTasks from './ShareTasks';
 import useAuthToken from '../utils/useAuthToken';
-import { useOutletContext } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 function MyTasks() {
@@ -15,7 +14,8 @@ function MyTasks() {
     searchTerm,
     setSearchTerm,
     isMenuOpen,
-    setIsMenuOpen
+    setIsMenuOpen,
+    setNotification, // ✅ Get it from context
   } = useOutletContext();
 
   const location = useLocation();
@@ -80,14 +80,12 @@ function MyTasks() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
     >
-      {/* ✅ Row: Menu + Main Content Box */}
       <motion.div
         className="flex flex-row mt-[2rem] gap-x-20 sm:mt-[1rem]"
         initial={{ scale: 0.98, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.4, delay: 0.1 }}
       >
-        {/* ✅ Main Content */}
         <div className="flex-1 flex justify-center sm:justify-end sm:mr-5 px-4 pb-6">
           {!isMenuOpen && (
             <div className="relative z-0 h-[75vh] border sm:h-[76vh] border-[rgba(161,163,171,0.63)] shadow-lg rounded-2xl p-4 flex flex-col sm:flex-row sm:gap-6 sm:w-[150vh] w-[40vh] bg-white transition-all duration-300">
@@ -97,13 +95,19 @@ function MyTasks() {
                 <TaskList
                   tasks={filteredTasksList}
                   statuses={["Pending", "In Progress", "Completed"]}
-                  setEditTask={setEditTask}
-                  setShareTask={setShareTask}
+                  setEditTask={(task) => {
+                    setEditTask(task);
+                  }}
+                  setShareTask={(task) => {
+                    setShareTask(task);
+                  }}
                   fetchTasksWithRetry={fetchTasksWithRetry}
                   loading={loading}
                   onTaskClick={(id) => setSelectedTaskId(id)}
                   searchTerm={searchTerm}
-                  onAddTaskClick={() => setShowAddModal(true)}
+                  onAddTaskClick={() => {
+                    setShowAddModal(true);
+                  }}
                 />
               </div>
 
@@ -114,7 +118,9 @@ function MyTasks() {
                     <Tasks
                       tasks={tasks}
                       task_id={selectedTaskId}
-                      setEditTask={setEditTask}
+                      setEditTask={(task) => {
+                        setEditTask(task);
+                      }}
                       fetchTasksWithRetry={fetchTasksWithRetry}
                     />
                   ) : (
@@ -132,21 +138,30 @@ function MyTasks() {
       {showAddModal && (
         <AddTasks
           onClose={() => setShowAddModal(false)}
-          fetchTasksWithRetry={fetchTasksWithRetry}
+          fetchTasksWithRetry={() => {
+            fetchTasksWithRetry();
+            setNotification={setNotification}
+          }}
         />
       )}
       {editTask && (
         <Edit
           taskData={editTask}
           onClose={() => setEditTask(null)}
-          fetchTasksWithRetry={fetchTasksWithRetry}
+          fetchTasksWithRetry={() => {
+            fetchTasksWithRetry();
+            setNotification={setNotification}
+          }}
         />
       )}
       {shareTask && (
         <ShareTasks
           taskData={shareTask}
           onClose={() => setShareTask(null)}
-          fetchTasksWithRetry={fetchTasksWithRetry}
+          fetchTasksWithRetry={() => {
+            fetchTasksWithRetry();
+            setNotification={setNotification}
+          }}
         />
       )}
     </motion.div>

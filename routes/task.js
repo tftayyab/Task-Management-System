@@ -6,6 +6,7 @@ const validateRequest = require("../middleware/validateRequest");
 const isValidObjectId = require("../utils/validateObjectId");
 const asyncWrapper = require("../middleware/asyncWrapper");
 const verifyToken = require("../middleware/verifyToken");
+const { getIO } = require('../socket');
 
 const router = express.Router();
 router.use(verifyToken);
@@ -34,7 +35,6 @@ router.get(
 );
 
 
-// ✏️ PUT /tasks/:id - Update a task
 // ✏️ PUT /tasks/:id - Update a task
 router.put(
   "/:id",
@@ -147,6 +147,23 @@ router.put(
       }
 
       await task.save();
+
+      // ✅ Emit notifications
+      const io = getIO();
+
+      // 1. Notify all usernames individually
+      usernames.forEach((username) => {
+        io.to(username).emit("task_created", {
+          message: `Task "${task.title}" was shared with you`,
+          teamId: updatedTeam._id.toString(),
+        });
+      });
+
+      // 2. Notify the team room
+      io.to(updatedTeam._id.toString()).emit("team_updated", {
+        message: `Team "${updatedTeam.teamName}" has been updated`,
+        teamId: updatedTeam._id.toString(),
+      });
     }
 
     res.json({ message: "Team shared/updated", team: updatedTeam });

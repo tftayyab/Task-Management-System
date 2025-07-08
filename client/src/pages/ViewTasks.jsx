@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useOutletContext } from 'react-router-dom';
 import Tasks from '../components/Tasks';
 import api from '../api';
 import Edit from './EditTasks';
 import useAuthToken from '../utils/useAuthToken';
 import ShareTasks from './ShareTasks';
-import { useOutletContext } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 function ViewTasks() {
@@ -13,7 +12,8 @@ function ViewTasks() {
     searchTerm,
     setSearchTerm,
     isMenuOpen,
-    setIsMenuOpen
+    setIsMenuOpen,
+    setNotification, // ✅ Notification function
   } = useOutletContext();
 
   const { id } = useParams();
@@ -96,9 +96,13 @@ function ViewTasks() {
                     <Tasks
                       tasks={tasks}
                       task_id={selectedTaskId}
-                      setEditTask={setEditTask}
+                      setEditTask={(task) => {
+                        setEditTask(task);
+                      }}
+                      setShareTask={(task) => {
+                        setShareTask(task);
+                      }}
                       fetchTasksWithRetry={fetchTasksWithRetry}
-                      setShareTask={setShareTask}
                       loading={loading}
                     />
                   </div>
@@ -115,7 +119,10 @@ function ViewTasks() {
         <Edit
           taskData={editTask}
           onClose={() => setEditTask(null)}
-          fetchTasksWithRetry={fetchTasksWithRetry}
+          fetchTasksWithRetry={() => {
+            fetchTasksWithRetry();
+            setNotification("Task updated successfully");
+          }}
         />
       )}
 
@@ -123,7 +130,10 @@ function ViewTasks() {
         <ShareTasks
           taskData={shareTask}
           onClose={() => setShareTask(null)}
-          fetchTasksWithRetry={fetchTasksWithRetry}
+          fetchTasksWithRetry={() => {
+            fetchTasksWithRetry();
+            setNotification("Task shared with team");
+          }}
         />
       )}
     </motion.div>

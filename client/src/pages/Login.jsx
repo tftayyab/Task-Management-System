@@ -2,7 +2,8 @@ import '../App.css';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import PageWrapper from '../components/PageWrapper'
+import socket from '../utils/socket'; // ✅ use shared socket
+import PageWrapper from '../components/PageWrapper';
 import { UsernameIcon, PasswordIcon, EyeIcon, EyeOffIcon, TickIcon } from '../components/svg';
 
 function Login() {
@@ -13,13 +14,10 @@ function Login() {
     password: '',
     remember: false,
   });
-
   const [loginError, setLoginError] = useState('');
-
 
   useEffect(() => {
     document.title = 'Login';
-
     const rememberedUsername = localStorage.getItem('rememberedUsername');
     if (rememberedUsername) {
       setFormData((prev) => ({
@@ -39,64 +37,72 @@ function Login() {
   };
 
   const handleLogin = async () => {
-  setLoginError(''); // Clear any previous errors
+    setLoginError('');
 
-  try {
-    const response = await axios.post(`${import.meta.env.VITE_API_URL}/login`, {
-      username: formData.username,
-      password: formData.password,
-    }, { withCredentials: true });
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/login`, {
+        username: formData.username,
+        password: formData.password,
+      }, { withCredentials: true });
 
-    const user = response.data.user;
-    const token = response.data.accessToken;
+      const user = response.data.user;
+      const token = response.data.accessToken;
 
-    localStorage.setItem('username', user.username);
-    localStorage.setItem('email', user.email);
-    localStorage.setItem('token', token);
+      // Save auth info
+      localStorage.setItem('username', user.username);
+      localStorage.setItem('email', user.email);
+      localStorage.setItem('token', token);
 
-    if (formData.remember) {
-      localStorage.setItem('rememberedUsername', user.username);
-    } else {
-      localStorage.removeItem('rememberedUsername');
-    }
-
-    navigate('/dashboard');
-
-  } catch (error) {
-    console.error('Login failed:', error);
-
-    if (error.response) {
-      const { status, data } = error.response;
-
-      if (status === 404 && data.message === "User not found") {
-        setLoginError('Username not found');
-      } else if (status === 400 && data.message === "Invalid credentials") {
-        setLoginError('Password is incorrect');
+      if (formData.remember) {
+        localStorage.setItem('rememberedUsername', user.username);
       } else {
-        setLoginError('Something went wrong. Please try again.');
+        localStorage.removeItem('rememberedUsername');
       }
-    } else {
-      setLoginError('Network error. Please check your connection.');
+
+      // ✅ Emit socket joins
+      socket.emit('join_user', user.username);
+
+      const sharedRes = await axios.get(`${import.meta.env.VITE_API_URL}/tasks/shared`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const teamIds = sharedRes.data.teams.map(team => team._id);
+      socket.emit('join_teams', teamIds);
+
+      navigate('/dashboard');
+
+    } catch (error) {
+      console.error('Login failed:', error);
+
+      if (error.response) {
+        const { status, data } = error.response;
+        if (status === 404 && data.message === "User not found") {
+          setLoginError('Username not found');
+        } else if (status === 400 && data.message === "Invalid credentials") {
+          setLoginError('Password is incorrect');
+        } else {
+          setLoginError('Something went wrong. Please try again.');
+        }
+      } else {
+        setLoginError('Network error. Please check your connection.');
+      }
     }
-  }
-};
+  };
 
   return (
     <PageWrapper>
       <div className="relative w-full h-screen bg-gray-100 overflow-hidden">
         <div className="absolute inset-0 bg-[url('/bg.jpg')] bg-center bg-cover z-0" />
-
         <div className="absolute z-10 hidden sm:block bg-[url('/login_image.png')] bg-cover bg-center opacity-75"
           style={{ width: '50vw', height: '50vw', top: '40vh', left: '50vw' }}
         />
-
         <div className="relative z-10 flex flex-col h-full px-4 sm:px-8 justify-start pt-[20vh]">
           <h1 className="text-[#212427] sm:ml-4.5 font-montserrat text-3xl sm:text-4xl font-bold text-center sm:text-left">
             Sign In
           </h1>
 
-          {/* UserName */}
+          {/* Inputs */}
           <div className="flex flex-col gap-6 mt-6 items-center sm:items-start w-full max-w-xl">
+            {/* Username */}
             <div className="relative w-full px-4">
               <input
                 type="text"
@@ -133,7 +139,7 @@ function Login() {
             </div>
           </div>
 
-          {/* Remember Me */}
+          {/* Remember me */}
           <div className="flex items-center gap-2 mt-6 px-4">
             <label htmlFor="remember" className="relative flex items-center cursor-pointer">
               <input
@@ -144,17 +150,17 @@ function Login() {
                 onChange={handleChange}
                 className="peer w-5 h-5 appearance-none border border-[#565454] rounded-sm bg-white checked:bg-[#FF6767] transition-all duration-200 grid place-content-center"
               />
-              <TickIcon/>
+              <TickIcon />
               <span className="ml-2 text-[#212427] font-montserrat text-base font-medium">Remember me</span>
             </label>
           </div>
 
+          {/* Errors */}
           {loginError && (
-            <div className="px-4 text-red-500 mt-3 text-sm font-medium">
-              {loginError}
-            </div>
+            <div className="px-4 text-red-500 mt-3 text-sm font-medium">{loginError}</div>
           )}
 
+          {/* Login */}
           <div className="mt-6 px-4">
             <button
               onClick={handleLogin}
@@ -164,6 +170,7 @@ function Login() {
             </button>
           </div>
 
+          {/* Register */}
           <div className="mt-4 px-4 text-center sm:text-left">
             <p className="text-[#212427] font-montserrat text-base font-medium">
               Don’t have an account?{' '}

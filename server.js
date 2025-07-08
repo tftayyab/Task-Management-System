@@ -64,7 +64,19 @@ app.get("/", (req, res) => {
 });
 
 // ==== Server Port ====
+// ==== Socket.IO Integration ====
+const http = require('http');
+const socket = require('./socket'); // You will create this file
+
+// Create HTTP server from Express app
+const server = http.createServer(app);
+
+// Initialize socket.io on the server
+const io = socket.init(server);
+
+// ==== Server Port ====
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
+server.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
+

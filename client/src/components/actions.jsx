@@ -1,11 +1,12 @@
 import { motion } from 'framer-motion';
 import api from '../api';
 
-const Actions = ({ task, fetchTasksWithRetry, setEditTask, setShareTask }) => {
+const Actions = ({ task, fetchTasksWithRetry, setEditTask, setShareTask, setNotification }) => {
   const handleDelete = async (id) => {
     try {
       await api.delete(`/task/${id}`);
       fetchTasksWithRetry();
+      setNotification("Task deleted successfully");
     } catch (error) {
       if (error.response?.status === 401) {
         try {
@@ -14,6 +15,7 @@ const Actions = ({ task, fetchTasksWithRetry, setEditTask, setShareTask }) => {
           localStorage.setItem('token', newToken);
           await api.delete(`/task/${id}`);
           fetchTasksWithRetry();
+          setNotification("Task deleted successfully");
         } catch {
           console.error('Token refresh failed on delete');
           window.location.href = '/login';

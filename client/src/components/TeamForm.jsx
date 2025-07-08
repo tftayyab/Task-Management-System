@@ -9,7 +9,7 @@ import {
 } from '../utils/handleTeams';
 import { motion } from 'framer-motion';
 
-function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry }) {
+function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry, setNotification }) {
   const [originalTitle, setOriginalTitle] = useState(document.title);
   const [teamData, setTeamData] = useState({
     teamName: '',
@@ -54,8 +54,11 @@ function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry 
         className="relative w-full sm:w-[90vw] max-w-3xl bg-[#F9F9F9] rounded-xl shadow-2xl p-4 sm:p-8 space-y-6"
       >
         {/* Close */}
-        <div onClick={onClose} className="absolute top-4 right-4 cursor-pointer">
-          <CrossIcon className="w-6 h-6 hover:scale-110 transition-transform" />
+        <div
+          onClick={onClose}
+          className="absolute top-4 right-4 cursor-pointer hover:scale-110 transition-transform"
+        >
+          <CrossIcon className="w-6 h-6" />
         </div>
 
         {/* Header */}
@@ -77,13 +80,13 @@ function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={() => setStep('create')}
-                className="bg-[#FF9090] hover:bg-[#FF6F6F] text-white px-6 py-2 rounded-md text-sm font-medium"
+                className="bg-[#FF9090] hover:bg-[#FF6F6F] text-white px-6 py-2 rounded-md text-sm font-medium transition-all"
               >
                 ➕ Create New Team
               </button>
               <button
                 onClick={() => setStep('list')}
-                className="bg-[#F3F3F3] hover:bg-[#ECECEC] border border-[#A1A3AB] text-black px-6 py-2 rounded-md text-sm font-medium"
+                className="bg-[#F3F3F3] hover:bg-[#ECECEC] border border-[#A1A3AB] text-black px-6 py-2 rounded-md text-sm font-medium transition-all"
               >
                 📌 Add to Existing Team
               </button>
@@ -103,9 +106,11 @@ function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry 
                   <li
                     key={team._id}
                     onClick={() =>
-                      handleAddToTeam({ team, taskData, fetchTasksWithRetry, onClose })
+                      handleAddToTeam({ team, taskData, fetchTasksWithRetry, onClose, setNotification })
                     }
-                    className="cursor-pointer px-4 py-3 rounded-md bg-white border border-[#A1A3AB] hover:shadow hover:bg-gray-50 transition-all"
+                    className="cursor-pointer px-4 py-3 rounded-md bg-white border border-[#A1A3AB]
+                               hover:border-[#FFAFAF] hover:shadow-md hover:bg-gray-50
+                               transition-all"
                   >
                     <p className="text-sm font-medium text-black">{team.teamName}</p>
                     <p className="text-xs text-gray-500">
@@ -128,7 +133,10 @@ function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry 
                 placeholder="Enter team name"
                 value={teamData.teamName}
                 onChange={(e) => setTeamData({ ...teamData, teamName: e.target.value })}
-                className="w-full border border-[#A1A3AB] rounded-md px-3 py-2 text-sm"
+                className="w-full border border-[#A1A3AB] rounded-md px-3 py-2 text-sm
+                           hover:border-[#FFAFAF] focus:border-[#F24E1E]
+                           focus:outline-none focus:ring-1 focus:ring-[#F24E1E]
+                           transition-all"
               />
             </div>
 
@@ -143,7 +151,10 @@ function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry 
                   onChange={(e) =>
                     handleMemberChange(idx, e.target.value, teamData, setTeamData)
                   }
-                  className="w-full border border-[#A1A3AB] rounded-md px-3 py-2 text-sm"
+                  className="w-full border border-[#A1A3AB] rounded-md px-3 py-2 text-sm
+                             hover:border-[#FFAFAF] focus:border-[#F24E1E]
+                             focus:outline-none focus:ring-1 focus:ring-[#F24E1E]
+                             transition-all"
                 />
               ))}
             </div>
@@ -152,13 +163,14 @@ function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry 
               <button
                 onClick={() => {
                   if (mode === 'edit') {
-                    handleTeamEditDirect({ teamData, fetchTasksWithRetry, onClose });
+                    handleTeamEditDirect({ teamData, fetchTasksWithRetry, onClose, setNotification });
                   } else {
-                    handleTeamSubmit({ teamData, fetchTasksWithRetry, onClose, taskData });
+                    handleTeamSubmit({ teamData, fetchTasksWithRetry, onClose, taskData, setNotification });
                   }
                 }}
                 disabled={!teamData.teamName}
-                className="bg-[#FF9090] hover:bg-[#FF6F6F] text-white px-6 py-2 rounded-md text-sm font-medium shadow transition-all"
+                className={`bg-[#FF9090] hover:bg-[#FF6F6F] hover:scale-[1.03] text-white px-6 py-2 rounded-md text-sm font-medium shadow transition-all duration-300
+                  ${!teamData.teamName && 'opacity-50 cursor-not-allowed'}`}
               >
                 Done
               </button>

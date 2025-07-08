@@ -1,77 +1,104 @@
 import api from '../api';
 
 // 🧩 Handle team creation
-export const handleTeamSubmit = async ({ teamData, fetchTasksWithRetry, onClose, taskData = null }) => {
+export const handleTeamSubmit = async ({
+  teamData,
+  fetchTasksWithRetry,
+  onClose,
+  taskData = null,
+  setNotification, // ✅ added
+}) => {
   try {
     const payload = {
       teamName: teamData.teamName,
       usernames: teamData.members.filter(Boolean),
     };
 
-    // 🧩 Step 1: Create the team
     await api.post('/teams', payload);
 
-    // 🧩 Step 2: If a task is being shared, share it to this new team
     if (taskData) {
       await api.put(`/task/${taskData._id}/share`, payload);
     }
 
-    // ✅ Refresh data and close modal
     if (fetchTasksWithRetry) fetchTasksWithRetry();
     if (onClose) onClose();
+    if (setNotification) setNotification("✅ Team created successfully!");
   } catch (error) {
     console.error("❌ Team submit (with share) failed:", error);
+    if (setNotification) setNotification("❌ Failed to create team");
   }
 };
 
 // ♻️ Handle team update (share task with team)
-export const handleTeamUpdate = async ({ teamData, taskData, fetchTasksWithRetry, onClose }) => {
+export const handleTeamUpdate = async ({
+  teamData,
+  taskData,
+  fetchTasksWithRetry,
+  onClose,
+  setNotification, // ✅
+}) => {
   try {
     const payload = {
       teamName: teamData.teamName,
       usernames: teamData.members.filter(Boolean),
-      teamId: teamData._id, // ✅ Add this line (must be present in the team object)
+      teamId: teamData._id,
     };
 
     await api.put(`/task/${taskData._id}/share`, payload);
 
     if (fetchTasksWithRetry) fetchTasksWithRetry();
     if (onClose) onClose();
+    if (setNotification) setNotification("✅ Task shared with team!");
   } catch (error) {
     console.error("❌ Team update failed:", error);
+    if (setNotification) setNotification("❌ Failed to update team");
   }
 };
 
 // ✏️ Real team edit (not task sharing)
-export const handleTeamEditDirect = async ({ teamData, fetchTasksWithRetry, onClose }) => {
+export const handleTeamEditDirect = async ({
+  teamData,
+  fetchTasksWithRetry,
+  onClose,
+  setNotification, // ✅
+}) => {
   try {
     const payload = {
       teamName: teamData.teamName,
       usernames: teamData.members.filter(Boolean),
     };
 
-    await api.put(`/teams/${teamData._id}`, payload); // ✅ hit /teams/:id
+    await api.put(`/teams/${teamData._id}`, payload);
 
     if (fetchTasksWithRetry) fetchTasksWithRetry();
     if (onClose) onClose();
+    if (setNotification) setNotification("✏️ Team updated!");
   } catch (err) {
     console.error("❌ Failed to edit team:", err);
+    if (setNotification) setNotification("❌ Team update failed");
   }
 };
 
 // ❌ Delete a team
-export const handleTeamDelete = async ({ teamId, selectedTeam, setSelectedTeam, fetchTeamsWithRetry }) => {
+export const handleTeamDelete = async ({
+  teamId,
+  selectedTeam,
+  setSelectedTeam,
+  fetchTeamsWithRetry,
+  setNotification, // ✅
+}) => {
   try {
     await api.delete(`/teams/${teamId}`);
 
-    // Clear selected team if it was deleted
     if (selectedTeam && selectedTeam._id === teamId) {
       setSelectedTeam(null);
     }
 
     if (fetchTeamsWithRetry) fetchTeamsWithRetry();
+    if (setNotification) setNotification("🗑️ Team deleted");
   } catch (error) {
     console.error('❌ Failed to delete team:', error);
+    if (setNotification) setNotification("❌ Failed to delete team");
   }
 };
 
@@ -83,17 +110,24 @@ export const handleMemberChange = (idx, value, teamData, setTeamData) => {
 };
 
 // 🔁 Fetch all user teams (for share)
-export const fetchTeams = async (setUserTeams) => {
+export const fetchTeams = async (setUserTeams, setNotification = null) => {
   try {
     const res = await api.get('/tasks/shared');
     setUserTeams(res.data.teams || []);
   } catch (err) {
     console.error('❌ Failed to fetch teams:', err);
+    if (setNotification) setNotification("❌ Couldn't load teams");
   }
 };
 
 // 📌 Share a task with an existing team
-export const handleAddToTeam = async ({ team, taskData, fetchTasksWithRetry, onClose }) => {
+export const handleAddToTeam = async ({
+  team,
+  taskData,
+  fetchTasksWithRetry,
+  onClose,
+  setNotification, // ✅
+}) => {
   try {
     const payload = {
       teamName: team.teamName,
@@ -104,7 +138,9 @@ export const handleAddToTeam = async ({ team, taskData, fetchTasksWithRetry, onC
 
     if (fetchTasksWithRetry) fetchTasksWithRetry();
     if (onClose) onClose();
+    if (setNotification) setNotification("🔗 Task shared to team");
   } catch (err) {
     console.error('❌ Failed to share task with team:', err);
+    if (setNotification) setNotification("❌ Failed to share task");
   }
 };

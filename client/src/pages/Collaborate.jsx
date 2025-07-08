@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useOutletContext } from 'react-router-dom';
 import TeamList from '../components/TeamList';
 import TaskList from '../components/TaskList';
 import TaskForm from '../components/TaskForm';
@@ -7,7 +7,6 @@ import TeamForm from '../components/TeamForm';
 import ShareTasks from './ShareTasks';
 import api from '../api';
 import useAuthToken from '../utils/useAuthToken';
-import { useOutletContext } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 function Collaborate() {
@@ -15,7 +14,8 @@ function Collaborate() {
     searchTerm,
     setSearchTerm,
     isMenuOpen,
-    setIsMenuOpen
+    setIsMenuOpen,
+    setNotification, // ✅ get notification setter
   } = useOutletContext();
 
   const location = useLocation();
@@ -37,32 +37,30 @@ function Collaborate() {
     fetchSharedData();
   }, []);
 
-const fetchSharedData = async () => {
-  setLoading(true); // ✅ Start loading
-  try {
-    const res = await api.get('/tasks/shared');
-    const updatedTeams = res.data.teams || [];
-    setTeams(updatedTeams);
-    setTasks(res.data.tasks || []);
+  const fetchSharedData = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get('/tasks/shared');
+      const updatedTeams = res.data.teams || [];
+      setTeams(updatedTeams);
+      setTasks(res.data.tasks || []);
 
-    if (
-      selectedTeam &&
-      updatedTeams.some((team) => team._id === selectedTeam._id)
-    ) {
-      setSelectedTeam(
-        updatedTeams.find((team) => team._id === selectedTeam._id)
-      );
-    } else if (updatedTeams.length > 0) {
-      setSelectedTeam(updatedTeams[0]);
-    } else {
-      setSelectedTeam(null);
+      if (
+        selectedTeam &&
+        updatedTeams.some((team) => team._id === selectedTeam._id)
+      ) {
+        setSelectedTeam(updatedTeams.find((team) => team._id === selectedTeam._id));
+      } else if (updatedTeams.length > 0) {
+        setSelectedTeam(updatedTeams[0]);
+      } else {
+        setSelectedTeam(null);
+      }
+    } catch (err) {
+      console.error("❌ Failed to load shared data:", err.response?.data || err.message);
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error("❌ Failed to load shared data:", err.response?.data || err.message);
-  } finally {
-    setLoading(false); // ✅ End loading
-  }
-};
+  };
 
   const filteredTasks = selectedTeam
     ? tasks.filter(task =>
@@ -78,14 +76,13 @@ const fetchSharedData = async () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
     >
-      {/* 🔶 Layout */}
+      {/* Layout */}
       <motion.div
         className="flex flex-row mt-[2rem] gap-x-20 sm:mt-[1rem]"
         initial={{ scale: 0.98, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.4, delay: 0.1 }}
       >
-        {/* Main Content */}
         <div className="flex-1 flex justify-center sm:justify-end sm:mr-5 px-4 pb-6">
           {!isMenuOpen && (
             <div className="relative z-0 border h-[75vh] sm:h-[76vh] border-[rgba(161,163,171,0.63)] shadow-lg rounded-2xl p-4 flex flex-col gap-y-5 sm:flex-row sm:gap-6 sm:w-[150vh] w-[40vh] bg-white transition-all duration-300">
@@ -98,9 +95,13 @@ const fetchSharedData = async () => {
                     const team = teams.find((t) => t._id === teamId);
                     setSelectedTeam(team);
                   }}
-                  onAddTeamClick={() => setShowTeamForm(true)}
+                  onAddTeamClick={() => {
+                    setShowTeamForm(true);
+                  }}
                   fetchTeamsWithRetry={fetchSharedData}
-                  setEditTeam={setEditTeam}
+                  setEditTeam={(team) => {
+                    setEditTeam(team);
+                  }}
                   selectedTeam={selectedTeam}
                   setSelectedTeam={setSelectedTeam}
                   loading={loading}
@@ -109,17 +110,23 @@ const fetchSharedData = async () => {
 
               {/* 🔸 Task List */}
               <div className="order-2 sm:h-full h-full w-full sm:w-1/2 bg-[#F5F8FF] rounded-xl p-6 overflow-y-auto scrollbar-hide">
-                  <TaskList
-                    tasks={filteredTasks}
-                    statuses={["Pending", "In Progress", "Completed"]}
-                    setEditTask={setEditTask}
-                    fetchTasksWithRetry={fetchSharedData}
-                    setShareTask={setShareTask}
-                    onTaskClick={(taskId) => navigate(`/viewtask/${taskId}`)}
-                    onAddTaskClick={() => setShowTaskForm(true)}
-                    searchTerm={searchTerm}
-                    loading={loading}
-                  />
+                <TaskList
+                  tasks={filteredTasks}
+                  statuses={["Pending", "In Progress", "Completed"]}
+                  setEditTask={(task) => {
+                    setEditTask(task);
+                  }}
+                  fetchTasksWithRetry={fetchSharedData}
+                  setShareTask={(task) => {
+                    setShareTask(task);
+                  }}
+                  onTaskClick={(taskId) => navigate(`/viewtask/${taskId}`)}
+                  onAddTaskClick={() => {
+                    setShowTaskForm(true);
+                  }}
+                  searchTerm={searchTerm}
+                  loading={loading}
+                />
               </div>
             </div>
           )}
@@ -132,7 +139,10 @@ const fetchSharedData = async () => {
           mode="add"
           team={selectedTeam}
           onClose={() => setShowTaskForm(false)}
-          fetchTasksWithRetry={fetchSharedData}
+          fetchTasksWithRetry={() => {
+            fetchSharedData();
+            setNotification("Task added to team");
+          }}
         />
       )}
 
@@ -142,7 +152,10 @@ const fetchSharedData = async () => {
           taskData={editTask}
           team={selectedTeam}
           onClose={() => setEditTask(null)}
-          fetchTasksWithRetry={fetchSharedData}
+          fetchTasksWithRetry={() => {
+            fetchSharedData();
+            setNotification("Task updated");
+          }}
         />
       )}
 
@@ -150,7 +163,10 @@ const fetchSharedData = async () => {
         <TeamForm
           mode="add"
           onClose={() => setShowTeamForm(false)}
-          fetchTasksWithRetry={() => fetchSharedData()}
+          fetchTasksWithRetry={() => {
+            fetchSharedData();
+            setNotification("Team created successfully");
+          }}
         />
       )}
 
@@ -159,7 +175,10 @@ const fetchSharedData = async () => {
           mode="edit"
           taskData={editTeam}
           onClose={() => setEditTeam(null)}
-          fetchTasksWithRetry={() => fetchSharedData()}
+          fetchTasksWithRetry={() => {
+            fetchSharedData();
+            setNotification("Team updated");
+          }}
         />
       )}
 
@@ -167,7 +186,10 @@ const fetchSharedData = async () => {
         <ShareTasks
           taskData={shareTask}
           onClose={() => setShareTask(null)}
-          fetchTasksWithRetry={fetchSharedData}
+          fetchTasksWithRetry={() => {
+            fetchSharedData();
+            setNotification("Task shared with team");
+          }}
         />
       )}
     </motion.div>

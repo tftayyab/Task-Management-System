@@ -1,7 +1,12 @@
 import { useEffect, useState } from 'react';
 import { CrossIcon } from '../components/svg';
-import { handleTeamSubmit, handleTeamUpdate, handleTeamEditDirect } from '../utils/handleTeams';
-import api from '../api';
+import {
+  handleTeamSubmit,
+  handleTeamEditDirect,
+  handleMemberChange,
+  fetchTeams,
+  handleAddToTeam,
+} from '../utils/handleTeams';
 import { motion } from 'framer-motion';
 
 function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry }) {
@@ -32,44 +37,13 @@ function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry 
       document.title = 'Add Team';
     } else if (mode === 'share') {
       document.title = 'Share Task';
-      fetchTeams();
+      fetchTeams(setUserTeams);
     }
 
     return () => {
       document.title = originalTitle;
     };
   }, [mode, taskData]);
-
-  const fetchTeams = async () => {
-    try {
-      const res = await api.get('/tasks/shared');
-      setUserTeams(res.data.teams || []);
-    } catch (err) {
-      console.error('Failed to fetch teams:', err);
-    }
-  };
-
-  const handleMemberChange = (idx, value) => {
-    const updatedMembers = [...teamData.members];
-    updatedMembers[idx] = value;
-    setTeamData({ ...teamData, members: updatedMembers });
-  };
-
-  const handleAddToTeam = async (team) => {
-    try {
-      const payload = {
-        teamName: team.teamName,
-        usernames: team.shareWith,
-      };
-
-      await api.put(`/task/${taskData._id}/share`, payload);
-
-      if (fetchTasksWithRetry) fetchTasksWithRetry();
-      if (onClose) onClose();
-    } catch (err) {
-      console.error('❌ Failed to share task with team:', err);
-    }
-  };
 
   return (
     <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 backdrop-blur-sm px-2 sm:px-4">
@@ -128,7 +102,9 @@ function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry 
                 userTeams.map((team) => (
                   <li
                     key={team._id}
-                    onClick={() => handleAddToTeam(team)}
+                    onClick={() =>
+                      handleAddToTeam({ team, taskData, fetchTasksWithRetry, onClose })
+                    }
                     className="cursor-pointer px-4 py-3 rounded-md bg-white border border-[#A1A3AB] hover:shadow hover:bg-gray-50 transition-all"
                   >
                     <p className="text-sm font-medium text-black">{team.teamName}</p>
@@ -164,7 +140,9 @@ function TeamForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry 
                   type="text"
                   placeholder={`Member ${idx + 1}`}
                   value={member}
-                  onChange={(e) => handleMemberChange(idx, e.target.value)}
+                  onChange={(e) =>
+                    handleMemberChange(idx, e.target.value, teamData, setTeamData)
+                  }
                   className="w-full border border-[#A1A3AB] rounded-md px-3 py-2 text-sm"
                 />
               ))}

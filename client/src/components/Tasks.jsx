@@ -2,7 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { DeleteTasksIcon, EditTasksIcon, ShareIcon } from './svg';
 import { formatDueDate } from '../utils/DayDate';
 import api from '../api';
-import { motion, AnimatePresence } from 'framer-motion'; // ✅ for animation
+import { motion, AnimatePresence } from 'framer-motion';
+import { handleDelete } from '../utils/handleTasks';
 
 function Tasks({
   tasks,
@@ -12,32 +13,10 @@ function Tasks({
   task_id = null,
   setEditTask,
   setShareTask,
-  loading = false, // ✅ loading prop
+  loading = false,
 }) {
   const navigate = useNavigate();
   const search = searchTerm.toLowerCase().trim();
-
-  const handleDelete = async (id) => {
-    try {
-      await api.delete(`/task/${id}`);
-    } catch (error) {
-      if (error.response?.status === 401) {
-        try {
-          const refreshRes = await api.get('/auth/refresh-token');
-          const newToken = refreshRes.data.accessToken;
-          localStorage.setItem('token', newToken);
-          await api.delete(`/task/${id}`);
-        } catch (refreshError) {
-          console.error('❌ Token refresh failed during delete');
-          window.location.href = '/login';
-          return;
-        }
-      } else {
-        console.error('❌ Delete failed:', error);
-        throw error;
-      }
-    }
-  };
 
   const filtered = tasks.filter((task) => {
     if (task_id) return task._id === task_id;
@@ -59,11 +38,8 @@ function Tasks({
     <>
       {loading ? (
         <div className="flex-1 flex items-center justify-center py-10">
-          <motion.div
-            className="w-10 h-10 border-4 border-dashed border-[#FF9090] border-t-transparent rounded-full"
-            animate={{ rotate: 360 }}
-            transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
-          />
+          {/* Tailwind-based loader (same as TaskList.jsx) */}
+          <div className="w-10 h-10 border-4 border-dashed border-[#FF9090] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
         <ul className="flex flex-col gap-4 w-full h-full overflow-y-auto pr-1 scrollbar-hide">
@@ -99,15 +75,15 @@ function Tasks({
                     type="button"
                     className="hover:text-red-500 hover:scale-110 transition-transform"
                     onClick={async (e) => {
-                      e.stopPropagation();
-                      try {
-                        await handleDelete(task._id);
-                        await fetchTasksWithRetry();
-                        navigate('/mytasks');
-                      } catch (err) {
-                        console.error('Delete failed:', err);
-                      }
-                    }}
+                    e.stopPropagation();
+                    try {
+                      await handleDelete(task._id);
+                      await fetchTasksWithRetry();
+                      navigate('/mytasks');
+                    } catch (err) {
+                      console.error('Delete failed:', err);
+                    }
+                  }}
                   >
                     <DeleteTasksIcon className="w-8 h-8" />
                   </button>

@@ -103,6 +103,7 @@ const fetchSharedData = async () => {
                   setEditTeam={setEditTeam}
                   selectedTeam={selectedTeam}
                   setSelectedTeam={setSelectedTeam}
+                  loading={loading}
                 />
               </div>
 

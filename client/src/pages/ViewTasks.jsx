@@ -99,6 +99,7 @@ function ViewTasks() {
                       setEditTask={setEditTask}
                       fetchTasksWithRetry={fetchTasksWithRetry}
                       setShareTask={setShareTask}
+                      loading={loading}
                     />
                   </div>
                 )}

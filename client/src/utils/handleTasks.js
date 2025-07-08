@@ -77,3 +77,65 @@ export const handleLogout = async (navigate) => {
   localStorage.removeItem('email');
   navigate('/login');
 };
+
+// 📝 Decides whether to submit a new task or update an existing one
+export const handleTaskSubmit = ({
+  mode,
+  newTask,
+  taskData,
+  fetchTasksWithRetry,
+  onClose,
+  setNewTask,
+  team = null,
+}) => {
+  const owner = localStorage.getItem('username');
+
+  const fullTask = {
+    ...newTask,
+    owner,
+    shareWith: team?.shareWith || [],
+    teamIds: team ? [team._id] : [],
+  };
+
+  if (mode === 'edit') {
+    handleUpdate({
+      newTask: fullTask,
+      taskData,
+      fetchTasksWithRetry,
+      onClose,
+      team,
+    });
+  } else {
+    handleSubmit({
+      newTask: fullTask,
+      setNewTask,
+      fetchTasksWithRetry,
+      onClose,
+      team,
+    });
+  }
+};
+
+// ❌ Delete task with token refresh fallback
+export const handleDelete = async (id) => {
+  try {
+    await api.delete(`/task/${id}`);
+  } catch (error) {
+    if (error.response?.status === 401) {
+      try {
+        const refreshRes = await api.get('/auth/refresh-token');
+        const newToken = refreshRes.data.accessToken;
+        localStorage.setItem('token', newToken);
+        await api.delete(`/task/${id}`);
+      } catch (refreshError) {
+        console.error('❌ Token refresh failed during delete');
+        window.location.href = '/login';
+        return;
+      }
+    } else {
+      console.error('❌ Delete failed:', error);
+      throw error;
+    }
+  }
+};
+

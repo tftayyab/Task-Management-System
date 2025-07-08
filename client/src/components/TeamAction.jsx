@@ -1,20 +1,8 @@
 import { motion } from 'framer-motion';
-import api from '../api';
+import { handleTeamDelete } from '../utils/handleTeams';
+
 
 const TeamActions = ({ team, fetchTeamsWithRetry, setEditTeam, selectedTeam, setSelectedTeam }) => {
-  const handleDelete = async (id) => {
-    try {
-      await api.delete(`/teams/${id}`);
-
-      if (selectedTeam && selectedTeam._id === id) {
-        setSelectedTeam(null);
-      }
-
-      await fetchTeamsWithRetry?.();
-    } catch (error) {
-      console.error('❌ Failed to delete team:', error);
-    }
-  };
 
   return (
     <motion.div
@@ -36,7 +24,12 @@ const TeamActions = ({ team, fetchTeamsWithRetry, setEditTeam, selectedTeam, set
       <button
         onClick={(e) => {
           e.stopPropagation();
-          handleDelete(team._id);
+          handleTeamDelete({
+            teamId: team._id,
+            selectedTeam,
+            setSelectedTeam,
+            fetchTeamsWithRetry
+          });
         }}
         className="px-4 py-2 whitespace-nowrap text-sm text-red-600 hover:bg-red-50 hover:text-red-800 font-medium text-left"
       >

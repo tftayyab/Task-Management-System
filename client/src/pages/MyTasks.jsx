@@ -140,7 +140,7 @@ function MyTasks() {
           onClose={() => setShowAddModal(false)}
           fetchTasksWithRetry={() => {
             fetchTasksWithRetry();
-            setNotification={setNotification}
+            setNotification("✅ Task added successfully");
           }}
         />
       )}
@@ -150,7 +150,7 @@ function MyTasks() {
           onClose={() => setEditTask(null)}
           fetchTasksWithRetry={() => {
             fetchTasksWithRetry();
-            setNotification={setNotification}
+            setNotification("✏️ Task updated successfully");
           }}
         />
       )}
@@ -160,7 +160,7 @@ function MyTasks() {
           onClose={() => setShareTask(null)}
           fetchTasksWithRetry={() => {
             fetchTasksWithRetry();
-            setNotification={setNotification}
+             setNotification("📤 Task shared with team!");
           }}
         />
       )}

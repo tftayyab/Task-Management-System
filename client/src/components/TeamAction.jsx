@@ -21,7 +21,6 @@ const TeamActions = ({
         onClick={(e) => {
           e.stopPropagation();
           setEditTeam(team);
-          setNotification("Editing team...");
         }}
         className="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 hover:text-blue-800 font-medium text-left"
       >

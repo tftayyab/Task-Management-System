@@ -12,10 +12,15 @@ const PageHeader = ({
   setIsMenuOpen = () => {},
 }) => {
   const [showMenu, setShowMenu] = useState(false);
+  const [hasAnimated, setHasAnimated] = useState(false);
 
   useEffect(() => {
     document.title = redTitle + blackTitle;
   }, [redTitle, blackTitle]);
+
+  useEffect(() => {
+  if (!hasAnimated) setHasAnimated(true);
+}, []);
 
   const handleMenuToggle = () => {
     setShowMenu((prev) => !prev);
@@ -30,9 +35,14 @@ const PageHeader = ({
       className="relative w-full bg-[#fad3d3] shadow-md py-4 sm:py-6 px-4 sm:px-10 z-10"
     >
       {/* Desktop Menu */}
-      <div className="hidden sm:block border-r border-gray-200">
+      <motion.div
+        className="hidden sm:block border-r border-gray-200"
+        initial={!hasAnimated ? {  opacity: 0 } : false}
+        animate={!hasAnimated ? {  opacity: 1 } : false}
+        transition={{ duration: 0.6 }}
+      >
         <Menu />
-      </div>
+      </motion.div>
 
       {/* Mobile Menu */}
       <AnimatePresence>
@@ -99,7 +109,7 @@ const PageHeader = ({
             </div>
           </div>
 
-          <div className="text-center sm:text-right transition-all hover:text-[#FF6767] cursor-default">
+          <div className="text-center hidden sm:block sm:text-right transition-all hover:text-[#FF6767] cursor-default">
             <p className="text-black font-inter text-sm sm:text-base font-medium transition-colors">
               {day}
             </p>

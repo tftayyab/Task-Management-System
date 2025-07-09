@@ -6,8 +6,10 @@ import Edit from './EditTasks';
 import useAuthToken from '../utils/useAuthToken';
 import ShareTasks from './ShareTasks';
 import { motion } from 'framer-motion';
+import TaskList from '../components/TaskList';
+import useIsMobile from '../utils/useScreenSize'; // ✅
 
-function ViewTasks() {
+function ViewTeamTasks() {
   const {
     searchTerm,
     setSearchTerm,
@@ -23,6 +25,8 @@ function ViewTasks() {
   const [loading, setLoading] = useState(true);
   const [editTask, setEditTask] = useState(null);
   const [shareTask, setShareTask] = useState(null);
+  const isMobile = useIsMobile();
+
 
   const navigate = useNavigate();
   useAuthToken();
@@ -50,26 +54,18 @@ function ViewTasks() {
 
 const fetchTasksWithRetry = async () => {
   try {
-    const username = localStorage.getItem('username');
-
-    const [personalRes, sharedRes] = await Promise.all([
-      api.get(`/tasks`),
-      api.get(`/tasks/shared`),
-    ]);
-
-    const allTasks = [
-      ...(personalRes.data || []),
-      ...(sharedRes.data?.tasks || []),
-    ];
-
-    setTasks(allTasks);
-    setFilteredTasksList(allTasks);
+    const res = await api.get(`/tasks/shared`);
+    const allTasks = res.data.tasks; // ✅ Access the correct array
+    const teamTasks = allTasks.filter(task => task.teamIds?.includes(id));
+    setTasks(teamTasks);
+    setFilteredTasksList(teamTasks);
   } catch (err) {
     console.error("❌ Fetch error:", err.response?.data || err.message);
   } finally {
     setLoading(false);
   }
 };
+
 
   useEffect(() => {
     if (id && filteredTasksList.length > 0) {
@@ -100,23 +96,35 @@ const fetchTasksWithRetry = async () => {
             <div className="relative z-0 border sm:h-[76vh] border-[rgba(161,163,171,0.63)] shadow-lg rounded-2xl p-4 flex flex-col sm:flex-row sm:gap-6 sm:w-[150vh] w-[40vh] bg-white transition-all duration-300">
 
               {/* 🔷 Right Side: Task Preview */}
-              <div className="order-1 sm:order-2 w-full flex flex-col gap-6 mt-6 sm:mt-0">
-                {selectedTaskId && (
-                  <div className="h-[31rem] bg-[#F5F8FF] p-4 rounded-xl sm:mt-0 -mt-5 border border-[rgba(161,163,171,0.63)] shadow overflow-y-auto scrollbar-hide">
-                    <Tasks
-                      tasks={tasks}
-                      task_id={selectedTaskId}
-                      setEditTask={(task) => {
-                        setEditTask(task);
-                      }}
-                      setShareTask={(task) => {
-                        setShareTask(task);
-                      }}
-                      fetchTasksWithRetry={fetchTasksWithRetry}
-                      loading={loading}
-                    />
-                  </div>
-                )}
+              <div className="order-1 sm:order-2 w-full flex flex-col gap-6 sm:mt-0">
+            {/* If on mobile, show TaskList instead of full preview */}
+            {isMobile ? (
+            <div className="h-full bg-[#F5F8FF] p-4 rounded-xl border overflow-y-auto scrollbar-hide">
+                <TaskList
+                tasks={tasks}
+                statuses={["Pending", "In Progress", "Completed"]}
+                fetchTasksWithRetry={fetchTasksWithRetry}
+                onTaskClick={(taskId) => navigate(`/viewtask/${taskId}`)}
+                setEditTask={setEditTask}
+                setShareTask={setShareTask}
+                searchTerm={searchTerm}
+                loading={loading}
+                />
+            </div>
+            ) : (
+            selectedTaskId && (
+                <div className="h-[31rem] bg-[#F5F8FF] p-4 rounded-xl sm:mt-0 -mt-5 border overflow-y-auto scrollbar-hide">
+                <Tasks
+                    tasks={tasks}
+                    task_id={selectedTaskId}
+                    setEditTask={setEditTask}
+                    setShareTask={setShareTask}
+                    fetchTasksWithRetry={fetchTasksWithRetry}
+                    loading={loading}
+                />
+                </div>
+            )
+            )}
               </div>
 
             </div>
@@ -150,4 +158,4 @@ const fetchTasksWithRetry = async () => {
   );
 }
 
-export default ViewTasks;
+export default ViewTeamTasks;

@@ -77,7 +77,11 @@ function TeamList({
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.2 }}
                   onClick={() => {
-                    if (!isMobile && onTeamClick) onTeamClick(team._id);
+                    if (isMobile) {
+                      navigate(`/viewteamtask/${team._id}`);
+                    } else {
+                      onTeamClick?.(team._id);
+                    }
                   }}
                   className="cursor-pointer group p-4 rounded-xl border border-[#A1A3AB] bg-white shadow transition-all duration-200 hover:shadow-lg hover:scale-[1.001] relative"
                 >

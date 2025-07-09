@@ -85,7 +85,7 @@ function Collaborate() {
       >
         <div className="flex-1 flex justify-center sm:justify-end sm:mr-5 px-4 pb-6">
           {!isMenuOpen && (
-            <div className="relative z-0 border h-[75vh] sm:h-[76vh] border-[rgba(161,163,171,0.63)] shadow-lg rounded-2xl p-4 flex flex-col gap-y-5 sm:flex-row sm:gap-6 sm:w-[150vh] w-[40vh] bg-white transition-all duration-300">
+            <div className="relative z-0 border h-[75vh] sm:h-[76vh] border-[rgba(161,163,171,0.63)] shadow-lg rounded-2xl p-4 sm:flex flex-col gap-y-5 sm:flex-row sm:gap-6 sm:w-[150vh] w-[40vh] bg-white transition-all duration-300">
               
               {/* 🔹 Team List */}
               <div className="order-1 sm:h-full w-full h-full sm:w-1/2 bg-[#F5F8FF] rounded-xl p-6 overflow-y-auto scrollbar-hide">
@@ -109,7 +109,7 @@ function Collaborate() {
               </div>
 
               {/* 🔸 Task List */}
-              <div className="order-2 sm:h-full h-full w-full sm:w-1/2 bg-[#F5F8FF] rounded-xl p-6 overflow-y-auto scrollbar-hide">
+              <div className="order-2 hidden sm:block sm:h-full h-full w-full sm:w-1/2 bg-[#F5F8FF] rounded-xl p-6 overflow-y-auto scrollbar-hide">
                 <TaskList
                   tasks={filteredTasks}
                   statuses={["Pending", "In Progress", "Completed"]}

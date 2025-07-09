@@ -9,6 +9,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import MyTasks from './pages/MyTasks';
 import ViewTasks from './pages/ViewTasks';
+import ViewTeamTasks from './pages/ViewTeamTasks';
 import AddTasks from './pages/AddTasks';
 import Edit from './pages/EditTasks';
 import Collaborate from './pages/Collaborate';
@@ -22,6 +23,7 @@ const router = createBrowserRouter([
       { path: 'dashboard', element: <Dashboard /> },
       { path: 'mytasks', element: <MyTasks /> },
       { path: 'viewtask/:id', element: <ViewTasks /> },
+      { path: 'viewteamtask/:id', element: <ViewTeamTasks /> },
       { path: 'addtasks', element: <AddTasks /> },
       { path: 'edit', element: <Edit /> },
       { path: 'collaborate', element: <Collaborate /> },

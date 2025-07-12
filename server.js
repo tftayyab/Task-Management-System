@@ -3,38 +3,37 @@ const app = express();
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
+const http = require('http');
+const socket = require('./socket'); // Socket.IO setup
 require('dotenv').config();
 
-// ==== Middleware Setup ====
+// ========== MIDDLEWARE ==========
 app.use(cors({
-    origin: [
-      'http://localhost:5173',
-      'https://tf-task-management-system.netlify.app'
-    ],
-  credentials: true
+  origin: [
+    'http://localhost:5173',
+    'https://tf-task-management-system.netlify.app',
+  ],
+  credentials: true,
 }));
-
 app.use(express.json());
 app.use(cookieParser());
 
-// ==== Mongoose Connection ====
+// ========== DATABASE ==========
 const mongoURI = process.env.MONGO_URI;
 mongoose.connect(mongoURI, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
 })
 .then(() => console.log('✅ MongoDB Atlas Connected'))
 .catch((err) => console.error('❌ MongoDB Connection Failed:', err));
 
-// ==== View Engine ====
+// ========== VIEW ENGINE ==========
 app.set('view engine', 'ejs');
 
-// ==== Route Imports ====
-const MyTasks = require('./routes/tasks');
-const ViewTasks = require('./routes/task');
-const tasks = require('./routes/tasks');
-const task = require('./routes/task');
-const login = require('./routes/login');
+// ========== ROUTES ==========
+const Tasks = require('./routes/tasks');
+const Task = require('./routes/task');
+const Login = require('./routes/login');
 const Register = require('./routes/Register');
 const Dashboard = require('./routes/Dashboard');
 const Collaborate = require('./routes/Collaborate');
@@ -42,41 +41,32 @@ const Edit = require('./routes/Edit');
 const AddTasks = require('./routes/AddTasks');
 const AuthRoutes = require('./routes/auth');
 const Teams = require('./routes/teams');
+const AiEnhance = require('./routes/aiEnhance'); // 🧠 AI Route
 
-// ==== Mount Routes ====
-app.use('/tasks', tasks);
-app.use('/task', task);
-app.use('/mytask', MyTasks);
-app.use('/viewtask', ViewTasks);
-app.use('/login', login);
-app.use('/edit', Edit);
+// ========== ROUTE MOUNTS ==========
+app.use('/tasks', Tasks);
+app.use('/task', Task);
+app.use('/login', Login);
+app.use('/register', Register);
 app.use('/dashboard', Dashboard);
 app.use('/collaborate', Collaborate);
-app.use('/register', Register);
+app.use('/edit', Edit);
 app.use('/addtasks', AddTasks);
 app.use('/auth', AuthRoutes);
-app.use("/teams", Teams);
+app.use('/teams', Teams);
+app.use('/ai', AiEnhance); // 🧠 AI Task Enhancer
 
-
-// ==== Home Page ====
+// ========== HOME PAGE ==========
 app.get("/", (req, res) => {
-    res.render("index");
+  res.render("index");
 });
 
-// ==== Server Port ====
-// ==== Socket.IO Integration ====
-const http = require('http');
-const socket = require('./socket'); // You will create this file
-
-// Create HTTP server from Express app
+// ========== SERVER & SOCKET ==========
 const server = http.createServer(app);
-
-// Initialize socket.io on the server
 const io = socket.init(server);
 
-// ==== Server Port ====
+// ========== START SERVER ==========
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
-

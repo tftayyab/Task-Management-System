@@ -1,6 +1,15 @@
 import { TaskIcon, DotIcon } from '../components/svg';
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
+import { Doughnut } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+} from 'chart.js';
 
+ChartJS.register(ArcElement, Tooltip);
+
+// Animated Number Component
 const AnimatedNumber = ({ target }) => {
   const [count, setCount] = useState(0);
 
@@ -25,44 +34,50 @@ const AnimatedNumber = ({ target }) => {
   return <>{count}%</>;
 };
 
+// Chart Settings
 const statusConfig = [
-  { label: "Pending", key: "Pending", color: "#FFB347" },
-  { label: "In Progress", key: "In Progress", color: "#3ABEFF" },
-  { label: "Completed", key: "Completed", color: "#4CAF50" },
+  { label: 'Pending', key: 'Pending', color: '#FFB347' },
+  { label: 'In Progress', key: 'In Progress', color: '#3ABEFF' },
+  { label: 'Completed', key: 'Completed', color: '#4CAF50' },
 ];
 
-const CircleProgress = ({ percent, color }) => {
-  const radius = 40;
-  const stroke = 8;
-  const normalizedRadius = radius - stroke / 2;
-  const circumference = 2 * Math.PI * normalizedRadius;
-  const offset = circumference - (percent / 100) * circumference;
+// Chart Component for One Circle
+const CircleChart = ({ percent, color }) => {
+  const data = {
+    datasets: [
+      {
+        data: [percent, 100 - percent],
+        backgroundColor: [color, '#D9D9D9'],
+        borderWidth: 0,
+        cutout: '80%',
+      },
+    ],
+  };
+
+  const options = {
+    cutout: '72%',
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: {
+      animateRotate: true,
+    },
+    plugins: {
+      tooltip: { enabled: false },
+      legend: { display: false },
+    },
+  };
 
   return (
-    <svg width="90" height="90" viewBox="0 0 90 90" className="transform -rotate-90">
-      <circle
-        cx="45"
-        cy="45"
-        r={normalizedRadius}
-        stroke="#D9D9D9"
-        strokeWidth={stroke}
-        fill="none"
-      />
-      <circle
-        cx="45"
-        cy="45"
-        r={normalizedRadius}
-        stroke={color}
-        strokeWidth={stroke}
-        fill="none"
-        strokeDasharray={circumference}
-        strokeDashoffset={offset}
-        className="transition-all duration-1000 ease-out"
-      />
-    </svg>
+    <div className="relative w-20 h-20">
+      <Doughnut data={data} options={options} />
+      <div className="absolute inset-0 flex items-center justify-center text-sm font-semibold text-black font-inter">
+        <AnimatedNumber target={percent} />
+      </div>
+    </div>
   );
 };
 
+// Final TaskStatusCard
 const TaskStatusCard = ({ tasks }) => {
   const total = tasks.length || 1;
 
@@ -82,17 +97,13 @@ const TaskStatusCard = ({ tasks }) => {
         {statusConfig.map(({ label, key, color }) => {
           const count = getCount(key);
           const percent = getPercent(count);
+
           return (
             <div
               key={key}
               className="flex flex-col items-center gap-y-2 group hover:scale-105 transition-all"
             >
-              <div className="relative flex items-center justify-center w-20 h-20">
-                <CircleProgress percent={percent} color={color} />
-                <p className="absolute text-black text-sm font-inter font-semibold">
-                  <AnimatedNumber target={percent} />
-                </p>
-              </div>
+              <CircleChart percent={percent} color={color} />
 
               <div className="flex items-center gap-1">
                 <DotIcon className="w-2 h-2" fill={color} />

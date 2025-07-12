@@ -66,10 +66,12 @@ router.put(
       shareWith = [...new Set(members)].filter((user) => user !== username);
     }
 
+    const { createdAt, ...rest } = req.validatedBody; // ✅ exclude createdAt from updates
+
     const updatedTask = await Task.findByIdAndUpdate(
       id,
       {
-        ...req.validatedBody,
+        ...rest,
         teamIds,
         shareWith,
       },

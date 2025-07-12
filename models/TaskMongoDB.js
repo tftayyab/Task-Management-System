@@ -14,12 +14,14 @@ const taskSchema = new mongoose.Schema({
     type: [String],
     default: [],
   },
-  teamIds: [ // ✅ rename to plural and allow multiple teams
+  teamIds: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Team',
     },
   ],
+}, {
+  timestamps: true // ✅ Adds createdAt and updatedAt automatically
 });
 
 const Task = mongoose.model('Task', taskSchema);

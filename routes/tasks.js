@@ -16,9 +16,8 @@ router.post(
   validateRequest(validateTasks),
   asyncWrapper(async (req, res) => {
     const owner = req.user.username;
-    const { teamIds = [] } = req.validatedBody;
-
-    const io = getIO(); // ✅ Get io before using it
+    const { teamIds = [], createdAt } = req.validatedBody;
+    const io = getIO();
 
     let shareWith = [];
 
@@ -33,11 +32,12 @@ router.post(
       owner,
       teamIds,
       shareWith,
+      ...(createdAt ? { createdAt } : {}), // ✅ only set manually if provided
     });
 
     await task.save();
 
-    // ✅ Notify team rooms (if online)
+    // ✅ Notify team rooms
     teamIds.forEach(teamId => {
       io.to(teamId.toString()).emit('task_created', {
         message: `New task "${task.title}" added to your team`,
@@ -45,20 +45,11 @@ router.post(
       });
     });
 
-    // ✅ Notify users directly
+    // ✅ Notify shared users
     shareWith.forEach(username => {
       io.to(username).emit('task_created', {
         message: `A new task "${task.title}" was shared with you`,
-        teamId: teamIds[0], // optional: handle multiple if needed
-      });
-    });
-
-    // (Optional) Second team-wide event – might be redundant
-    teamIds.forEach(teamId => {
-      io.to(teamId.toString()).emit('task_added', {
-        message: `New task added to your team`,
-        teamId,
-        taskTitle: task.title,
+        teamId: teamIds[0],
       });
     });
 

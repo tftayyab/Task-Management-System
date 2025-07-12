@@ -20,6 +20,10 @@ const taskSchema = Joi.object({
     'date.base': 'Due Date must be a valid date.',
   }),
 
+  createdAt: Joi.date().optional().messages({
+    'date.base': 'CreatedAt must be a valid date.',
+  }),
+
   owner: Joi.string().optional(), // set from token
 
   shareWith: Joi.array().items(Joi.string()).optional().messages({
@@ -27,7 +31,6 @@ const taskSchema = Joi.object({
     'string.base': 'Each item in ShareWith must be a string.',
   }),
 
-  // ✅ Replace teamId with teamIds
   teamIds: Joi.array()
     .items(Joi.string().pattern(/^[0-9a-fA-F]{24}$/))
     .optional()

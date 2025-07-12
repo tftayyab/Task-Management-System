@@ -18,21 +18,28 @@ function Tasks({
   const navigate = useNavigate();
   const search = searchTerm.toLowerCase().trim();
 
-  const filtered = tasks.filter((task) => {
-    if (task_id) return task._id === task_id;
+// De-duplicate filtered tasks using Map keyed by task._id
+const filtered = Array.from(
+  new Map(
+    tasks
+      .filter((task) => {
+        if (task_id) return task._id === task_id;
 
-    const matchesSearch =
-      !search ||
-      [
-        task.title?.toLowerCase(),
-        task.description?.toLowerCase(),
-        task.status?.toLowerCase(),
-        task.dueDate,
-      ].some((field) => field?.includes(search));
+        const matchesSearch =
+          !search ||
+          [
+            task.title?.toLowerCase(),
+            task.description?.toLowerCase(),
+            task.status?.toLowerCase(),
+            task.dueDate,
+          ].some((field) => field?.includes(search));
 
-    if (search) return matchesSearch;
-    return statuses.includes(task.status);
-  });
+        if (search) return matchesSearch;
+        return statuses.includes(task.status);
+      })
+      .map(task => [task._id, task]) // use Map to remove duplicates
+  ).values()
+);
 
   return (
     <>

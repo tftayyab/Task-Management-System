@@ -97,7 +97,7 @@ function TaskForm({
             name="title"
             value={newTask.title}
             onChange={handleUserInput}
-            className="w-full pr-10 rounded-md border border-[#A1A3AB] dark:border-[#444] px-3 py-2 text-sm bg-white dark:bg-[#2a2a2a] text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500
+            className="w-full pr-40 rounded-md border border-[#A1A3AB] dark:border-[#444] px-3 py-2 text-sm bg-white dark:bg-[#2a2a2a] text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500
               hover:border-[#FFAFAF] focus:border-[#F24E1E]
               focus:outline-none focus:ring-1 focus:ring-[#F24E1E]
               transition-all"
@@ -126,7 +126,7 @@ function TaskForm({
               }
               className="text-[#F24E1E] hover:scale-110 transition-transform"
             >
-              {loadingTitle ? '⏳' : '✨'}
+              {loadingTitle ? '⏳' : 'Write with AI ✨'}
             </button>
           </div>
         </div>
@@ -141,7 +141,7 @@ function TaskForm({
             value={newTask.description}
             onChange={handleUserInput}
             rows="4"
-            className="w-full pr-10 rounded-md border border-[#A1A3AB] dark:border-[#444] px-3 py-2 text-sm resize-none bg-white dark:bg-[#2a2a2a] text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500
+            className="w-full pr-40 rounded-md border border-[#A1A3AB] dark:border-[#444] px-3 py-2 text-sm resize-none bg-white dark:bg-[#2a2a2a] text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500
               hover:border-[#FFAFAF] focus:border-[#F24E1E]
               focus:outline-none focus:ring-1 focus:ring-[#F24E1E]
               transition-all"
@@ -170,7 +170,7 @@ function TaskForm({
               }
               className="text-[#F24E1E] hover:scale-110 transition-transform"
             >
-              {loadingDesc ? '⏳' : '✨'}
+              {loadingDesc ? '⏳' : 'Write with AI ✨'}
             </button>
           </div>
         </div>

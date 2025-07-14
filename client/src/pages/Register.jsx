@@ -17,8 +17,6 @@ function Register() {
     username: '',
     email: '',
     password: '',
-    confirmPassword: '',
-    termsAccepted: false,
   });
   const [errors, setErrors] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -28,34 +26,43 @@ function Register() {
   }, []);
 
   const handleRegister = async () => {
-    setErrors([]);
+  setErrors([]);
 
-    if (!formData.termsAccepted) {
-      setErrors(["You must agree to the terms."]);
-      return;
-    }
+  // ✅ Frontend validations
+  if (!formData.termsAccepted) {
+    setErrors(["You must agree to the terms."]);
+    return;
+  }
 
-    if (formData.password !== formData.confirmPassword) {
-      setErrors(["Passwords do not match."]);
-      return;
-    }
+  if (formData.password !== formData.confirmPassword) {
+    setErrors(["Passwords do not match."]);
+    return;
+  }
 
-    try {
-      setLoading(true);
-      await axios.post(`${import.meta.env.VITE_API_URL}/register`, formData);
-      navigate("/login");
-    } catch (err) {
-      if (err.response?.data?.errors) {
-        setErrors(err.response.data.errors);
-      } else if (err.response?.data?.message) {
-        setErrors([err.response.data.message]);
-      } else {
-        setErrors(["Something went wrong. Please try again."]);
-      }
-    } finally {
-      setLoading(false);
+  // ✅ Prepare data for backend (remove confirmPassword and termsAccepted)
+  const { confirmPassword, termsAccepted, ...payload } = formData;
+
+  try {
+    setLoading(true);
+
+    // ✅ Send to backend
+    await axios.post(`${import.meta.env.VITE_API_URL}/register`, payload);
+
+    // ✅ On success, go to login page
+    navigate("/login");
+  } catch (err) {
+    // ✅ Error handling
+    if (err.response?.data?.errors) {
+      setErrors(err.response.data.errors);
+    } else if (err.response?.data?.message) {
+      setErrors([err.response.data.message]);
+    } else {
+      setErrors(["Something went wrong. Please try again."]);
     }
-  };
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <PageWrapper>

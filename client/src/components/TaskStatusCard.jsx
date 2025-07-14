@@ -9,7 +9,6 @@ import {
 
 ChartJS.register(ArcElement, Tooltip);
 
-// Animated Number Component
 const AnimatedNumber = ({ target }) => {
   const [count, setCount] = useState(0);
 
@@ -34,20 +33,20 @@ const AnimatedNumber = ({ target }) => {
   return <>{count}%</>;
 };
 
-// Chart Settings
 const statusConfig = [
   { label: 'Pending', key: 'Pending', color: '#FFB347' },
   { label: 'In Progress', key: 'In Progress', color: '#3ABEFF' },
   { label: 'Completed', key: 'Completed', color: '#4CAF50' },
 ];
 
-// Chart Component for One Circle
 const CircleChart = ({ percent, color }) => {
+  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
   const data = {
     datasets: [
       {
         data: [percent, 100 - percent],
-        backgroundColor: [color, '#D9D9D9'],
+        backgroundColor: [color, isDark ? '#333' : '#D9D9D9'],
         borderWidth: 0,
         cutout: '80%',
       },
@@ -70,14 +69,13 @@ const CircleChart = ({ percent, color }) => {
   return (
     <div className="relative w-20 h-20">
       <Doughnut data={data} options={options} />
-      <div className="absolute inset-0 flex items-center justify-center text-sm font-semibold text-black font-inter">
+      <div className="absolute inset-0 flex items-center justify-center text-sm font-semibold font-inter text-black dark:text-white">
         <AnimatedNumber target={percent} />
       </div>
     </div>
   );
 };
 
-// Final TaskStatusCard
 const TaskStatusCard = ({ tasks }) => {
   const total = tasks.length || 1;
 
@@ -85,7 +83,7 @@ const TaskStatusCard = ({ tasks }) => {
   const getPercent = (count) => Math.round((count / total) * 100);
 
   return (
-    <div className="w-full sm:w-[22rem] rounded-2xl bg-[#F5F8FF] shadow-lg p-4 flex flex-col gap-y-4 transition hover:shadow-xl">
+    <div className="w-full sm:w-[22rem] rounded-2xl bg-[#F5F8FF] dark:bg-[#1e1e1e] shadow-lg p-4 flex flex-col gap-y-4 transition hover:shadow-xl text-black dark:text-white">
       {/* Header */}
       <div className="flex items-center gap-x-2">
         <TaskIcon className="w-5 h-5 flex-shrink-0" />
@@ -104,10 +102,11 @@ const TaskStatusCard = ({ tasks }) => {
               className="flex flex-col items-center gap-y-2 group hover:scale-105 transition-all"
             >
               <CircleChart percent={percent} color={color} />
-
               <div className="flex items-center gap-1">
                 <DotIcon className="w-2 h-2" fill={color} />
-                <p className="text-black text-xs font-medium font-inter">{label}</p>
+                <p className="text-xs font-medium font-inter text-black dark:text-white">
+                  {label}
+                </p>
               </div>
             </div>
           );

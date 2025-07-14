@@ -103,82 +103,86 @@ function TaskList({
         </div>
       ) : (
         <ul className="flex flex-col gap-4 w-full h-full overflow-y-auto pr-1 scrollbar-hide">
-          <AnimatePresence>
-            {filtered.map((task, index) => {
-              const stroke = strokeColors[index % strokeColors.length];
-              return (
-                <motion.li
-                  key={task._id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
-                  onClick={() => {
-                    if (isMobile) {
-                      navigate(`/viewtask/${task._id}`);
-                    } else {
-                      onTaskClick?.(task._id);
-                    }
-                  }}
-                  className={`cursor-pointer group p-4 rounded-xl border border-[#A1A3AB] bg-white shadow transition-all duration-200 hover:shadow-lg hover:scale-[1.001] relative ${
+        <AnimatePresence>
+          {filtered.map((task, index) => {
+            const stroke = strokeColors[index % strokeColors.length];
+            return (
+              <motion.li
+                key={task._id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                onClick={() => {
+                  if (isMobile) {
+                    navigate(`/viewtask/${task._id}`);
+                  } else {
+                    onTaskClick?.(task._id);
+                  }
+                }}
+                className={`cursor-pointer group p-4 rounded-xl border 
+                  border-[#A1A3AB] dark:border-[#444]
+                  bg-white dark:bg-[#1c1c1c]
+                  text-black dark:text-white 
+                  shadow transition-all duration-200 hover:shadow-lg hover:scale-[1.001] relative ${
                     openActionId === task._id ? 'z-[60]' : 'z-10'
                   }`}
-                >
-                  {/* Top Row */}
-                  <div className="flex justify-between items-start gap-2 flex-wrap">
-                    <div className="flex items-center gap-2 flex-1 min-w-0">
-                      <CircleIcon className="flex-shrink-0 mt-1 w-4 h-4" stroke={stroke} />
-                      <p
-                        className="text-black font-inter text-base font-semibold truncate"
-                        title={task.title}
-                      >
-                        {task.title}
-                      </p>
-                    </div>
-
-                    {/* Options */}
-                    <div className="relative hidden sm:block flex-shrink-0">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setOpenActionId((prev) => (prev === task._id ? null : task._id));
-                        }}
-                        className="hover:scale-110 transition-transform p-4"
-                        type="button"
-                      >
-                        <OptionIcon />
-                      </button>
-
-                      {openActionId === task._id && (
-                        <div className="absolute z-50 right-0 mt-2">
-                          <Actions
-                            task={task}
-                            fetchTasksWithRetry={fetchTasksWithRetry}
-                            setEditTask={setEditTask}
-                            setShareTask={setShareTask}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Description */}
-                  <p className="text-[#747474] text-sm mt-2 break-words line-clamp-2 overflow-hidden text-ellipsis">
-                    {task.description}
-                  </p>
-
-                  {/* Status + Due */}
-                  <div className="flex justify-between items-center mt-3 text-xs">
-                    <p className="text-[#F21E1E]">
-                      <span className="text-black">Status:</span> {task.status}
+              >
+                {/* Top Row */}
+                <div className="flex justify-between items-start gap-2 flex-wrap">
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <CircleIcon className="flex-shrink-0 mt-1 w-4 h-4" stroke={stroke} />
+                    <p
+                      className="font-inter text-base font-semibold truncate"
+                      title={task.title}
+                    >
+                      {task.title}
                     </p>
-                    <p className="text-[#A1A3AB]">{getDueLabel(task.dueDate)}</p>
                   </div>
-                </motion.li>
-              );
-            })}
-          </AnimatePresence>
-        </ul>
+
+                  {/* Options */}
+                  <div className="relative hidden sm:block flex-shrink-0">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenActionId((prev) => (prev === task._id ? null : task._id));
+                      }}
+                      className="hover:scale-110 transition-transform p-4"
+                      type="button"
+                    >
+                      <OptionIcon />
+                    </button>
+
+                    {openActionId === task._id && (
+                      <div className="absolute z-50 right-0 mt-2">
+                        <Actions
+                          task={task}
+                          fetchTasksWithRetry={fetchTasksWithRetry}
+                          setEditTask={setEditTask}
+                          setShareTask={setShareTask}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Description */}
+                <p className="text-[#747474] dark:text-gray-400 text-sm mt-2 break-words line-clamp-2 overflow-hidden text-ellipsis">
+                  {task.description}
+                </p>
+
+                {/* Status + Due */}
+                <div className="flex justify-between items-center mt-3 text-xs">
+                  <p className="text-[#F21E1E] dark:text-red-400">
+                    <span className="text-black dark:text-white">Status:</span> {task.status}
+                  </p>
+                  <p className="text-[#A1A3AB] dark:text-gray-500">{getDueLabel(task.dueDate)}</p>
+                </div>
+              </motion.li>
+            );
+          })}
+        </AnimatePresence>
+      </ul>
       )}
     </div>
   );

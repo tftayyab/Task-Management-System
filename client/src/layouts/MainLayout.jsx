@@ -8,30 +8,31 @@ import useIsMobile from '../utils/useScreenSize';
 function MainLayout() {
   const [searchTerm, setSearchTerm] = useState('');
   const [notification, setNotification] = useState(null);
-  const isMobile = useIsMobile();
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem('darkMode') === 'true';
+  });
 
+  const isMobile = useIsMobile();
   const location = useLocation();
   const path = location.pathname;
-
   const navigate = useNavigate();
   useSocketNotifications(setNotification);
 
-  // ✅ Redirect if typing in search bar and not on /collaborate
+  // Search redirect
   useEffect(() => {
     if (path !== '/collaborate' && searchTerm.trim().length > 0) {
       navigate('/mytasks');
     }
   }, [searchTerm, path, navigate]);
 
-  // Clear search term on page change
+  // Clear search on page change
   useEffect(() => {
-  if (!location.pathname.startsWith('/mytasks')) {
-    setSearchTerm('');
-  }
-}, [location]);
+    if (!location.pathname.startsWith('/mytasks')) {
+      setSearchTerm('');
+    }
+  }, [location]);
 
-
-  // Manage body scroll on screen size
+  // Handle scroll behavior
   useEffect(() => {
     if (isMobile) {
       document.body.style.overflow = 'auto';
@@ -47,6 +48,20 @@ function MainLayout() {
     };
   }, [isMobile]);
 
+  // Sync dark mode with localStorage
+  useEffect(() => {
+    localStorage.setItem('darkMode', darkMode);
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
+
+  const toggleDarkMode = () => {
+    setDarkMode((prev) => !prev);
+  };
+
   const shouldShowHeader = !['/', '/login', '/register'].includes(path);
 
   const getTitles = (pathname) => {
@@ -61,7 +76,7 @@ function MainLayout() {
   const { red, black } = getTitles(path);
 
   return (
-    <div className="min-h-screen bg-white flex flex-col overflow-auto sm:overflow-hidden">
+    <div className="min-h-screen flex flex-col overflow-auto sm:overflow-hidden bg-white text-black dark:bg-gray-900 dark:text-white">
       {notification && (
         <Notification message={notification} onClose={() => setNotification(null)} />
       )}
@@ -72,6 +87,8 @@ function MainLayout() {
           blackTitle={black}
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
+          toggleDarkMode={toggleDarkMode}
+          darkMode={darkMode}
         />
       )}
 

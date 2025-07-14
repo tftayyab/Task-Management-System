@@ -15,7 +15,7 @@ function ViewTeamTasks() {
     setSearchTerm,
     isMenuOpen,
     setIsMenuOpen,
-    setNotification, // ✅ Notification function
+    setNotification,
   } = useOutletContext();
 
   const { id } = useParams();
@@ -26,7 +26,6 @@ function ViewTeamTasks() {
   const [editTask, setEditTask] = useState(null);
   const [shareTask, setShareTask] = useState(null);
   const isMobile = useIsMobile();
-
 
   const navigate = useNavigate();
   useAuthToken();
@@ -52,20 +51,19 @@ function ViewTeamTasks() {
     tryFetch();
   }, []);
 
-const fetchTasksWithRetry = async () => {
-  try {
-    const res = await api.get(`/tasks/shared`);
-    const allTasks = res.data.tasks; // ✅ Access the correct array
-    const teamTasks = allTasks.filter(task => task.teamIds?.includes(id));
-    setTasks(teamTasks);
-    setFilteredTasksList(teamTasks);
-  } catch (err) {
-    console.error("❌ Fetch error:", err.response?.data || err.message);
-  } finally {
-    setLoading(false);
-  }
-};
-
+  const fetchTasksWithRetry = async () => {
+    try {
+      const res = await api.get(`/tasks/shared`);
+      const allTasks = res.data.tasks;
+      const teamTasks = allTasks.filter(task => task.teamIds?.includes(id));
+      setTasks(teamTasks);
+      setFilteredTasksList(teamTasks);
+    } catch (err) {
+      console.error("❌ Fetch error:", err.response?.data || err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (id && filteredTasksList.length > 0) {
@@ -78,7 +76,7 @@ const fetchTasksWithRetry = async () => {
 
   return (
     <motion.div
-      className="min-h-screen h-screen bg-white flex flex-col overflow-hidden"
+      className="min-h-screen h-screen bg-white dark:bg-[#121212] text-black dark:text-white flex flex-col overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
@@ -90,49 +88,45 @@ const fetchTasksWithRetry = async () => {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.4, delay: 0.1 }}
       >
-        {/* ✅ Task Preview Box */}
         <div className="flex-1 flex justify-center sm:justify-end sm:mr-5 px-4 pb-6">
           {!isMenuOpen && (
-            <div className="relative z-0 border sm:h-[76vh] border-[rgba(161,163,171,0.63)] shadow-lg rounded-2xl p-4 flex flex-col sm:flex-row sm:gap-6 sm:w-[150vh] w-[40vh] bg-white transition-all duration-300">
-
+            <div className="relative z-0 border sm:h-[76vh] border-[rgba(161,163,171,0.63)] dark:border-gray-700 shadow-lg rounded-2xl p-4 flex flex-col sm:flex-row sm:gap-6 sm:w-[150vh] w-[40vh] bg-white dark:bg-[#1e1e1e] transition-all duration-300">
               {/* 🔷 Right Side: Task Preview */}
               <div className="order-1 sm:order-2 w-full flex flex-col gap-6 sm:mt-0">
-            {/* If on mobile, show TaskList instead of full preview */}
-            {isMobile ? (
-            <div className="h-full bg-[#F5F8FF] p-4 rounded-xl border overflow-y-auto scrollbar-hide">
-                <TaskList
-                tasks={tasks}
-                statuses={["Pending", "In Progress", "Completed"]}
-                fetchTasksWithRetry={fetchTasksWithRetry}
-                onTaskClick={(taskId) => navigate(`/viewtask/${taskId}`)}
-                setEditTask={setEditTask}
-                setShareTask={setShareTask}
-                searchTerm={searchTerm}
-                loading={loading}
-                />
-            </div>
-            ) : (
-            selectedTaskId && (
-                <div className="h-[31rem] bg-[#F5F8FF] p-4 rounded-xl sm:mt-0 -mt-5 border overflow-y-auto scrollbar-hide">
-                <Tasks
-                    tasks={tasks}
-                    task_id={selectedTaskId}
-                    setEditTask={setEditTask}
-                    setShareTask={setShareTask}
-                    fetchTasksWithRetry={fetchTasksWithRetry}
-                    loading={loading}
-                />
-                </div>
-            )
-            )}
+                {isMobile ? (
+                  <div className="h-full bg-[#F5F8FF] dark:bg-[#1f1f1f] p-4 rounded-xl border dark:border-gray-700 overflow-y-auto scrollbar-hide">
+                    <TaskList
+                      tasks={tasks}
+                      statuses={["Pending", "In Progress", "Completed"]}
+                      fetchTasksWithRetry={fetchTasksWithRetry}
+                      onTaskClick={(taskId) => navigate(`/viewtask/${taskId}`)}
+                      setEditTask={setEditTask}
+                      setShareTask={setShareTask}
+                      searchTerm={searchTerm}
+                      loading={loading}
+                    />
+                  </div>
+                ) : (
+                  selectedTaskId && (
+                    <div className="h-[31rem] bg-[#F5F8FF] dark:bg-[#1f1f1f] p-4 rounded-xl sm:mt-0 -mt-5 border dark:border-gray-700 overflow-y-auto scrollbar-hide">
+                      <Tasks
+                        tasks={tasks}
+                        task_id={selectedTaskId}
+                        setEditTask={setEditTask}
+                        setShareTask={setShareTask}
+                        fetchTasksWithRetry={fetchTasksWithRetry}
+                        loading={loading}
+                      />
+                    </div>
+                  )
+                )}
               </div>
-
             </div>
           )}
         </div>
       </motion.div>
 
-      {/* ✅ Modal for Edit */}
+      {/* ✅ Modals */}
       {editTask && (
         <Edit
           taskData={editTask}

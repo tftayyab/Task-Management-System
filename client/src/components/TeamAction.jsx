@@ -7,14 +7,14 @@ const TeamActions = ({
   setEditTeam,
   selectedTeam,
   setSelectedTeam,
-  setNotification, // ✅ added
+  setNotification,
 }) => {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.2 }}
-      className="flex flex-col min-w-[6rem] bg-white rounded-xl shadow-lg ring-1 ring-gray-200 overflow-hidden transition-all duration-300 ease-in-out"
+      className="flex flex-col min-w-[6rem] bg-white dark:bg-[#1e1e1e] rounded-xl shadow-lg ring-1 ring-gray-200 dark:ring-gray-700 overflow-hidden transition-all duration-300 ease-in-out"
     >
       {/* ✏️ Edit */}
       <button
@@ -22,7 +22,7 @@ const TeamActions = ({
           e.stopPropagation();
           setEditTeam(team);
         }}
-        className="px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 hover:text-blue-800 font-medium text-left"
+        className="px-4 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-[#223344] hover:text-blue-800 dark:hover:text-blue-300 font-medium text-left"
       >
         ✏️ Edit
       </button>
@@ -36,10 +36,10 @@ const TeamActions = ({
             selectedTeam,
             setSelectedTeam,
             fetchTeamsWithRetry,
-            setNotification, // ✅ pass it
+            setNotification,
           });
         }}
-        className="px-4 py-2 whitespace-nowrap text-sm text-red-600 hover:bg-red-50 hover:text-red-800 font-medium text-left"
+        className="px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-[#331f1f] hover:text-red-800 dark:hover:text-red-300 font-medium text-left whitespace-nowrap"
       >
         🗑️ Delete
       </button>

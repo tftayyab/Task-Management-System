@@ -13,7 +13,7 @@ function ViewTasks() {
     setSearchTerm,
     isMenuOpen,
     setIsMenuOpen,
-    setNotification, // ✅ Notification function
+    setNotification,
   } = useOutletContext();
 
   const { id } = useParams();
@@ -48,28 +48,28 @@ function ViewTasks() {
     tryFetch();
   }, []);
 
-const fetchTasksWithRetry = async () => {
-  try {
-    const username = localStorage.getItem('username');
+  const fetchTasksWithRetry = async () => {
+    try {
+      const username = localStorage.getItem('username');
 
-    const [personalRes, sharedRes] = await Promise.all([
-      api.get(`/tasks`),
-      api.get(`/tasks/shared`),
-    ]);
+      const [personalRes, sharedRes] = await Promise.all([
+        api.get(`/tasks`),
+        api.get(`/tasks/shared`),
+      ]);
 
-    const allTasks = [
-      ...(personalRes.data || []),
-      ...(sharedRes.data?.tasks || []),
-    ];
+      const allTasks = [
+        ...(personalRes.data || []),
+        ...(sharedRes.data?.tasks || []),
+      ];
 
-    setTasks(allTasks);
-    setFilteredTasksList(allTasks);
-  } catch (err) {
-    console.error("❌ Fetch error:", err.response?.data || err.message);
-  } finally {
-    setLoading(false);
-  }
-};
+      setTasks(allTasks);
+      setFilteredTasksList(allTasks);
+    } catch (err) {
+      console.error("❌ Fetch error:", err.response?.data || err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (id && filteredTasksList.length > 0) {
@@ -82,7 +82,7 @@ const fetchTasksWithRetry = async () => {
 
   return (
     <motion.div
-      className="min-h-screen h-screen bg-white flex flex-col overflow-hidden"
+      className="min-h-screen h-screen bg-white dark:bg-[#121212] text-black dark:text-white flex flex-col overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
@@ -97,21 +97,17 @@ const fetchTasksWithRetry = async () => {
         {/* ✅ Task Preview Box */}
         <div className="flex-1 flex justify-center sm:justify-end sm:mr-5 px-4 pb-6">
           {!isMenuOpen && (
-            <div className="relative z-0 border sm:h-[76vh] border-[rgba(161,163,171,0.63)] shadow-lg rounded-2xl p-4 flex flex-col sm:flex-row sm:gap-6 sm:w-[150vh] w-[40vh] bg-white transition-all duration-300">
+            <div className="relative z-0 border sm:h-[76vh] border-[rgba(161,163,171,0.63)] dark:border-gray-700 shadow-lg rounded-2xl p-4 flex flex-col sm:flex-row sm:gap-6 sm:w-[150vh] w-[40vh] bg-white dark:bg-[#1e1e1e] transition-all duration-300">
 
               {/* 🔷 Right Side: Task Preview */}
               <div className="order-1 sm:order-2 w-full flex flex-col gap-6 mt-6 sm:mt-0">
                 {selectedTaskId && (
-                  <div className="h-[31rem] bg-[#F5F8FF] p-4 rounded-xl sm:mt-0 -mt-5 border border-[rgba(161,163,171,0.63)] shadow overflow-y-auto scrollbar-hide">
+                  <div className="h-[31rem] bg-[#F5F8FF] dark:bg-[#2a2a2a] p-4 rounded-xl sm:mt-0 -mt-5 border border-[rgba(161,163,171,0.63)] dark:border-gray-700 shadow overflow-y-auto scrollbar-hide">
                     <Tasks
                       tasks={tasks}
                       task_id={selectedTaskId}
-                      setEditTask={(task) => {
-                        setEditTask(task);
-                      }}
-                      setShareTask={(task) => {
-                        setShareTask(task);
-                      }}
+                      setEditTask={setEditTask}
+                      setShareTask={setShareTask}
                       fetchTasksWithRetry={fetchTasksWithRetry}
                       loading={loading}
                     />

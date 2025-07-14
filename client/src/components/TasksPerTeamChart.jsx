@@ -17,6 +17,8 @@ const getTeamName = (teams, teamId) => {
 };
 
 const TasksPerTeamChart = ({ tasks, teams }) => {
+  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
   const chartData = useMemo(() => {
     const teamStatusMap = {};
 
@@ -79,13 +81,14 @@ const TasksPerTeamChart = ({ tasks, teams }) => {
           font: { family: 'Inter', size: 10 },
           boxWidth: 12,
           padding: 16,
+          color: isDark ? '#fff' : '#000',
         },
       },
       tooltip: {
-        backgroundColor: '#fff',
-        titleColor: '#333',
-        bodyColor: '#555',
-        borderColor: '#ccc',
+        backgroundColor: isDark ? '#1e1e1e' : '#fff',
+        titleColor: isDark ? '#fff' : '#333',
+        bodyColor: isDark ? '#ccc' : '#555',
+        borderColor: isDark ? '#444' : '#ccc',
         borderWidth: 1,
         cornerRadius: 6,
         padding: 10,
@@ -101,9 +104,16 @@ const TasksPerTeamChart = ({ tasks, teams }) => {
           display: true,
           text: 'Teams',
           font: { size: 10, family: 'Inter' },
+          color: isDark ? '#fff' : '#000',
         },
-        ticks: { font: { family: 'Inter' } },
-        grid: { color: '#f2f2f2' },
+        ticks: {
+          font: { family: 'Inter' },
+          color: isDark ? '#ccc' : '#000',
+        },
+        grid: {
+          color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+          lineWidth: 1,
+        },
       },
       y: {
         stacked: true,
@@ -112,20 +122,24 @@ const TasksPerTeamChart = ({ tasks, teams }) => {
           stepSize: 1,
           precision: 0,
           font: { family: 'Inter' },
+          color: isDark ? '#ccc' : '#000',
         },
         title: {
           display: true,
           text: 'Tasks',
           font: { size: 10, family: 'Inter' },
+          color: isDark ? '#fff' : '#000',
         },
-        grid: { color: '#f2f2f2' },
+        grid: {
+          color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+          lineWidth: 1,
+        },
       },
     },
   };
 
   return (
-    <div className="w-full sm:w-[22rem] rounded-2xl bg-[#F5F8FF] shadow-lg p-4 flex flex-col transition hover:shadow-xl hover:scale-[1.01]">
-      {/* Chart */}
+    <div className="w-full sm:w-[22rem] rounded-2xl bg-[#F5F8FF] dark:bg-[#1e1e1e] shadow-lg p-4 flex flex-col transition hover:shadow-xl hover:scale-[1.01]">
       <div className="w-full h-56 sm:h-full">
         <Bar data={chartData} options={options} />
       </div>

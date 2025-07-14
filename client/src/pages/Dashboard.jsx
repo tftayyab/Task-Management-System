@@ -52,7 +52,7 @@ function Dashboard() {
 
   return (
     <motion.div
-      className="min-h-screen h-screen bg-white flex flex-col overflow-hidden"
+      className="min-h-screen h-screen bg-white dark:bg-[#121212] flex flex-col overflow-hidden text-black dark:text-white"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
@@ -65,7 +65,7 @@ function Dashboard() {
       >
         <div className="flex-1 flex justify-center sm:justify-end sm:mr-5 px-4 pb-6">
           {!isMenuOpen && (
-            <div className="relative z-0 border sm:h-[76vh] border-[rgba(161,163,171,0.63)] shadow-lg rounded-2xl p-4 flex flex-col sm:flex-row sm:gap-6 sm:w-[150vh] w-[40vh] bg-white transition-all duration-300">
+            <div className="relative z-0 border sm:h-[76vh] border-[rgba(161,163,171,0.63)] dark:border-gray-700 shadow-lg rounded-2xl p-4 flex flex-col sm:flex-row sm:gap-6 sm:w-[150vh] w-[40vh] bg-white dark:bg-[#1e1e1e] transition-all duration-300">
               
               {/* Right side */}
               <div className="order-1 sm:order-2 w-full sm:w-[22rem] flex flex-col gap-6 mt-6 sm:mt-0">

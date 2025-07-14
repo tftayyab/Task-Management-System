@@ -29,7 +29,7 @@ function TeamList({
   const isEmpty = !loading && teams.length === 0;
 
   return (
-    <div className="w-full h-full flex flex-col">
+    <div className="w-full h-full flex flex-col text-black dark:text-white">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div
@@ -56,7 +56,7 @@ function TeamList({
         </div>
       ) : isEmpty ? (
         <div className="flex-1 flex flex-col items-center justify-center text-center">
-          <p className="text-gray-400 text-lg font-inter mb-2">No Teams Found</p>
+          <p className="text-gray-400 text-lg font-inter mb-2 dark:text-gray-500">No Teams Found</p>
           <button
             onClick={() => onAddTeamClick?.()}
             className="text-[#FF6767] font-medium hover:underline mt-1"
@@ -83,13 +83,13 @@ function TeamList({
                       onTeamClick?.(team._id);
                     }
                   }}
-                  className="cursor-pointer group p-4 rounded-xl border border-[#A1A3AB] bg-white shadow transition-all duration-200 hover:shadow-lg hover:scale-[1.001] relative"
+                  className="cursor-pointer group p-4 rounded-xl border border-[#A1A3AB] dark:border-gray-700 bg-white dark:bg-[#1e1e1e] shadow transition-all duration-200 hover:shadow-lg hover:scale-[1.001] relative"
                 >
                   {/* Top Row */}
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <CircleIcon className="flex-shrink-0 mt-1 w-4 h-4" stroke={stroke} />
-                      <p className="text-black font-inter text-base font-semibold truncate">
+                      <p className="text-black dark:text-white font-inter text-base font-semibold truncate">
                         {team.teamName || 'Unnamed Team'}
                       </p>
                     </div>
@@ -121,10 +121,13 @@ function TeamList({
                   </div>
 
                   {/* Details */}
-                  <div className="mt-2 text-sm text-[#555]">
-                    <p><span className="font-medium text-black">Owner:</span> {team.owner}</p>
+                  <div className="mt-2 text-sm text-[#555] dark:text-gray-300">
                     <p>
-                      <span className="font-medium text-black">Shared With:</span>{' '}
+                      <span className="font-medium text-black dark:text-white">Owner:</span>{' '}
+                      {team.owner}
+                    </p>
+                    <p>
+                      <span className="font-medium text-black dark:text-white">Shared With:</span>{' '}
                       {team.shareWith?.length > 0 ? team.shareWith.join(', ') : 'No one yet'}
                     </p>
                   </div>

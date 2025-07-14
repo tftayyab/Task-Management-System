@@ -13,61 +13,42 @@ import {
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend, Filler);
 
-const formatDateKey = (dateStr) => {
-  const date = new Date(dateStr);
-  return date.toISOString().split('T')[0]; // yyyy-mm-dd (sortable)
-};
-
-const formatLabel = (dateStr) => {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('en-GB', {
-    day: '2-digit',
-    month: 'short',
-  }); // e.g. 12 Jul
-};
+const formatDateKey = (dateStr) => new Date(dateStr).toISOString().split('T')[0];
+const formatLabel = (dateStr) =>
+  new Date(dateStr).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
 
 const TasksOverTimeChart = ({ tasks }) => {
+  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   const chartData = useMemo(() => {
-    const createdMap = {};
-    const completedMap = {};
-    const inProgressMap = {};
+    const createdMap = {}, completedMap = {}, inProgressMap = {};
 
     tasks.forEach((task) => {
-      const createdKey = formatDateKey(task.createdAt);
-      createdMap[createdKey] = (createdMap[createdKey] || 0) + 1;
+      const key = formatDateKey(task.createdAt);
+      createdMap[key] = (createdMap[key] || 0) + 1;
 
+      const updatedKey = formatDateKey(task.updatedAt || task.createdAt);
       if (task.status === 'Completed') {
-        const key = formatDateKey(task.updatedAt || task.createdAt);
-        completedMap[key] = (completedMap[key] || 0) + 1;
+        completedMap[updatedKey] = (completedMap[updatedKey] || 0) + 1;
       }
-
       if (task.status === 'In Progress') {
-        const key = formatDateKey(task.updatedAt || task.createdAt);
-        inProgressMap[key] = (inProgressMap[key] || 0) + 1;
+        inProgressMap[updatedKey] = (inProgressMap[updatedKey] || 0) + 1;
       }
     });
 
-    const allKeys = Array.from(
-      new Set([
-        ...Object.keys(createdMap),
-        ...Object.keys(completedMap),
-        ...Object.keys(inProgressMap),
-      ])
-    ).sort((a, b) => new Date(a) - new Date(b));
-
-    const labels = allKeys.map(formatLabel);
-    const createdCounts = allKeys.map((d) => createdMap[d] || 0);
-    const completedCounts = allKeys.map((d) => completedMap[d] || 0);
-    const inProgressCounts = allKeys.map((d) => inProgressMap[d] || 0);
+    const allKeys = Array.from(new Set([
+      ...Object.keys(createdMap),
+      ...Object.keys(completedMap),
+      ...Object.keys(inProgressMap),
+    ])).sort((a, b) => new Date(a) - new Date(b));
 
     return {
-      labels,
+      labels: allKeys.map(formatLabel),
       datasets: [
         {
           label: 'Created',
-          data: createdCounts,
+          data: allKeys.map(k => createdMap[k] || 0),
           borderColor: '#FF9F40',
-          backgroundColor: 'rgba(255, 159, 64, 0.2)',
+          backgroundColor: 'rgba(255, 159, 64, 0.15)',
           pointBackgroundColor: '#FF9F40',
           pointRadius: 4,
           fill: true,
@@ -75,9 +56,9 @@ const TasksOverTimeChart = ({ tasks }) => {
         },
         {
           label: 'In Progress',
-          data: inProgressCounts,
+          data: allKeys.map(k => inProgressMap[k] || 0),
           borderColor: '#36A2EB',
-          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          backgroundColor: 'rgba(54, 162, 235, 0.15)',
           pointBackgroundColor: '#36A2EB',
           pointRadius: 4,
           fill: true,
@@ -85,9 +66,9 @@ const TasksOverTimeChart = ({ tasks }) => {
         },
         {
           label: 'Completed',
-          data: completedCounts,
+          data: allKeys.map(k => completedMap[k] || 0),
           borderColor: '#4CAF50',
-          backgroundColor: 'rgba(76, 175, 80, 0.2)',
+          backgroundColor: 'rgba(76, 175, 80, 0.15)',
           pointBackgroundColor: '#4CAF50',
           pointRadius: 4,
           fill: true,
@@ -100,16 +81,13 @@ const TasksOverTimeChart = ({ tasks }) => {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
-    interaction: {
-      mode: 'index',
-      intersect: false,
-    },
+    interaction: { mode: 'index', intersect: false },
     plugins: {
       tooltip: {
-        backgroundColor: '#fff',
-        titleColor: '#333',
-        bodyColor: '#555',
-        borderColor: '#ccc',
+        backgroundColor: isDark ? '#1e1e1e' : '#fff',
+        titleColor: isDark ? '#fff' : '#333',
+        bodyColor: isDark ? '#ccc' : '#555',
+        borderColor: isDark ? '#444' : '#ccc',
         borderWidth: 1,
         cornerRadius: 6,
         padding: 10,
@@ -124,6 +102,7 @@ const TasksOverTimeChart = ({ tasks }) => {
           usePointStyle: true,
           pointStyle: 'circle',
           padding: 16,
+          color: isDark ? '#f0f0f0' : '#333',
         },
       },
     },
@@ -133,34 +112,40 @@ const TasksOverTimeChart = ({ tasks }) => {
           display: true,
           text: 'Date',
           font: { size: 14 },
+          color: isDark ? '#ffffff' : '#333',
+        },
+        ticks: {
+          color: isDark ? '#dddddd' : '#333',
         },
         grid: {
-          color: '#f2f2f2',
+          color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+          lineWidth: 1,
         },
       },
       y: {
         beginAtZero: true,
         ticks: {
-            stepSize: 1,
-            precision: 0,
-            callback: function (value) {
-            return Number.isInteger(value) ? value : null;
-            },
+          stepSize: 1,
+          precision: 0,
+          color: isDark ? '#dddddd' : '#333',
+          callback: (value) => Number.isInteger(value) ? value : null,
         },
         title: {
-            display: true,
-            text: 'Tasks',
-            font: { size: 14 },
+          display: true,
+          text: 'Tasks',
+          font: { size: 14 },
+          color: isDark ? '#ffffff' : '#333',
         },
         grid: {
-            color: '#f2f2f2',
+          color: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+          lineWidth: 1,
         },
-        },
+      },
     },
   };
 
   return (
-    <div className="w-full rounded-2xl bg-[#F5F8FF] shadow-lg p-4 h-full transition hover:shadow-xl">
+    <div className="w-full rounded-2xl bg-[#F5F8FF] dark:bg-[#1a1a1a] shadow-lg p-4 h-full transition hover:shadow-xl">
       <Line data={chartData} options={options} />
     </div>
   );

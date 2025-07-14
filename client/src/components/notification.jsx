@@ -15,7 +15,7 @@ export default function Notification({ message, onClose }) {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 300 }}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          className="fixed top-40 sm:top-20 right-4 z-50 w-auto max-w-sm px-5 py-3 rounded-xl shadow-2xl bg-gradient-to-r from-red-600 via-red-700 to-red-800 text-white text-base sm:text-sm font-semibold"
+          className="fixed top-40 sm:top-20 right-4 z-50 w-auto max-w-sm px-5 py-3 rounded-xl shadow-2xl bg-gradient-to-r from-red-500 via-red-600 to-red-700 dark:from-red-600 dark:via-red-700 dark:to-red-800 text-white text-base sm:text-sm font-semibold"
         >
           {message}
         </motion.div>

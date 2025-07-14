@@ -9,7 +9,7 @@ import {
 import { handleLogout } from '../utils/handleTasks';
 import { motion, AnimatePresence } from 'framer-motion';
 
-function Menu({ onClose }) {
+function Menu({ onClose, toggleDarkMode = () => {}, darkMode = false }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [username, setUsername] = useState('');

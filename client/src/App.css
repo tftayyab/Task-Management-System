@@ -16,10 +16,17 @@
 }
 
 @layer components {
-  .homeBtn {
-    @apply text-[#F8F9FB] bg-[#FF9090] text-sm sm:text-base font-medium px-6 py-3 sm:px-10 sm:py-4 rounded sm:w-40 transition-all duration-300 ease-in-out hover:bg-[#FF6F6F] hover:shadow-lg active:scale-95
-  }
-  .RegisterInput {
-    @apply w-full h-14 sm:h-12 pl-12 pr-12 sm:pl-10 sm:pr-10 rounded-md border border-[#565454] text-base font-medium placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#FF9090] hover:border-[#FF9090] transition-colors duration-300
-  }
+.homeBtn {
+  @apply text-[#F8F9FB] bg-[#FF9090] text-sm sm:text-base font-medium px-6 py-3 sm:px-10 sm:py-4 rounded sm:w-40 
+         transition-all duration-300 ease-in-out hover:bg-[#FF6F6F] hover:shadow-lg active:scale-95
+         dark:bg-[#FF7070] dark:hover:bg-[#ff5a5a] dark:text-white;
+}
+
+.RegisterInput {
+  @apply w-full h-14 sm:h-12 pl-12 pr-12 sm:pl-10 sm:pr-10 rounded-md border border-[#565454] text-base font-medium 
+         placeholder:text-[#999] focus:outline-none focus:ring-2 focus:ring-[#FF9090] hover:border-[#FF9090] 
+         transition-colors duration-300
+         dark:bg-[#1f1f1f] dark:border-[#888] dark:text-white dark:placeholder:text-[#aaa] dark:hover:border-[#FF7070] 
+         dark:focus:ring-[#FF7070];
+}
 }

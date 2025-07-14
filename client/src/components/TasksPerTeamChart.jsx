@@ -139,7 +139,7 @@ const TasksPerTeamChart = ({ tasks, teams }) => {
   };
 
   return (
-    <div className="w-full sm:w-[22rem] rounded-2xl bg-[#F5F8FF] dark:bg-[#1e1e1e] shadow-lg p-4 flex flex-col transition hover:shadow-xl hover:scale-[1.01]">
+    <div className="w-full sm:w-[22rem] rounded-2xl bg-[#F5F8FF] dark:bg-[#1a1a1a] shadow-lg p-4 flex flex-col transition hover:shadow-xl hover:scale-[1.01]">
       <div className="w-full h-56 sm:h-full">
         <Bar data={chartData} options={options} />
       </div>

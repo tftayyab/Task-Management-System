@@ -1,10 +1,23 @@
 import { useEffect, useState } from 'react';
 import { CrossIcon } from '../components/svg';
-import { handleChange, handleTaskSubmit } from '../utils/handleTasks';
+import { handleTaskSubmit } from '../utils/handleTasks';
 import { enhanceTextWithAI } from '../utils/aiEnhancer';
 import { motion } from 'framer-motion';
+import {
+  handleEnhanceField,
+  animateTyping,
+  handleReload,
+} from '../utils/handleAI';
 
-function TaskForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry, team = null, setNotification }) {
+
+function TaskForm({
+  mode = 'add',
+  taskData = null,
+  onClose,
+  fetchTasksWithRetry,
+  team = null,
+  setNotification
+}) {
   const [originalTitle, setOriginalTitle] = useState(document.title);
   const [newTask, setNewTask] = useState({
     title: '',
@@ -15,7 +28,7 @@ function TaskForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry,
 
   const [loadingTitle, setLoadingTitle] = useState(false);
   const [loadingDesc, setLoadingDesc] = useState(false);
-  const token = localStorage.getItem('token');
+  const [showReload, setShowReload] = useState({ title: false, description: false });
 
   useEffect(() => {
     setOriginalTitle(document.title);
@@ -28,6 +41,8 @@ function TaskForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry,
         status: taskData.status,
         dueDate: formattedDate,
       });
+      localStorage.setItem('originalTitle', taskData.title);
+      localStorage.setItem('originalDescription', taskData.description);
       document.title = 'Edit Task';
     } else {
       document.title = 'Add Task';
@@ -35,23 +50,14 @@ function TaskForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry,
 
     return () => {
       document.title = originalTitle;
+      localStorage.removeItem('originalTitle');
+      localStorage.removeItem('originalDescription');
     };
   }, [mode, taskData]);
 
-  const handleAIEnhance = async (field) => {
-    const fieldText = newTask[field];
-    if (!fieldText || fieldText.length < 3) return;
-
-    field === 'title' ? setLoadingTitle(true) : setLoadingDesc(true);
-
-    try {
-      const improved = await enhanceTextWithAI(fieldText, token);
-      setNewTask((prev) => ({ ...prev, [field]: improved }));
-    } catch (err) {
-      alert('AI Enhance failed. Try again.');
-    } finally {
-      field === 'title' ? setLoadingTitle(false) : setLoadingDesc(false);
-    }
+  const handleUserInput = (e) => {
+    const { name, value } = e.target;
+    setNewTask((prev) => ({ ...prev, [name]: value }));
   };
 
   return (
@@ -64,7 +70,11 @@ function TaskForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry,
       >
         {/* Close */}
         <div
-          onClick={onClose}
+          onClick={() => {
+            onClose();
+            localStorage.removeItem('originalTitle');
+            localStorage.removeItem('originalDescription');
+          }}
           className="absolute top-4 right-4 cursor-pointer hover:scale-110 transition-transform"
         >
           <CrossIcon className="w-6 h-6" />
@@ -78,121 +88,147 @@ function TaskForm({ mode = 'add', taskData = null, onClose, fetchTasksWithRetry,
           <div className="mt-1 mx-auto w-12 sm:w-20 h-1 bg-[#F24E1E] rounded-full" />
         </div>
 
-        {/* Task Form */}
-        <div className="space-y-5">
-          {/* Title */}
-          <div>
-            <label className="block text-sm font-semibold text-black mb-1">Title</label>
-            <div className="relative">
-              <input
-                type="text"
-                name="title"
-                value={newTask.title}
-                onChange={(e) => handleChange(e, setNewTask)}
-                className="w-full pr-10 rounded-md border border-[#A1A3AB] px-3 py-2 text-sm
-                           hover:border-[#FFAFAF] focus:border-[#F24E1E]
-                           focus:outline-none focus:ring-1 focus:ring-[#F24E1E]
-                           transition-all"
-              />
+        {/* Title */}
+        <div>
+          <label className="block text-sm font-semibold text-black mb-1">Title</label>
+          <div className="relative">
+            <input
+              type="text"
+              name="title"
+              value={newTask.title}
+              onChange={handleUserInput}
+              className="w-full pr-10 rounded-md border border-[#A1A3AB] px-3 py-2 text-sm
+                hover:border-[#FFAFAF] focus:border-[#F24E1E]
+                focus:outline-none focus:ring-1 focus:ring-[#F24E1E]
+                transition-all"
+            />
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-2 items-center">
+              {showReload.title && (
+                <button
+                  type="button"
+                  onClick={() => handleReload('title', setNewTask)}
+                  className="text-blue-500 text-xs hover:underline"
+                >
+                  🔄
+                </button>
+              )}
               <button
                 type="button"
-                title="Enhance with AI"
-                onClick={() => handleAIEnhance('title')}
-                disabled={loadingTitle}
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-[#F24E1E] text-sm hover:scale-110 transition-transform"
+                 onClick={() =>
+                  handleEnhanceField({
+                    field: 'title',
+                    newTask,
+                    setNewTask,
+                    setShowReload,
+                    setLoadingTitle,
+                    setLoadingDesc,
+                  })
+                }
+                className="text-[#F24E1E] hover:scale-110 transition-transform"
               >
                 {loadingTitle ? '⏳' : '✨'}
               </button>
             </div>
           </div>
+        </div>
 
-          {/* Description */}
-          <div>
-            <label className="block text-sm font-semibold text-black mb-1">Description</label>
-            <div className="relative">
-              <textarea
-                name="description"
-                value={newTask.description}
-                onChange={(e) => handleChange(e, setNewTask)}
-                rows="4"
-                className="w-full pr-10 rounded-md border border-[#A1A3AB] px-3 py-2 text-sm resize-none
-                           hover:border-[#FFAFAF] focus:border-[#F24E1E]
-                           focus:outline-none focus:ring-1 focus:ring-[#F24E1E]
-                           transition-all"
-              />
+        {/* Description */}
+        <div>
+          <label className="block text-sm font-semibold text-black mb-1">Description</label>
+          <div className="relative">
+            <textarea
+              name="description"
+              value={newTask.description}
+              onChange={handleUserInput}
+              rows="4"
+              className="w-full pr-10 rounded-md border border-[#A1A3AB] px-3 py-2 text-sm resize-none
+                hover:border-[#FFAFAF] focus:border-[#F24E1E]
+                focus:outline-none focus:ring-1 focus:ring-[#F24E1E]
+                transition-all"
+            />
+            <div className="absolute right-2 top-3 flex gap-2 items-center">
+              {showReload.description && (
+                <button
+                  type="button"
+                  onClick={() => handleReload('description', setNewTask)}
+                  className="text-blue-500 text-xs hover:underline"
+                >
+                  🔄
+                </button>
+              )}
               <button
                 type="button"
-                title="Enhance with AI"
-                onClick={() => handleAIEnhance('description')}
-                disabled={loadingDesc}
-                className="absolute right-2 top-3 text-[#F24E1E] text-sm hover:scale-110 transition-transform"
+                onClick={() =>
+                  handleEnhanceField({
+                    field: 'description',
+                    newTask,
+                    setNewTask,
+                    setShowReload,
+                    setLoadingTitle,
+                    setLoadingDesc,
+                  })
+                }
+                className="text-[#F24E1E] hover:scale-110 transition-transform"
               >
                 {loadingDesc ? '⏳' : '✨'}
               </button>
             </div>
           </div>
+        </div>
 
-          {/* Due Date */}
-          <div>
-            <label className="block text-sm font-semibold text-black mb-1">Due Date</label>
-            <input
-              type="date"
-              name="dueDate"
-              value={newTask.dueDate}
-              onChange={(e) => handleChange(e, setNewTask)}
-              className="w-full rounded-md border border-[#A1A3AB] px-3 py-2 text-sm
-                         hover:border-[#FFAFAF] focus:border-[#F24E1E]
-                         focus:outline-none focus:ring-1 focus:ring-[#F24E1E]
-                         transition-all"
-            />
-          </div>
+        {/* Due Date */}
+        <div>
+          <label className="block text-sm font-semibold text-black mb-1">Due Date</label>
+          <input
+            type="date"
+            name="dueDate"
+            value={newTask.dueDate}
+            onChange={handleUserInput}
+            className="w-full rounded-md border border-[#A1A3AB] px-3 py-2 text-sm transition-all hover:border-[#FFAFAF] focus:border-[#F24E1E] focus:outline-none focus:ring-1 focus:ring-[#F24E1E]"
+          />
+        </div>
 
-          {/* Status */}
-          <div>
-            <p className="text-sm font-semibold text-black mb-2">Status</p>
-            <div className="flex flex-wrap gap-4">
-              {["Pending", "In Progress", "Completed"].map((status) => (
-                <label
-                  key={status}
-                  className="inline-flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer
-                             hover:text-[#F24E1E] transition-colors"
-                >
-                  <input
-                    type="radio"
-                    name="status"
-                    value={status}
-                    checked={newTask.status === status}
-                    onChange={(e) => handleChange(e, setNewTask)}
-                    className="accent-[#F24E1E] cursor-pointer"
-                  />
-                  {status}
-                </label>
-              ))}
-            </div>
+        {/* Status */}
+        <div>
+          <p className="text-sm font-semibold text-black mb-2">Status</p>
+          <div className="flex flex-wrap gap-4">
+            {["Pending", "In Progress", "Completed"].map((status) => (
+              <label key={status} className="inline-flex items-center gap-2 text-sm font-medium text-gray-700 cursor-pointer hover:text-[#F24E1E] transition-colors">
+                <input
+                  type="radio"
+                  name="status"
+                  value={status}
+                  checked={newTask.status === status}
+                  onChange={handleUserInput}
+                  className="accent-[#F24E1E] cursor-pointer"
+                />
+                {status}
+              </label>
+            ))}
           </div>
+        </div>
 
-          {/* Submit Button */}
-          <div className="flex justify-center sm:justify-start">
-            <button
-              onClick={() =>
-                handleTaskSubmit({
-                  mode,
-                  newTask,
-                  taskData,
-                  fetchTasksWithRetry,
-                  onClose,
-                  setNewTask,
-                  team,
-                  setNotification,
-                })
-              }
-              disabled={!newTask.title || !newTask.description || !newTask.dueDate}
-              className={`bg-[#FF9090] hover:bg-[#FF6F6F] hover:scale-[1.03] text-white px-6 py-2 rounded-md text-sm font-medium shadow transition-all duration-300
-                ${(!newTask.title || !newTask.description || !newTask.dueDate) && 'opacity-50 cursor-not-allowed'}`}
-            >
-              Done
-            </button>
-          </div>
+        {/* Submit Button */}
+        <div className="flex justify-center sm:justify-start">
+          <button
+            onClick={() =>
+              handleTaskSubmit({
+                mode,
+                newTask,
+                taskData,
+                fetchTasksWithRetry,
+                onClose,
+                setNewTask,
+                team,
+                setNotification,
+              })
+            }
+            disabled={!newTask.title || !newTask.description || !newTask.dueDate}
+            className={`bg-[#FF9090] hover:bg-[#FF6F6F] hover:scale-[1.03] text-white px-6 py-2 rounded-md text-sm font-medium shadow transition-all duration-300
+              ${(!newTask.title || !newTask.description || !newTask.dueDate) && 'opacity-50 cursor-not-allowed'}`}
+          >
+            Done
+          </button>
         </div>
       </motion.div>
     </div>

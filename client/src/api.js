@@ -23,7 +23,7 @@ api.interceptors.response.use(
     if ((status === 401 || status === 403) && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        console.log('🔁 Trying to refresh token...');
+        //console.log('🔁 Trying to refresh token...');
 
         // 🛠 Use plain axios here instead of api to avoid interceptor
         const refreshResponse = await axios.get(
@@ -36,7 +36,7 @@ api.interceptors.response.use(
 
         localStorage.setItem('token', newToken);
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
-        console.log('✅ Token refreshed via interceptor');
+        //console.log('✅ Token refreshed via interceptor');
 
         return api(originalRequest); // retry original request
       } catch (err) {

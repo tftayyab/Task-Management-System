@@ -66,11 +66,7 @@ function Dashboard() {
         <div className="flex-1 flex justify-center sm:justify-end sm:mr-5 px-4 pb-6">
           {!isMenuOpen && (
             <div className="relative z-0 border sm:h-[76vh] border-[rgba(161,163,171,0.63)] shadow-lg rounded-2xl p-4 flex flex-col sm:flex-row sm:gap-6 sm:w-[150vh] w-[40vh] bg-white transition-all duration-300">
-              {/* Left side */}
-              <div className="flex justify-center sm:justify-start h-full w-full">
-                <TasksOverTimeChart tasks={tasks} />
-              </div>
-
+              
               {/* Right side */}
               <div className="order-1 sm:order-2 w-full sm:w-[22rem] flex flex-col gap-6 mt-6 sm:mt-0">
                 <div className="flex justify-center sm:justify-start">
@@ -81,6 +77,12 @@ function Dashboard() {
                   <TasksPerTeamChart tasks={tasks} teams={teams} />
                 </div>
               </div>
+
+              {/* Left side */}
+              <div className="flex justify-center sm:justify-start h-[40vh] sm:h-full w-full">
+                <TasksOverTimeChart tasks={tasks} />
+              </div>
+
             </div>
           )}
         </div>

@@ -8,8 +8,7 @@ const { getIO } = require('../socket');
 const router = express.Router();
 router.use(verifyToken);
 
-// ✅ POST /teams - Create or update a team
-// ✅ POST /teams - Create or update a team
+// POST /teams - Create or update a team
 router.post(
   "/",
   asyncWrapper(async (req, res) => {
@@ -35,7 +34,6 @@ router.post(
 
     const io = getIO();
 
-    // 1. Emit to all usernames in the team
     usernames.forEach(username => {
       io.to(username).emit('team_added', {
         message: `You've been added to team "${team.teamName}"`,
@@ -43,7 +41,6 @@ router.post(
       });
     });
 
-    // 2. Emit to team room (if anyone else is already in it)
     io.to(team._id.toString()).emit('team_updated', {
       message: `Team "${team.teamName}" was updated`,
       teamId: team._id,
@@ -53,7 +50,7 @@ router.post(
   })
 );
 
-// ✅ DELETE /teams/:id - Delete a team (only owner can delete)
+// DELETE /teams/:id - Delete a team (only owner can delete)
 router.delete(
   "/:id",
   asyncWrapper(async (req, res) => {
@@ -69,10 +66,8 @@ router.delete(
       return res.status(403).json({ message: "Only the team owner can delete this team" });
     }
 
-    // ✅ Delete team
     await Team.findByIdAndDelete(teamId);
 
-    // ✅ Remove teamId from all tasks' teamIds array
     await Task.updateMany(
       { teamIds: teamId },
       { $pull: { teamIds: teamId } }
@@ -82,7 +77,7 @@ router.delete(
   })
 );
 
-// ✅ PUT /teams/:id - Edit a team (name + members)
+// PUT /teams/:id - Edit a team (name + members)
 router.put(
   "/:id",
   asyncWrapper(async (req, res) => {
@@ -90,7 +85,6 @@ router.put(
     const { teamName, usernames = [] } = req.body;
     const username = req.user.username;
 
-    // ✅ Validate inputs
     if (!teamName || typeof teamName !== "string") {
       return res.status(400).json({ message: "Team name is required" });
     }
@@ -99,7 +93,6 @@ router.put(
       return res.status(400).json({ message: "Max 5 members allowed" });
     }
 
-    // 🔒 Make sure team exists and belongs to the user
     const team = await Team.findById(teamId);
     if (!team) {
       return res.status(404).json({ message: "Team not found" });
@@ -109,7 +102,6 @@ router.put(
       return res.status(403).json({ message: "You cannot edit this team" });
     }
 
-    // ✅ Update team
     team.teamName = teamName;
     team.shareWith = usernames;
     await team.save();
@@ -117,7 +109,5 @@ router.put(
     res.json({ message: "Team updated successfully", team });
   })
 );
-
-
 
 module.exports = router;

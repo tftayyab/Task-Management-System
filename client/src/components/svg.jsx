@@ -10,23 +10,23 @@ export const FirstNameIcon = ({ className = "w-6 h-6" }) => (
   >
     <path
       d="M15 9.375C17.4162 9.375 19.375 7.74271 19.375 5.72917C19.375 3.71563 17.4162 2.08334 15 2.08334C12.5838 2.08334 10.625 3.71563 10.625 5.72917C10.625 7.74271 12.5838 9.375 15 9.375Z"
-      fill="black"
-      stroke="black"
+      fill="#5e6873"
+      stroke="#5e6873"
       strokeWidth="4"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <path
       d="M2.5 21.3542C2.5 16.7516 7.53688 13.0208 13.75 13.0208"
-      stroke="black"
+      stroke="#5e6873"
       strokeWidth="4"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <path
       d="M19.375 21.875L25.625 16.6667L23.125 14.5833L16.875 19.7917V21.875H19.375Z"
-      fill="black"
-      stroke="black"
+      fill="#5e6873"
+      stroke="#5e6873"
       strokeWidth="4"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -43,21 +43,21 @@ export const LastNameIcon = ({ className = "w-6 h-6" }) => (
   >
     <path
       d="M15 9.75C17.4162 9.75 19.375 8.05242 19.375 5.95834C19.375 3.86426 17.4162 2.16667 15 2.16667C12.5838 2.16667 10.625 3.86426 10.625 5.95834C10.625 8.05242 12.5838 9.75 15 9.75Z"
-      stroke="black"
+      stroke="#5e6873"
       strokeWidth="4"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <path
       d="M2.5 22.2083C2.5 17.4216 7.53688 13.5417 13.75 13.5417"
-      stroke="black"
+      stroke="#5e6873"
       strokeWidth="4"
       strokeLinecap="round"
       strokeLinejoin="round"
     />
     <path
       d="M19.375 22.75L25.625 17.3333L23.125 15.1667L16.875 20.5833V22.75H19.375Z"
-      stroke="black"
+      stroke="#5e6873"
       strokeWidth="4"
       strokeLinecap="round"
       strokeLinejoin="round"
@@ -75,7 +75,7 @@ export const UsernameIcon = ({ className = "w-6 h-6" }) => (
   >
     <path
       d="M14.4999 4.5C15.7818 4.5 17.0112 4.97411 17.9176 5.81802C18.824 6.66193 19.3333 7.80653 19.3333 9C19.3333 10.1935 18.824 11.3381 17.9176 12.182C17.0112 13.0259 15.7818 13.5 14.4999 13.5C13.218 13.5 11.9887 13.0259 11.0822 12.182C10.1758 11.3381 9.66659 10.1935 9.66659 9C9.66659 7.80653 10.1758 6.66193 11.0822 5.81802C11.9887 4.97411 13.218 4.5 14.4999 4.5ZM14.4999 15.75C19.8408 15.75 24.1666 17.7637 24.1666 20.25V22.5H4.83325V20.25C4.83325 17.7637 9.15909 15.75 14.4999 15.75Z"
-      fill="#212427"
+      fill="#5e6873"
     />
   </svg>
 );
@@ -89,7 +89,7 @@ export const EmailIcon = ({ className = "w-6 h-6" }) => (
   >
     <path
       d="M21.6666 4.5H4.33329C3.14163 4.5 2.17746 5.5125 2.17746 6.75L2.16663 20.25C2.16663 21.4875 3.14163 22.5 4.33329 22.5H21.6666C22.8583 22.5 23.8333 21.4875 23.8333 20.25V6.75C23.8333 5.5125 22.8583 4.5 21.6666 4.5ZM21.6666 9L13 14.625L4.33329 9V6.75L13 12.375L21.6666 6.75V9Z"
-      fill="black"
+      fill="#5e6873"
     />
   </svg>
 );
@@ -98,7 +98,7 @@ export const PasswordIcon = ({ className = "w-6 h-6 text-[#212427]" }) => (
   <svg
     className={className}
     viewBox="0 0 24 24"
-    fill="currentColor"
+    fill="#5e6873"
     xmlns="http://www.w3.org/2000/svg"
   >
     <path d="M12 1a5 5 0 00-5 5v4H6a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V12a2 2 0 00-2-2h-1V6a5 5 0 00-5-5zm-3 5a3 3 0 116 0v4H9V6zm3 7a1.5 1.5 0 11-.001 3.001A1.5 1.5 0 0112 13z" />
@@ -120,18 +120,20 @@ export const ConfirmPasswordIcon = ({ className = "w-6 h-6 text-[#212427]" }) =>
 export const EyeOffIcon = ({ className = "w-6 h-6 text-gray-600" }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className={className}
     fill="none"
     viewBox="0 0 24 24"
+    strokeWidth={1.5}
     stroke="currentColor"
+    className={className}
   >
     <path
       strokeLinecap="round"
       strokeLinejoin="round"
-      strokeWidth={2}
-      d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-4.477-10-10 
-         0-1.176.203-2.3.575-3.325m4.045 1.575A3.978 3.978 0 0112 7c2.21 0 
-         4 1.79 4 4a3.978 3.978 0 01-1.825 3.375M15 15l6 6"
+      d="M3.98 8.223A10.477 10.477 0 001.5 12c1.636 4.06 5.735 7.5 10.5 7.5 
+         1.75 0 3.4-.402 4.886-1.12M6.32 6.329A10.45 10.45 0 0112 4.5c4.764 0 
+         8.864 3.44 10.5 7.5a10.457 10.457 0 01-2.294 3.592M6.32 6.329L3 
+         3m3.32 3.329l12.36 12.36M14.121 14.121A3 3 0 019.88 
+         9.88m4.242 4.242L9.88 9.88"
     />
   </svg>
 );

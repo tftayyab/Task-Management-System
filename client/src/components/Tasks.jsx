@@ -82,7 +82,7 @@ const filtered = Array.from(
                 <p className="text-[#747474] dark:text-gray-400 text-sm mt-2 break-words">{task.description}</p>
 
                 {/* Action Buttons */}
-                <div className="absolute bottom-4 right-4 flex items-center gap-4 opacity-80 group-hover:opacity-100 transition-opacity">
+                <div className="sm:absolute sm:bottom-4 sm:right-4 justify-end sm:mt-0 mt-18 flex sm:items-center gap-4 opacity-80 group-hover:opacity-100 transition-opacity">
                   <button
                     type="button"
                     className="hover:text-red-500 hover:scale-110 transition-transform"

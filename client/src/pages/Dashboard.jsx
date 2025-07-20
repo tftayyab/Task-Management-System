@@ -52,7 +52,7 @@ function Dashboard() {
 
   return (
     <motion.div
-      className="min-h-screen h-screen bg-white dark:bg-[#121212] flex flex-col overflow-hidden text-black dark:text-white"
+      className="min-h-screen sm:h-screen h-full bg-white dark:bg-[#121212] flex flex-col overflow-hidden text-black dark:text-white"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
@@ -73,7 +73,7 @@ function Dashboard() {
                   <TaskStatusCard tasks={tasks} />
                 </div>
 
-                <div className="flex justify-center sm:justify-start h-[40vh] w-full">
+                <div className="flex justify-center sm:justify-start h-full mb-2 sm:mb-0 w-full">
                   <TasksPerTeamChart tasks={tasks} teams={teams} />
                 </div>
               </div>

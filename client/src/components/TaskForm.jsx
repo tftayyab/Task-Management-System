@@ -29,9 +29,15 @@ function TaskForm({
   const [loadingTitle, setLoadingTitle] = useState(false);
   const [loadingDesc, setLoadingDesc] = useState(false);
   const [showReload, setShowReload] = useState({ title: false, description: false });
+  const [showTooltip, setShowTooltip] = useState({
+  title: true,
+});
+
 
   useEffect(() => {
     setOriginalTitle(document.title);
+
+
 
     if (mode === 'edit' && taskData) {
       const formattedDate = taskData.dueDate?.slice(0, 10);
@@ -47,8 +53,13 @@ function TaskForm({
     } else {
       document.title = 'Add Task';
     }
+    // Hide tooltips after 5 seconds when form opens
+    const timeout = setTimeout(() => {
+      setShowTooltip({ title: false, description: false });
+    }, 3000);
 
     return () => {
+      clearTimeout(timeout);
       document.title = originalTitle;
       localStorage.removeItem('originalTitle');
       localStorage.removeItem('originalDescription');
@@ -97,21 +108,23 @@ function TaskForm({
             name="title"
             value={newTask.title}
             onChange={handleUserInput}
-            className="w-full pr-40 rounded-md border border-[#A1A3AB] dark:border-[#444] px-3 py-2 text-sm bg-white dark:bg-[#2a2a2a] text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500
+            className="w-full pr-8 rounded-md border border-[#A1A3AB] dark:border-[#444] px-3 py-2 text-sm bg-white dark:bg-[#2a2a2a] text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500
               hover:border-[#FFAFAF] focus:border-[#F24E1E]
               focus:outline-none focus:ring-1 focus:ring-[#F24E1E]
               transition-all"
           />
           <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-2 items-center">
-            {showReload.title && (
-              <button
-                type="button"
-                onClick={() => handleReload('title', setNewTask)}
-                className="text-blue-500 text-xs hover:underline"
-              >
-                🔄
-              </button>
-            )}
+          {showReload.title && (
+            <button
+              type="button"
+              onClick={() => handleReload('title', setNewTask)}
+              className="text-blue-500 text-xl hover:underline"
+            >
+              🔄
+            </button>
+          )}
+
+          <div className="relative">
             <button
               type="button"
               onClick={() =>
@@ -124,11 +137,24 @@ function TaskForm({
                   setLoadingDesc,
                 })
               }
-              className="text-[#F24E1E] hover:scale-110 transition-transform"
+              className="text-[#F24E1E] text-xl hover:scale-110 transition-transform"
             >
-              {loadingTitle ? '⏳' : 'Write with AI ✨'}
+              {loadingTitle ? '⏳' : '✨'}
             </button>
+
+            {showTooltip.title && (
+              <motion.div
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                transition={{ duration: 0.3 }}
+                className="absolute whitespace-nowrap top-9 right-1 text-xs text-white bg-[#F24E1E] px-2 py-1 rounded shadow z-10"
+              >
+                Edit with AI
+              </motion.div>
+            )}
           </div>
+        </div>
         </div>
       </div>
 
@@ -141,7 +167,7 @@ function TaskForm({
             value={newTask.description}
             onChange={handleUserInput}
             rows="4"
-            className="w-full pr-40 rounded-md border border-[#A1A3AB] dark:border-[#444] px-3 py-2 text-sm resize-none bg-white dark:bg-[#2a2a2a] text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500
+            className="w-full pr-8 rounded-md border border-[#A1A3AB] dark:border-[#444] px-3 py-2 text-sm resize-none bg-white dark:bg-[#2a2a2a] text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500
               hover:border-[#FFAFAF] focus:border-[#F24E1E]
               focus:outline-none focus:ring-1 focus:ring-[#F24E1E]
               transition-all"
@@ -151,7 +177,7 @@ function TaskForm({
               <button
                 type="button"
                 onClick={() => handleReload('description', setNewTask)}
-                className="text-blue-500 text-xs hover:underline"
+                className="text-blue-500 text-xl hover:underline"
               >
                 🔄
               </button>
@@ -168,9 +194,9 @@ function TaskForm({
                   setLoadingDesc,
                 })
               }
-              className="text-[#F24E1E] hover:scale-110 transition-transform"
+              className="text-[#F24E1E] hover:scale-110 text-xl transition-transform"
             >
-              {loadingDesc ? '⏳' : 'Write with AI ✨'}
+              {loadingDesc ? '⏳' : '✨'}
             </button>
           </div>
         </div>

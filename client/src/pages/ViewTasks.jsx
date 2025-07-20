@@ -102,7 +102,7 @@ function ViewTasks() {
               {/* 🔷 Right Side: Task Preview */}
               <div className="order-1 sm:order-2 w-full flex flex-col gap-6 mt-6 sm:mt-0">
                 {selectedTaskId && (
-                  <div className="h-[31rem] bg-[#F5F8FF] dark:bg-[#2a2a2a] p-4 rounded-xl sm:mt-0 -mt-5 border border-[rgba(161,163,171,0.63)] dark:border-gray-700 shadow overflow-y-auto scrollbar-hide">
+                  <div className="min-h-[31rem] sm:h-[31rem] sm:min-h-0 bg-[#F5F8FF] dark:bg-[#2a2a2a] p-4 rounded-xl sm:mt-0 -mt-5 border border-[rgba(161,163,171,0.63)] dark:border-gray-700 shadow overflow-y-auto scrollbar-hide">
                     <Tasks
                       tasks={tasks}
                       task_id={selectedTaskId}

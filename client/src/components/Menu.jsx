@@ -45,7 +45,7 @@ function Menu({ onClose, toggleDarkMode = () => {}, darkMode = false }) {
       </AnimatePresence>
 
       {/* Static menu drawer (no animation) */}
-      <div className="fixed sm:top-29 left-0 w-[95%] z-50 h-full sm:w-[20rem] sm:h-[80vh] bg-[#1c1c1e] rounded-tr-2xl rounded-br-2xl shadow-2xl flex flex-col justify-between">
+      <div className="fixed sm:bottom-0 left-0 w-[95%] z-50 h-full sm:w-[20rem] sm:h-[80vh] bg-[#1c1c1e] rounded-tr-2xl rounded-br-2xl shadow-2xl flex flex-col justify-between">
         {/* Top */}
         <div className="p-6 flex flex-col gap-6">
           <div className="text-white text-center mt-4 space-y-1">
